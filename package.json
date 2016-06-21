@@ -1,0 +1,28 @@
+{
+  "name": "cs310design",
+  "description": "Stub project",
+  "homepage": "https://ubc.ca",
+  "author": "N/A",
+  "contributors": "N/A",
+  "license": "private",
+  "repository": "",
+  "bugs": "",
+  "keywords": [],
+  "version": "0.0.1",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.4",
+    "mocha": "^2.5.3",
+    "typescript": "^1.8.7"
+  },
+  "scripts": {
+    "build": "tsc",
+	"test": "mocha -c",
+    "cover": "istanbul cover _mocha",
+    "start": "node src/App.js"
+
+  },
+  "dependencies": {
+    "restify": "^4.0.3"
+  }
+}
