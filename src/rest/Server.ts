@@ -18,44 +18,66 @@ export default class Server {
 }
 */
 
+
+/// <reference path="../../lib/corejs.d.ts" />
+
 import restify = require('restify');
 import Log from "../Util";
+import RouteHandler from './RouteHandler';
 
 
 export default class Server {
 
     private port:number;
+    private rest:restify.Server;
 
     constructor(port:number) {
-        console.log("Server::<init>( " + port + " )");
+        Log.info("Server::<init>( " + port + " )");
         this.port = port;
-        this.start();
     }
 
-    private start():void {
-
-        var api = restify.createServer({
-            name: 'classPortal'
+    public stop():Promise<boolean> {
+        Log.info('Server::close()');
+        let that = this;
+        return new Promise(function (fulfill, reject) {
+            that.rest.close(function () {
+                fulfill(true);
+            })
         });
+    }
 
-        //restify.CORS.ALLOW_HEADERS.push('authorization');
-        //api.use(restify.CORS());
-        //api.pre(restify.pre.sanitizePath());
-        //api.use(restify.acceptParser(api.acceptable));
-        api.use(restify.bodyParser());
-        // api.use(restify.queryParser());
-        //api.use(restify.authorizationParser());
-        //api.use(restify.fullResponse());
-
-        // clear; curl -is  http://localhost:3031/echo/foo
-        // api.get('/echo/:val', portal.rest.RouteHandler.getEcho);
-
-        // clear; curl -is -X PUT -d '{"key":"val","key2":"val2"}' http://localhost:3031/say/randomKey67
-        // api.put('/say/:val', portal.rest.RouteHandler.putSay);
+    public start():Promise<boolean> {
 
         let that = this;
-        api.listen(this.port, function () {
-            Log.info('Server::start() - restify listening on port: ' + that.port + ' at: ' + api.url);
+        return new Promise(function (fulfill, reject) {
+            try {
+                that.rest = restify.createServer({
+                    name: 'classPortal'
+                });
+
+                //restify.CORS.ALLOW_HEADERS.push('authorization');
+                //rest.use(restify.CORS());
+                //rest.pre(restify.pre.sanitizePath());
+                //rest.use(restify.acceptParser(rest.acceptable));
+                that.rest.use(restify.bodyParser());
+                // rest.use(restify.queryParser());
+                //rest.use(restify.authorizationParser());
+                //rest.use(restify.fullResponse());
+
+                // clear; curl -is  http://localhost:4321/echo/foo
+                that.rest.get('/echo/:message', RouteHandler.getEcho);
+
+                // clear; curl -is -X PUT -d '{"key":"val","key2":"val2"}' http://localhost:3031/say/randomKey67
+                // rest.put('/say/:val', portal.rest.RouteHandler.putSay);
+
+
+                that.rest.listen(that.port, function () {
+                    Log.info('Server::start() - restify listening: ' + that.rest.url);
+                    fulfill(true);
+                });
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 }

@@ -8,7 +8,6 @@ import Grade from '../model/Grade';
 import Student from '../model/Student';
 import Team from '../model/Team';
 
-// module portal.store {
 export interface Store {
 
     getAdmin(id:string):Admin;
@@ -48,4 +47,3 @@ export interface Store {
     saveGrade(grade:Grade):void;
 }
 export default Store;
-//}

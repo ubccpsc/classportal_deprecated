@@ -11,6 +11,7 @@ namespace portal {
         initServer(port:number) {
             Log.info('App::initServer( ' + port + ' ) - start');
             let s = new Server(port);
+            s.start();
         }
     }
 }
