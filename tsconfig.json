@@ -8,11 +8,13 @@
     "sourceMap": true
   },
   "filesGlob": [
+    "/typings/index.d.ts",
     "/src/**/*.ts",
     "/test/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "bower_components"
+    "bower_components",
+    "lib/"
   ]
 }

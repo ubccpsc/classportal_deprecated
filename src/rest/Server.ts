@@ -3,23 +3,23 @@
  */
 
 /*
-export default class Server {
-    private port:number;
+ export default class Server {
+ private port:number;
 
-    constructor(port:number) {
-        console.log("Server::<init>( " + port + " )");
-        this.port = port;
-        this.start();
-    }
+ constructor(port:number) {
+ console.log("Server::<init>( " + port + " )");
+ this.port = port;
+ this.start();
+ }
 
-    private start():void {
+ private start():void {
 
-    }
-}
-*/
-
-
-/// <reference path="../../lib/corejs.d.ts" />
+ }
+ }
+ */
+/*
+ /// <reference path="../../lib/corejs.d.ts" />
+ */
 
 import restify = require('restify');
 import Log from "../Util";

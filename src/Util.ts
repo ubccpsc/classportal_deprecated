@@ -26,7 +26,7 @@ export default class Log {
     }
 
     public static test(msg:string) {
-        console.error("<TEST> " + new Date().toLocaleString() + ": " + msg);
+        console.log("<X> " + new Date().toLocaleString() + ": " + msg);
     }
 
 }

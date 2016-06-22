@@ -8,3 +8,8 @@ NPM run scripts have been set up for most common tasks:
 * Test: ```npm run test``` (or ```npm test```)
 * Test + coverage: ```npm run cover``` (HTML reports in ```./coverage/lcov-report/index.html```)
 * Run: ```npm run start``` (or ```npm start```)
+
+
+must be global:
+
+* mocha
