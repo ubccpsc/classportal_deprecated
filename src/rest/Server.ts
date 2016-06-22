@@ -70,6 +70,8 @@ export default class Server {
                 // clear; curl -is -X PUT -d '{"key":"val","key2":"val2"}' http://localhost:3031/say/randomKey67
                 // rest.put('/say/:val', portal.rest.RouteHandler.putSay);
 
+                // clear; curl -is  http://localhost:4321/students
+                that.rest.get('/students', RouteHandler.getStudents);
 
                 that.rest.listen(that.port, function () {
                     Log.info('Server::start() - restify listening: ' + that.rest.url);

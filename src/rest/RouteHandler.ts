@@ -4,7 +4,9 @@
 
 import restify = require('restify');
 
+import MemoryStore from '../store/MemoryStore';
 import EchoController from '../controller/EchoController';
+
 import Log from '../Util';
 
 export default class RouteHandler {
@@ -12,7 +14,7 @@ export default class RouteHandler {
     static getEcho(req:restify.Request, res:restify.Response, next:restify.Next) {
         Log.trace('RoutHandler::getEcho(..) - params: ' + JSON.stringify(req.params));
 
-        if (typeof req.params.message !== 'undefined') {
+        if (typeof req.params.message !== 'undefined' && req.params.message.length > 0) {
             let val = req.params.message;
             let ret = EchoController.echo(val);
             res.json(200, {msg: ret});
@@ -23,7 +25,20 @@ export default class RouteHandler {
         return next();
     }
 
-    static putSay(req:restify.Request, res:restify.Response, next:restify.Next) {
+
+    static getStudents(req:restify.Request, res:restify.Response, next:restify.Next) {
+        Log.trace('RoutHandler::getStudents(..) - params: ' + JSON.stringify(req.params));
+
+        // TODO: make sure authorized?
+        
+        let store = new MemoryStore();
+        store.createData();
+        res.json(200, store.getStudents());
+        return next();
+    }
+
+
+    staticputSay(req:restify.Request, res:restify.Response, next:restify.Next) {
         Log.trace('RouteHandler::putSay(..) - params: ' + JSON.stringify(req.params));
         try {
             // validate params

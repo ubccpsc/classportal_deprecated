@@ -14,6 +14,8 @@ var request = require('request-promise');
 
 describe("Echo Service", function () {
 
+    const url = 'http://localhost:4321/';
+
     var server:Server;
     beforeEach(function (done) {
         server = new Server(4321);
@@ -40,7 +42,7 @@ describe("Echo Service", function () {
         let msg = 'hellooooo';
         return request({
             method: 'GET',
-            uri: 'http://localhost:4321/echo/' + msg,
+            uri: url + 'echo/' + msg,
             json: true
         }).then(function (obj:any) {
             Log.test('Echo response: ' + obj.msg);
@@ -48,16 +50,41 @@ describe("Echo Service", function () {
         });
     });
 
-    it('Should not be able to hit the wrong port', function () {
-        let msg = 'hellooooo';
+    it('Should not be able to echo without a msg', function () {
+        let thenExecuted = false;
         return request({
             method: 'GET',
-            uri: 'http://localhost:4322/echo/' + msg,
+            uri: url + 'echo/',
             json: true
         }).then(function (obj:any) {
-            throw new Error('should not happen');
-        }, function (err:any) {
+            Log.test("THEN");
+            thenExecuted = true;
+            expect(thenExecuted).to.equal(false);
+            // throw new Error('should not happen');
+        }).catch(function (err:any) {
+            Log.test("CATCH");
             Log.info("Expected error: " + err);
+            expect(thenExecuted).to.equal(false);
+            expect(err).not.to.equal(null);
+        });
+    });
+
+
+    it('Should not be able to hit the wrong port', function () {
+        let thenExecuted = false;
+        return request({
+            method: 'GET',
+            uri: 'http://localhost:4322/echo/foo',
+            json: true
+        }).then(function (obj:any) {
+            Log.test("THEN");
+            thenExecuted = true;
+            expect(thenExecuted).to.equal(false);
+            // throw new Error('should not happen');
+        }).catch(function (err:any) {
+            Log.test("CATCH");
+            Log.info("Expected error: " + err);
+            expect(thenExecuted).to.equal(false);
             expect(err).not.to.equal(null);
         });
     });
