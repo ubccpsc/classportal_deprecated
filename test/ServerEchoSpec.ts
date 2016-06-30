@@ -2,22 +2,26 @@
  * Created by rtholmes on 15-10-31.
  */
 
-// overview:
-// https://www.sitepoint.com/promises-in-javascript-unit-tests-the-definitive-guide/
-// specific:
-// http://catfish.life/testing-promises-with-mocha/
+
+// https://www.npmjs.com/package/icedfrisby
+// https://httpstatuses.com/
+
 import Server from '../src/rest/Server';
 import Log from "../src/Util";
 
 var expect = require('chai').expect;
-var request = require('request-promise');
+
+var frisby = require('icedfrisby');
+var Joi = require('joi');
+
 
 describe("Echo Service", function () {
 
-    const url = 'http://localhost:4321/';
-
+    const URL = 'http://localhost:4321/';
     var server:Server;
+
     beforeEach(function (done) {
+
         server = new Server(4321);
         server.start().then(function (val:boolean) {
             Log.test("EchoService::beforeEach() - started: " + val);
@@ -38,57 +42,48 @@ describe("Echo Service", function () {
         });
     });
 
-    it('Should be able to echo', function () {
-        let msg = 'hellooooo';
-        return request({
-            method: 'GET',
-            uri: url + 'echo/' + msg,
-            json: true
-        }).then(function (obj:any) {
-            Log.test('Echo response: ' + obj.msg);
-            expect(obj.msg).to.equal(msg + '...' + msg);
-        });
+
+    frisby.globalSetup({ // globalSetup is for ALL requests
+        request: {
+            // headers: { 'X-Auth-Token': 'fa8426a0-8eaf-4d22-8e13-7c1b16a9370c' }
+            inspectOnFailure: true // or false
+        }
     });
 
-    it('Should not be able to echo without a msg', function () {
-        let thenExecuted = false;
-        return request({
-            method: 'GET',
-            uri: url + 'echo/',
-            json: true
-        }).then(function (obj:any) {
-            Log.test("THEN");
-            thenExecuted = true;
-            expect(thenExecuted).to.equal(false);
-            // throw new Error('should not happen');
-        }).catch(function (err:any) {
-            Log.test("CATCH");
-            Log.info("Expected error: " + err);
-            expect(thenExecuted).to.equal(false);
-            expect(err).not.to.equal(null);
-        });
-    });
+    Log.info('frisby create');
+
+    frisby.create('Should not be able to echo without a msg')
+        .get(URL + 'echo/foo')
+        .inspectRequest('Request: ')
+        .inspectStatus('Response status: ')
+        .inspectBody('Response body: ')
+        .expectStatus(200)
+        .expectJSONTypes({
+            msg: Joi.string()
+        }).expectJSON({
+        msg: 'foo...foo'
+    }).toss();
+
+    frisby.create('Should not be able to echo without a msg')
+        .get(URL + 'echo/')
+        .inspectRequest('Request: ')
+        .inspectStatus('Response status: ')
+        .inspectBody('Response body: ')
+        .expectStatus(400)
+        .expectJSONTypes({
+            error: Joi.string()
+        }).afterJSON(function (json:any) {
+        expect(json.error.length).to.be.greaterThan(0);
+    }).toss();
 
 
-    it('Should not be able to hit the wrong port', function () {
-        let thenExecuted = false;
-        return request({
-            method: 'GET',
-            uri: 'http://localhost:4322/echo/foo',
-            json: true
-        }).then(function (obj:any) {
-            Log.test("THEN");
-            thenExecuted = true;
-            expect(thenExecuted).to.equal(false);
-            // throw new Error('should not happen');
-        }).catch(function (err:any) {
-            Log.test("CATCH");
-            Log.info("Expected error: " + err);
-            expect(thenExecuted).to.equal(false);
-            expect(err).not.to.equal(null);
-        });
-    });
-
+    frisby.create('Should not be able to hit the wrong port')
+        .get('http://localhost:4322/echo/foo')
+        .inspectRequest('Request: ')
+        //.inspectStatus('Response status: ')
+        //.inspectBody('Response body: ')
+        .expectStatus(599)
+        .toss();
 
 });
 

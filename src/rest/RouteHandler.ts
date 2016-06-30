@@ -19,7 +19,8 @@ export default class RouteHandler {
             let ret = EchoController.echo(val);
             res.json(200, {msg: ret});
         } else {
-            res.send(403);
+            res.json(400, {error: 'No message provided'});
+            //res.send(403);
         }
 
         return next();
@@ -30,7 +31,7 @@ export default class RouteHandler {
         Log.trace('RoutHandler::getStudents(..) - params: ' + JSON.stringify(req.params));
 
         // TODO: make sure authorized?
-        
+
         let store = new MemoryStore();
         store.createData();
         res.json(200, store.getStudents());

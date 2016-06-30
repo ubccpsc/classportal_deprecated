@@ -10,6 +10,8 @@ NPM run scripts have been set up for most common tasks:
 * Run: ```npm run start``` (or ```npm start```)
 
 
-must be global:
+must be global?
 
 * mocha
+* jasmine-node
+* typescript

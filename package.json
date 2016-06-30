@@ -11,8 +11,13 @@
   "version": "0.0.1",
   "devDependencies": {
     "chai": "^3.5.0",
+    "frisby": "^0.8.5",
     "http": "0.0.0",
+    "icedfrisby": "^0.2.4",
     "istanbul": "^0.4.4",
+    "jasmine-json-test-reporter": "^1.0.0-beta",
+    "jasmine-reporters": "^2.0.8",
+    "joi": "^8.4.2",
     "mocha": "^2.5.3",
     "request-promise": "^3.0.0",
     "typescript": "^1.8.7",

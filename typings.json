@@ -4,6 +4,8 @@
     "chai": "registry:dt/chai#3.4.0+20160601211834",
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",
     "form-data": "registry:dt/form-data#0.0.0+20160316155526",
+    "jasmine": "registry:dt/jasmine#2.2.0+20160621224255",
+    "jasmine-node": "registry:dt/jasmine-node#1.14.5+20160316155526",
     "mocha": "registry:dt/mocha#2.2.5+20160619032855",
     "node": "registry:dt/node#6.0.0+20160621231320",
     "request": "registry:dt/request#0.0.0+20160524135346",
