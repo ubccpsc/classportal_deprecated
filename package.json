@@ -1,7 +1,7 @@
 {
-  "name": "cs310design",
-  "description": "Stub project",
-  "homepage": "https://ubc.ca",
+  "name": "classportalserver",
+  "description": "Server portion of the class portal",
+  "homepage": "https://cs.ubc.ca",
   "author": "N/A",
   "contributors": "N/A",
   "license": "private",

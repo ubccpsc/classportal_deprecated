@@ -28,20 +28,18 @@ describe("MemoryStore", function () {
     var store:Store;
 
     beforeEach(function () {
-
         store = new MemoryStore();
     });
 
     it("Should be able to get a valid admin", function () {
         let admin = store.getAdmin('prof@gmail.com');
         expect(admin).not.to.equal(null);
-        expect(admin.getName()).to.equal('prof');
-        expect(admin.getTeams().length).to.equal(0);
+        expect(admin.name).to.equal('prof');
     });
 
     it("Should be able to get a valid admin with students", function () {
         let admin = store.getAdmin('ta1@310.com');
-        expect(admin.getTeams().length).to.equal(1);
+        expect(admin.teams.length).to.equal(1);
     });
 
     it("Should not be able to get an invalid admin", function () {
@@ -58,12 +56,12 @@ describe("MemoryStore", function () {
 
         admin = store.getAdmin('prof2@gmail.com');
         expect(admin).not.to.equal(null);
-        expect(admin.getName()).to.equal('p2');
+        expect(admin.name).to.equal('p2');
 
         admin = new Admin('prof2@gmail.com', 'p2 name', null);
         store.saveAdmin(admin);
         admin = store.getAdmin('prof2@gmail.com');
-        expect(admin.getName()).to.equal('p2 name');
+        expect(admin.name).to.equal('p2 name');
     });
 
 
@@ -75,7 +73,7 @@ describe("MemoryStore", function () {
     it("Should be able to get a valid student", function () {
         let student = store.getStudent('a1a1');
         expect(student).not.to.equal(null);
-        expect(student.getName()).to.equal('a1');
+        expect(student.name).to.equal('a1');
     });
 
     it("Should not be able to get an invalid student", function () {
@@ -91,8 +89,8 @@ describe("MemoryStore", function () {
     it("Should be able to get a valid team", function () {
         let team = store.getTeam('t1');
         expect(team).not.to.equal(null);
-        expect(team.getName()).to.equal('Team t1');
-        expect(team.getMembers()).not.to.equal(null);
+        expect(team.name).to.equal('Team t1');
+        expect(team.members).not.to.equal(null);
     });
 
     it("Should not be able to get an invalid team", function () {

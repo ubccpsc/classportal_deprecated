@@ -2,7 +2,6 @@
  * Created by rtholmes on 2016-06-19.
  */
 
-// module portal {
 export default class Deliverable {
 
     public id:string;
@@ -10,7 +9,8 @@ export default class Deliverable {
     public description:string;
     public url:string;
     public open:boolean;
-    public isTeam:boolean
+    public isTeam:boolean;
+    public uploadKind:string; // null means no upload required, options: [null, 'pdf', 'zip']
 
     constructor(deliverableId:string, name:string, description:string, url:string, isTeam:boolean, open:boolean) {
         this.id = deliverableId;
@@ -19,7 +19,7 @@ export default class Deliverable {
         this.url = url;
         this.isTeam = isTeam;
         this.open = open;
+        this.uploadKind = null;
     }
 
 }
-//}

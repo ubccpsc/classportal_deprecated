@@ -10,9 +10,9 @@ import Student from './Student';
 //module portal {
 export default class Team {
 
-    private id:string;
-    private name:string;
-    private members:Student[] = [];
+    public id:string;
+    public name:string;
+    public members:Student[] = [];
 
     constructor(id:string, name:string, members:Student[]) {
         this.id = id;
@@ -20,6 +20,7 @@ export default class Team {
         this.members = members;
     }
 
+    /*
     getName():string {
         return this.name;
     }
@@ -31,5 +32,9 @@ export default class Team {
     getId():string {
         return this.id;
     }
+    */
+
 }
 //}
+
+

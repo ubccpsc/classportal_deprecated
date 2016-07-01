@@ -16,8 +16,8 @@ export default class Admin {
      *
      * 310: we will use github id
      */
-    private id:string;
-    private name:string;
+    public id:string;
+    public name:string;
 
 
     /**
@@ -25,7 +25,7 @@ export default class Admin {
      *
      * @type {Array}
      */
-    private teams:Team[] = [];
+    public teams:Team[] = [];
 
     constructor(id:string, name:string, teams:Team[]) {
         this.id = id;
@@ -36,6 +36,7 @@ export default class Admin {
         this.teams = teams;
     }
 
+    /*
     getTeams():Team[] {
         return this.teams;
     }
@@ -47,5 +48,6 @@ export default class Admin {
     getId():string {
         return this.id;
     }
+    */
 }
 //}

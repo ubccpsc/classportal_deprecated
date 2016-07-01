@@ -10,9 +10,9 @@ export default class Student {
      *
      * 310: we will use CS lab id
      */
-    private id:string;
-    private name:string;
-    private studentNumber:number;
+    public id:string;
+    public name:string;
+    public studentNumber:number;
 
     /**
      * Alternate id. Optional.
@@ -42,17 +42,18 @@ export default class Student {
      return this.team;
      }
      */
+    /*
+        getName():string {
+            return this.name;
+        }
 
-    getName():string {
-        return this.name;
-    }
+        getAltId():string {
+            return this.altId;
+        }
 
-    getAltId():string {
-        return this.altId;
-    }
-
-    getId():string {
-        return this.id;
-    }
+        getId():string {
+            return this.id;
+        }
+        */
 }
 // }
