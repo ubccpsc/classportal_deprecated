@@ -8,7 +8,7 @@ export default class Deliverable {
     public name:string;
     public description:string;
     public url:string;
-    public open:boolean;
+    public open:boolean; // could be a date instead
     public isTeam:boolean;
     public uploadKind:string; // null means no upload required, options: [null, 'pdf', 'zip']
 
