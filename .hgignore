@@ -1,0 +1,9 @@
+.idea/
+node_modules/
+bak/
+coverage/
+typings/
+src/.*\.js
+src/.*\.map
+test/.*\.js
+test/.*\.map
