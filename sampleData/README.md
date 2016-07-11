@@ -25,5 +25,10 @@ teams: ['teamId1', 'teamId2']
 
 The ```id``` can be assumed to be unique; if it is already known to the Portal the admin record should be updated (in case the role or teams change). Role can be ```ta``` or ```prof```. The teams array can be empty (e.g., for the prof or at the start of the term when the teams are not known). Later in the term once the team Ids are known the file can be uploaded again and the admins will be linked to the right teams.
 
+# Deliverables Schema
+
+The ```id``` can be assumed to be unique; if it is already known to the Portal, the deliverable record should be updated (any field can change). This schema is not fixed, if you want to change ```isOpen``` to a date (or ```openDate/closeDate```) that would be fine too.
+
+
 
  
