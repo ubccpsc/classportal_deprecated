@@ -72,6 +72,15 @@ export default class Server {
 
                 // clear; curl -is  http://localhost:4321/students
                 that.rest.get('/students', RouteHandler.getStudents);
+                
+                //get, add, update, delete students
+                that.rest.get('students/:id', RouteHandler.getStudentById);
+                that.rest.post('students', RouteHandler.createStudent);
+                that.rest.put('students/:id', RouteHandler.updateStudent);
+                that.rest.del('students/:id', RouteHandler.deleteStudent);
+
+                //used for authenticating with Github
+                that.rest.get('/callback', RouteHandler.githubCallback);
 
                 that.rest.listen(that.port, function () {
                     Log.info('Server::start() - restify listening: ' + that.rest.url);

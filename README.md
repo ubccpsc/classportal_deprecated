@@ -5,10 +5,12 @@ To install:
 
 NPM run scripts have been set up for most common tasks:
 
+* Clean: ```npm run clean```
+* Configure: ```npm run configure```
 * Build: ```npm run build```
 * Test: ```npm run test``` (or ```npm test```)
 * Test + coverage: ```npm run cover``` (HTML reports in ```./coverage/lcov-report/index.html```)
-* Run: ```npm run start``` (or ```npm start```)
+* Run Server: ```npm run start``` (or ```npm start```)
 
 must be global?
 

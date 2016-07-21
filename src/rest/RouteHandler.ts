@@ -7,6 +7,8 @@ import restify = require('restify');
 import MemoryStore from '../store/MemoryStore';
 import EchoController from '../controller/EchoController';
 
+import Student from '../model/Student';
+
 import Log from '../Util';
 
 export default class RouteHandler {
@@ -26,7 +28,6 @@ export default class RouteHandler {
         return next();
     }
 
-
     static getStudents(req:restify.Request, res:restify.Response, next:restify.Next) {
         Log.trace('RoutHandler::getStudents(..) - params: ' + JSON.stringify(req.params));
 
@@ -38,8 +39,58 @@ export default class RouteHandler {
         return next();
     }
 
+    static getStudentById(req:restify.Request, res:restify.Response, next:restify.Next) {
+        Log.trace('RoutHandler::getStudentById(..) - params: ' + JSON.stringify(req.params));
+        
+        let store = new MemoryStore();
+        store.createData();
 
-    staticputSay(req:restify.Request, res:restify.Response, next:restify.Next) {
+        var found = store.getStudent(req.params.id);
+        if (found) {
+            res.json(200, found);
+        }
+        else {
+            res.send(404, "student not found");
+        }
+            
+        return next();
+    }
+
+    static createStudent(req:restify.Request, res:restify.Response, next:restify.Next) {
+        Log.trace('RoutHandler::createStudent(..) - params: ' + JSON.stringify(req.params));
+
+        var newStudent = new Student(req.body.id, req.body.name, req.body.studentNumber);
+
+        let store = new MemoryStore();
+        store.createData();
+
+        if (!req.body.hasOwnProperty('id') || !req.body.hasOwnProperty('name')) {
+            res.send(500, "error: not a student");
+        } else {
+            store.saveStudent(newStudent);
+            res.send(201, "Student " + req.body.name + " created!");
+        }
+
+
+        return next();
+    }
+
+    static updateStudent(req:restify.Request, res:restify.Response, next:restify.Next) {
+       
+        return next();
+    }
+
+    static deleteStudent(req:restify.Request, res:restify.Response, next:restify.Next) {
+       
+        return next();
+    }
+    
+    static githubCallback(req: restify.Request, res: restify.Response, next: restify.Next) {   
+        
+        return next();
+    }
+
+    static putSay(req:restify.Request, res:restify.Response, next:restify.Next) {
         Log.trace('RouteHandler::putSay(..) - params: ' + JSON.stringify(req.params));
         try {
             // validate params
