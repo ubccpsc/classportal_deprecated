@@ -1,0 +1,67 @@
+body {
+  background: rgba(0,0,50,.2);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0;
+  margin:0;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  background-color: rgba(0,0,0,0.1);
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  padding: 20px;
+  margin: 0;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 2.5em;
+}
+
+h2 {
+  font-size: 2em;
+}
+
+h3 {
+  font-size: 1.5em;
+}
+
+h4 {
+  font-size: 1.2em;
+}
+
+.active {
+  color: black;
+  outline: none;
+  background-color: rgba(0,0,0,0.05);
+}
+
+#App {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+#Title{
+  background: rgba(0,0,50,1);
+  color: white;
+}
+
+#userInfo{
+  margin-left: 35%;
+  text-align: left;
+}
+
+linee {
+  padding-top: 30px;
+  border-bottom: 0px, black;
+}

@@ -24,7 +24,7 @@
 import restify = require('restify');
 import Log from "../Util";
 import RouteHandler from './RouteHandler';
-
+const path = require('path');
 
 export default class Server {
 
@@ -47,23 +47,34 @@ export default class Server {
     }
 
     public start():Promise<boolean> {
-
         let that = this;
         return new Promise(function (fulfill, reject) {
             try {
                 that.rest = restify.createServer({
                     name: 'classPortal'
                 });
+                
+                that.rest.use(function(req, res, next){
+                    // Set permissive CORS header - this allows this server to be used only as
+                    // an API server in conjunction with something like webpack-dev-server.
+                    res.setHeader('Access-Control-Allow-Origin', '*');    
+
+                    // Disable caching so we'll always get the latest students.
+                    res.setHeader('Cache-Control', 'no-cache');
+                    
+                    console.log(req.method + ' ' + req.url);
+                    return next();
+                });
 
                 //restify.CORS.ALLOW_HEADERS.push('authorization');
-                //rest.use(restify.CORS());
+                //that.rest.use(restify.CORS());
                 //rest.pre(restify.pre.sanitizePath());
                 //rest.use(restify.acceptParser(rest.acceptable));
                 that.rest.use(restify.bodyParser());
                 // rest.use(restify.queryParser());
                 //rest.use(restify.authorizationParser());
-                //rest.use(restify.fullResponse());
-
+                //rest.use(restify.fullResponse());                
+                
                 // clear; curl -is  http://localhost:4321/echo/foo
                 that.rest.get('/echo/:message', RouteHandler.getEcho);
 
@@ -71,16 +82,34 @@ export default class Server {
                 // rest.put('/say/:val', portal.rest.RouteHandler.putSay);
 
                 // clear; curl -is  http://localhost:4321/students
-                that.rest.get('/students', RouteHandler.getStudents);
+                that.rest.get('/api/students', RouteHandler.getStudents);
                 
                 //get, add, update, delete students
-                that.rest.get('students/:id', RouteHandler.getStudentById);
-                that.rest.post('students', RouteHandler.createStudent);
-                that.rest.put('students/:id', RouteHandler.updateStudent);
-                that.rest.del('students/:id', RouteHandler.deleteStudent);
+                that.rest.get('/api/students/:id', RouteHandler.getStudentById);
+                that.rest.post('/api/students', RouteHandler.createStudent);
+                that.rest.put('/api/students/:id', RouteHandler.updateStudent);
+                that.rest.del('/api/students/:id', RouteHandler.deleteStudent);
 
                 //used for authenticating with Github
-                that.rest.get('/callback', RouteHandler.githubCallback);
+                that.rest.post('/api/authenticate', RouteHandler.authenticateGithub);
+                
+                //get github user info
+                that.rest.get('/api/githubuserinfo', RouteHandler.getInfoFromGithub);
+                
+                //update new student info
+                that.rest.post('/api/newStudent', RouteHandler.updateNewStudent);
+
+                //serve static css and js files
+                that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({
+                    directory: __dirname.substring(0, __dirname.lastIndexOf("/src")) + '/frontend/public',
+                    default: 'index.html'
+                }));
+                                
+                //otherwise, serve index.html and let the react router decide how to render the route
+                that.rest.get(/^((?!\.).)*$/, restify.serveStatic({
+                    directory: __dirname.substring(0, __dirname.lastIndexOf("/src")) + '/frontend/public',
+                    file: 'index.html'
+                }));
 
                 that.rest.listen(that.port, function () {
                     Log.info('Server::start() - restify listening: ' + that.rest.url);
