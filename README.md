@@ -10,9 +10,11 @@ NPM run scripts have been set up for most common tasks:
 * Test + coverage: ```npm run cover``` (HTML reports in ```./coverage/lcov-report/index.html```)
 
 We are using webpack-dev-server for front-end dev, which allows front-end files to be updated live. It runs on localhost:8080.
+
 * Run web-dev-server: ```npm run start``` (or ```npm start```)
 
 The production server runs on localhost:4321.
+
 * Build: ```npm run build```
 * Run production server: ```NODE_ENV=production npm start```
 
