@@ -70,16 +70,27 @@ export default class RouteHandler {
             };
 
             function requestCallback (err:any, res:any, body:any) {
+                Log.trace("filename: " + filename);
+                var filename = __dirname.substring(0, __dirname.lastIndexOf("rest")) + "students.json";
+                Log.trace("filename: " + filename);
+                
+                Log.trace("file: " + file);
+                var file = require(filename)
+                Log.trace("file: " + file);
+
                 if (!err && res.statusCode == 200) { 
+                    //update value
+                    file.students[0].accesstoken = body.access_token;
+
                     //write access token to file
-                    fs.writeFile(__dirname + '/accessTokens.txt', body.access_token, function (err) {
+                    fs.writeFile(filename, JSON.stringify(file, null, 2), function (err:any) {
                         if (err) {
                             Log.trace(err.toString());
                             return;
                         }
                         //if successful, execute callback to redirect user  
                         else {
-                            Log.trace('Request successful!\nAccess token is ' + body.access_token + '.\nWritten to file ' + __dirname + '/accessTokens.txt.');
+                            Log.trace('Request successful!\nAccess token is ' + body.access_token + '.\nWritten to file ' + filename+ 'students.json');
                             callback(respon,opt,body.access_token);
                         }
                     });
@@ -142,15 +153,15 @@ export default class RouteHandler {
     static getInfoFromGithub(req:restify.Request, res:restify.Response, next:restify.Next) {
         
         function getAccessToken(callback: any) {
-            Log.trace("getting AccessToken from file...");
-            fs.readFile(__dirname+'/accessTokens.txt', function read(err, data) {
+            Log.trace("getting AccessToken from file: " + __dirname.substring(0, __dirname.lastIndexOf("rest"))+'students.json');
+            fs.readFile(__dirname.substring(0, __dirname.lastIndexOf("rest"))+'students.json', function read(err:any, data:any) {
                 if (err) {
                     Log.trace("ERROR READING FILE");
                     Log.trace(err.toString());
                 }
-                else {
-                    Log.trace("accessToken is: " + data.toString());
-                    callback(data.toString(), returnResponse);
+                else { 
+                    Log.trace("accessToken is: " + JSON.parse(data).students[0].accesstoken);
+                    callback(JSON.parse(data).students[0].accesstoken, returnResponse);
                 }    
             })
         }

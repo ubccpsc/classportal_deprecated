@@ -10,17 +10,21 @@ import Team from '../model/Team';
 import Store from './Store';
 import Log from "../Util";
 
+var fs = require('fs');
+var path = require('path');
+var STUDENTS_FILE = path.join(__dirname, 'students.json');
+
 // module portal.store {
 export default class MemoryStore implements Store {
 
-    private admins:Admin[] = [];
-    private students:Student[] = [];
-    private deliverables:Deliverable[] = [];
-    private teams:Team[] = [];
-    private grades:Grade[] = [];
+    private admins: Admin[] = [];
+    private students: Student[] = [];
+    private deliverables: Deliverable[] = [];
+    private teams: Team[] = [];
+    private grades: Grade[] = [];
 
     constructor() {
-        this.createData();
+        //this.hydrate(); //not needed anymore ->: this.createData();
     }
 
     createData() {
@@ -52,48 +56,17 @@ export default class MemoryStore implements Store {
         this.admins.push(new Admin('ta1@310reddit.com', 'ta2', [t1, t2]));
     }
 
-    persist():string {
-        Log.trace('TestStore::persist()');
-
-
-        let admins:any = [];
-        for (var admin of this.admins) {
-            let teamIds:string[] = [];
-            for (var team of admin.teams) {
-                teamIds.push(team.id);
+    //temp readfile function until i figure out hydrate
+    readFromJson():any {
+        fs.readFile(STUDENTS_FILE, function(err:any, data:any) {
+            if (err) {
+                console.error(err);
+                return null;
             }
-            admins.push({id: admin.id, name: admin.name, teams: teamIds});
-        }
-
-        let teams:any = [];
-        for (var team of this.teams) {
-            let memberIds:string[] = [];
-            for (var member of team.members) {
-                memberIds.push(member.id);
+            else {
+                return JSON.parse(data);    
             }
-            teams.push({id: team.id, name: team.name, members: memberIds});
-        }
-
-        let grades:any = [];
-        for (var grade of this.grades) {
-            grades.push({student: grade.student.id, deliverable: grade.deliverable.id, value: grade.value})
-        }
-
-
-        let store = {
-            admins:       admins,
-            students:     this.students, // no external refs
-            deliverables: this.deliverables, // no external refs
-            teams:        teams,
-            grades:       grades
-        };
-
-        let storeVal = JSON.stringify(store);
-        Log.trace('TestStore::persist() - done; data: ' + storeVal);
-
-        // TODO: this should write to disk
-
-        return storeVal;
+        });
     }
 
     hydrate(val:string):void {
@@ -167,7 +140,49 @@ export default class MemoryStore implements Store {
 
         Log.trace('TestStore::hydrate() - done');
     }
+    
+    persist():string {
+        Log.trace('TestStore::persist()');
 
+        let admins:any = [];
+        for (var admin of this.admins) {
+            let teamIds:string[] = [];
+            for (var team of admin.teams) {
+                teamIds.push(team.id);
+            }
+            admins.push({id: admin.id, name: admin.name, teams: teamIds});
+        }
+
+        let teams:any = [];
+        for (var team of this.teams) {
+            let memberIds:string[] = [];
+            for (var member of team.members) {
+                memberIds.push(member.id);
+            }
+            teams.push({id: team.id, name: team.name, members: memberIds});
+        }
+
+        let grades:any = [];
+        for (var grade of this.grades) {
+            grades.push({student: grade.student.id, deliverable: grade.deliverable.id, value: grade.value})
+        }
+
+
+        let store = {
+            admins:       admins,
+            students:     this.students, // no external refs
+            deliverables: this.deliverables, // no external refs
+            teams:        teams,
+            grades:       grades
+        };
+
+        let storeVal = JSON.stringify(store);
+        Log.trace('TestStore::persist() - done; data: ' + storeVal);
+
+        // TODO: this should write to disk
+
+        return storeVal;
+    }
 
     getAdmin(id:string):Admin {
         Log.trace('TestStore::getAdmin( ' + id + ' )');
@@ -196,7 +211,6 @@ export default class MemoryStore implements Store {
             this.admins.push(admin);
         }
     }
-
 
     getStudent(id:string):Student {
         Log.trace('TestStore::getStudent( ' + id + ' )');
@@ -324,4 +338,3 @@ export default class MemoryStore implements Store {
     }
 
 }
-// }
