@@ -11,9 +11,7 @@ import fs = require('fs');
 import MemoryStore from '../store/MemoryStore';
 import Store from '../store/Store';
 import EchoController from '../controller/EchoController';
-
 import Student from '../model/Student';
-
 import Log from '../Util';
 
 export default class RouteHandler {
@@ -52,10 +50,18 @@ export default class RouteHandler {
         store.persist();
     }
     
-    static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {
+    static authenticateGithub(req: restify.Request, res1: restify.Response, next: restify.Next) {
+        Log.trace('RoutHandler::githubCallback(..) - params: ' + JSON.stringify(req.params));
         
-        function getAccessToken(respon: any, authcode: string, opt: any, callback: any) {
+        //start by requesting access token from Github. If successful, redirect user to appropriate page.
+        getAccessToken(req.params.authCode);
+
+        Log.trace('RoutHandler::githubCallback(..) complete!');
+        return next();
+
+        function getAccessToken(authcode: string) {
             var postData = {
+                //TODO: THESE SHOULD NOT BE SAVED TO BITBUCKET!
                 client_id: "97ae59518a9d5cae2550",
                 client_secret: "92b13f20a11919e1b223c16b049283da82dc3638",
                 code: authcode
@@ -69,66 +75,83 @@ export default class RouteHandler {
                 headers: {}
             };
 
-            function requestCallback (err:any, res:any, body:any) {
-                Log.trace("filename: " + filename);
-                var filename = __dirname.substring(0, __dirname.lastIndexOf("rest")) + "students.json";
-                Log.trace("filename: " + filename);
+            request(options, function (err: any, res: any, body0: any) {                
+                //1) Using AccessToken, get username from github.
+                //2) check students.json if username already exists.
+                    //if yes, update the user's accesstoken(?) and redirect to student portal 
+                    //if no, redirect to register page
                 
-                Log.trace("file: " + file);
-                var file = require(filename)
-                Log.trace("file: " + file);
+                Log.trace("1-getUserFromGithub() executing...");
+                getUserFromGithub(body0.access_token, function (err: any, res: any, body: any) {
+                    if (!err && res.statusCode == 200) {
+                        var obj = JSON.parse(body);
+                        Log.trace("4-checkFileForUser() executing...");
 
-                if (!err && res.statusCode == 200) { 
-                    //update value
-                    file.students[0].accesstoken = body.access_token;
+                        //todo: figure out a more elegant solution to reference "body0"
+                        checkFileForUser(obj.login, body0.access_token);
+                    }
+                    else {
+                        Log.trace("Error: " + err);
+                        Log.trace("Res: " + res);
+                        Log.trace("Body: " + body);
+                    }
+                });
 
-                    //write access token to file
-                    fs.writeFile(filename, JSON.stringify(file, null, 2), function (err:any) {
-                        if (err) {
-                            Log.trace(err.toString());
-                            return;
+                function getUserFromGithub(accessToken: string, callback: any) {
+                    //"Accept": "application / vnd.github.v3 + json",
+                    var options = {
+                        url: 'https://api.github.com/user',
+                        headers: {
+                            "User-Agent": "ClassPortal-Student",
+                            "Authorization": "token " + accessToken
                         }
-                        //if successful, execute callback to redirect user  
+                    };
+                    Log.trace("2-request() executing...");
+                    request(options, function (err:any, res:any, body:any) {
+                        if (!err && res.statusCode == 200) {
+                            Log.trace("3-callback() executing...");
+                            callback(err, res, body);
+                        }
                         else {
-                            Log.trace('Request successful!\nAccess token is ' + body.access_token + '.\nWritten to file ' + filename+ 'students.json');
-                            callback(respon,opt,body.access_token);
+                            Log.trace("Error: " + err);
+                            Log.trace("Res: " + res);
+                            Log.trace("Body: " + body);
                         }
                     });
                 }
-                else {
-                    Log.trace("Error: " + err.toString());
-                    return;
+
+                function checkFileForUser(username:string, accessToken:any) {
+                    fs.readFile(__dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json", function read(err:any, data:any) {
+                        if (err) {
+                            Log.trace("ERROR READING FILE");
+                            Log.trace(err.toString());
+                        }
+                        else {
+                            Log.trace("looking for: " + username + " in students.json");
+                            var file = JSON.parse(data);
+                            Log.trace("file successfully parsed: "+ file);
+                            
+                            for (var i = 0; i < file.students.length; i++) {
+                                Log.trace("index = " + i);
+                                if(file.students[i].github == username) {
+                                    //SUCCESS
+                                    Log.trace(file.students[i].github+ " is already registered. Redirecting to portal.");
+                                    //NEED SOME WAY TO LET PORTAL KNOW WHICH STUDENT IS LOGGED IN though.
+                                    //ALSO, find a more elegant way to refer to res1?
+                                    //ALSO need to update accesstoken on file??? not sure
+                                    res1.json(200, "/portal~"+username);
+                                    return;
+                                }
+                            }
+                            //UNSUCCESSFUL: send directly to register page with WHAT? Username or AccessToken, or both????
+                            Log.trace("user not found. sending to registration page. (this SHOULDNT execute if student is found in FILE!)");
+                            res1.json(200, "/register~"+accessToken);
+                            return;
+                        }
+                    })
                 }
-            }
-            
-            //send GET request to Github with client id, secret, and authcode.
-            //Github responds with an access token if successful.
-            request(options, requestCallback);
+            });
         }
-
-        function redirectResponse(resp:any, redirect:any, access:string){
-            //check against existing tokens to decide where to redirect user
-            if (redirect == 1){
-                resp.json(200, "/firstlogin");
-                Log.trace("First Time Login!");
-            } else if (redirect == 2){
-                resp.json(200, "admin");
-                Log.trace("Admin Login!");
-            } else if (redirect == 3){
-                resp.json(200, "student");
-                Log.trace("Student Login!");
-            } else {
-                resp.json(500, "There was an error authenticating the user!");
-                Log.trace("Authentication error.");
-            }
-        }
-
-        Log.trace('RoutHandler::githubCallback(..) - params: ' + JSON.stringify(req.params));
-        
-        //start by requesting access token from Github. If successful, redirect user to appropriate page.
-        getAccessToken(res, req.params.authCode, 1, redirectResponse);
-        
-        return next();
     }
     
     static getStudentById(req:restify.Request, res:restify.Response, next:restify.Next) {
@@ -152,21 +175,21 @@ export default class RouteHandler {
 
     static getInfoFromGithub(req:restify.Request, res:restify.Response, next:restify.Next) {
         
-        function getAccessToken(callback: any) {
-            Log.trace("getting AccessToken from file: " + __dirname.substring(0, __dirname.lastIndexOf("rest"))+'students.json');
-            fs.readFile(__dirname.substring(0, __dirname.lastIndexOf("rest"))+'students.json', function read(err:any, data:any) {
+        function getAccessToken2(callback: any) {
+            Log.trace("getting AccessToken from file: " + __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json");
+            fs.readFile(__dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json", function read(err:any, data:any) {
                 if (err) {
                     Log.trace("ERROR READING FILE");
                     Log.trace(err.toString());
                 }
                 else { 
                     Log.trace("accessToken is: " + JSON.parse(data).students[0].accesstoken);
-                    callback(JSON.parse(data).students[0].accesstoken, returnResponse);
-                }    
+                    callback(JSON.parse(data).students[0].accesstoken);
+                }
             })
         }
         
-        function requestUserInfo(accessToken: string, callback:any) {
+        function requestUserInfo(accessToken: string) {
             //"Accept": "application / vnd.github.v3 + json",
             var options = {
                 url: 'https://api.github.com/user',
@@ -181,7 +204,8 @@ export default class RouteHandler {
                 if (!err && res.statusCode == 200) {
                     var obj = JSON.parse(body);
                     Log.trace("Success! Obj: " + obj);
-                    callback(obj.login);
+                    Log.trace("returning username: " + obj.login);
+                    res.send(200, obj.login);
                 }
                 else {
                     Log.trace("Error: " + err);
@@ -191,16 +215,11 @@ export default class RouteHandler {
             });
         }
 
-        function returnResponse(username:string){
-            Log.trace("returning username: " + username);
-            res.send(200, username);
-        }
-
         Log.trace('RoutHandler::getStudentFromGithub(..) - params: ' + JSON.stringify(req.params));        
         
         //start by retrieving accesstoken. if success, send GET request to Github.
         //if success, Github responds with user info, which we send back to frontend.
-        getAccessToken(requestUserInfo);
+        getAccessToken2(requestUserInfo);
         return next();
     }
 
@@ -208,6 +227,61 @@ export default class RouteHandler {
         Log.trace('RoutHandler::getStudentFromGithub(..) - params: ' + JSON.stringify(req.params));        
         
         //TODO: associate new info with access token.
+        //first, find the correct student to update.
+        //next, add the info to his file.
+/*
+        function read(callback: any) {
+            Log.trace("getting AccessToken from file: " + __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json");
+            fs.readFile(__dirname.substring(0, __dirname.lastIndexOf("rest"))+'students.json', function read(err:any, data:any) {
+                if (err) {
+                    Log.trace("ERROR READING FILE");
+                    Log.trace(err.toString());
+                }
+                else { 
+                    Log.trace("accessToken is: " + JSON.parse(data).students[0].accesstoken);
+                    callback(JSON.parse(data).students[0].accesstoken);
+                }    
+            })
+        }
+
+        function updateFile() {
+            
+        }
+
+        function write (err:any, res:any, body:any) {
+            Log.trace("filename: " + filename);
+            var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
+            Log.trace("filename: " + filename);
+            
+            Log.trace("file: " + file);
+            var file = require(filename)
+            Log.trace("file: " + file);
+
+            if (!err && res.statusCode == 200) { 
+                //update value
+                file.students[0].accesstoken = body.access_token;
+
+                //write access token to file
+                fs.writeFile(filename, JSON.stringify(file, null, 2), function (err:any) {
+                    if (err) {
+                        Log.trace(err.toString());
+                        return;
+                    }
+                    //if successful, execute callback to redirect user  
+                    else {
+                        Log.trace('Request successful!\nAccess token is ' + body.access_token + '.\nWritten to file ' + filename+ 'students.json');
+                        callback(respon,opt,body.access_token);
+                    }
+                });
+            }
+            else {
+                Log.trace("Error: " + err.toString());
+                return;
+            }
+        }
+
+*/
+
         return next();
     }
         
@@ -265,3 +339,84 @@ export default class RouteHandler {
     }
 }
 
+
+                /*
+                var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
+                var file = require(filename)
+                Log.trace("filename: " + filename);
+                Log.trace("file: " + file);
+
+                if (!err && res.statusCode == 200) { 
+                    //first, check if student is already registered.
+                    //do this by getting github username, then checking students.json for that github username
+                    //if success, go to portal.
+                    
+                    //if not, write to file? go to register page? how to let register page know which access token?
+                    getUserFromGithub(body.access_token, function (err: any, res: any, body: any) {
+                        if (!err && res.statusCode == 200) {
+                            Log.trace("33333 executing...");
+                            var obj = JSON.parse(body);
+                            checkFileForUser(obj.login, function () {
+                                Log.trace("44444 executing...");
+                            });
+                        }
+                        else {
+                            Log.trace("Error: " + err);
+                            Log.trace("Res: " + res);
+                            Log.trace("Body: " + body);
+                        }
+                    });
+                    
+                    /* NOT SURE IF STILL NECESSARY????
+                    //update value
+                    file.students[0].accesstoken = body.access_token;
+
+                    //write access token to file
+                    fs.writeFile(filename, JSON.stringify(file, null, 2), function (err:any) {
+                        if (err) {
+                            Log.trace(err.toString());
+                            return;
+                        }
+                        //if successful, execute callback to redirect user  
+                        else {
+                            Log.trace('Request successful!\nAccess token is ' + body.access_token + '.\nWritten to file ' + filename);
+                            callback(respon,opt,body.access_token);
+                        }
+                    });
+                    /*
+                }
+                else {
+                    Log.trace("Error: " + err.toString());
+                    return;
+                }*/
+
+
+
+
+
+
+
+
+
+
+
+
+                        //NEEDED??
+/*        function redirectResponse(resp:any, redirect:any, access:string){
+            //check against existing tokens to decide where to redirect user
+            if (redirect == 1){
+                resp.json(200, "/firstlogin");
+                Log.trace("First Time Login!");
+            } else if (redirect == 2){
+                resp.json(200, "admin");
+                Log.trace("Admin Login!");
+            } else if (redirect == 3){
+                resp.json(200, "student");
+                Log.trace("Student Login!");
+            } else {
+                resp.json(500, "There was an error authenticating the user!");
+                Log.trace("Authentication error.");
+            }
+        }
+
+*/

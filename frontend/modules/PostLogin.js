@@ -21,7 +21,8 @@ var Page = React.createClass({
       // Get the authorization code from the url that was returned by GitHub
       this.state.authCode = getAuthCode(window.location.href);
       console.log("code is: " + this.state.authCode);
-
+    
+      //todo: figure out - do we need the "var saveData"? or just "$.ajax"?
       var saveData = $.ajax({
           type: 'POST',
           url: this.props.url + '/api/authenticate',
@@ -29,10 +30,24 @@ var Page = React.createClass({
             authCode: this.state.authCode
           },
           dataType: "json",
-          success: function (resp) {
-            console.log("success!");
-            console.log(resp);
-            browserHistory.push(resp);
+          success: function (response) {
+            console.log("success! response: " + response);
+            //first, split response
+            var fields = response.split('~');
+            var redirect = fields[0] ,attribute = fields[1];
+            console.log("redirect: " + redirect);
+            console.log("attribute: " + attribute);
+            
+            //if we need to redirect to registration, do this
+            if (redirect == "/portal") {
+              console.log("redirecting to portal");
+              browserHistory.push(redirect);
+            }
+            //if we already have user info, redirect to STUDENT PORTAL
+            else if (redirect == "/register") {
+              console.log("redirecting to registration");
+              browserHistory.push(redirect);
+            }
           }.bind(this),
           error: function (xhr, status, err) {
             console.log("fail!");
@@ -40,8 +55,7 @@ var Page = React.createClass({
             console.error(status);
             console.error(err.toString());
           }.bind(this)
-      });
-      console.log("sent authcode to server. waiting to redirect.");
+      });  
   },
   componentDidMount: function () {
     console.log("yass");

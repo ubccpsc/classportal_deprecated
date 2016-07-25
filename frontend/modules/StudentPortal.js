@@ -154,12 +154,12 @@ var Page = React.createClass({
     return { githubUser: 'not logged in', data: []};
   },
   componentDidMount: function () {
-    this.handleSubmit();
+    //this.handleSubmit();
   },
   render: function () {
     return (
       <div className="page">
-        <h1>Class Portal after Github redirect</h1>
+        <h1>STUDENT PORTAL</h1>
         
         <h3>Info</h3>
         <InfoComponent githubUser={this.state.githubUser} data={this.state.data}/><br/>
