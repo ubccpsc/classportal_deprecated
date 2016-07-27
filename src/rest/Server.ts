@@ -93,11 +93,9 @@ export default class Server {
                 //used for authenticating with Github
                 that.rest.post('/api/authenticate', RouteHandler.authenticateGithub);
                 
-                //get github user info
-                that.rest.get('/api/githubuserinfo', RouteHandler.getInfoFromGithub);
-                
-                //update new student info
-                that.rest.post('/api/newStudent', RouteHandler.updateNewStudent);
+                //get + update user info
+                that.rest.get('/api/getUserInfo', RouteHandler.getUserInfo);
+                that.rest.post('/api/updateUserInfo', RouteHandler.updateUserInfo);
 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({

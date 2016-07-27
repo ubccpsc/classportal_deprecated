@@ -1,4 +1,5 @@
 import React from 'react'
+import {browserHistory } from 'react-router'
 
 var Page = React.createClass({
   getInitialState: function () {
@@ -8,24 +9,30 @@ var Page = React.createClass({
       firstname:'',
       lastname:'',
       email:'',
-      github:''
+      github: ''
     };
   },
-  getUser: function () {
+
+  getUserInfo: function () {
     $.ajax({
-      url: this.props.url + '/api/githubuserinfo',
+      url: this.props.url + '/api/getUserInfo',
       method: "GET",
       dataType: 'json',
       cache: false,
       success: function(data) {
-        console.log("getUser success! Github user:  " + data);
-        this.setState({ github: data });
+        console.log("Response:  " + JSON.stringify(data));
+        this.setState({ sid: data.sid });
+        this.setState({ csid: data.csid });
+        this.setState({ firstname: data.firstname });
+        this.setState({ lastname: data.lastname });
+        this.setState({ email: data.email });
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
   },
+
   handleUpdate: function (event) {
     event.preventDefault()
     this.setState({ firstname: event.target.elements[0].value });
@@ -34,7 +41,7 @@ var Page = React.createClass({
     this.setState({ csid: event.target.elements[3].value });
     this.setState({ email: event.target.elements[4].value });
   },
-  //tell server to create student,update student info, don't show this page again
+
   handleSubmit: function (event) {
     event.preventDefault();
     
@@ -47,26 +54,24 @@ var Page = React.createClass({
     }
 
     $.ajax({
-      url: this.props.url + '/api/newStudent',
+      url: this.props.url + '/api/updateUserInfo',
       type: "POST",
       data: dataObj,
       dataType: 'json',
       cache: false,
       success: function(data) {
-        console.log("create/update newStudent success!");
+        browserHistory.push(data);
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
   },
+
   componentDidMount: function () {
-    //OLD: no need to do this anymore!
-          //this.getUser();
-    
-    //TODO: Instead, figure out how to save the logged student
-          //and pass state among react pages
+    this.getUserInfo();
   },
+
   render: function () {
     return (
       <div className="page">
@@ -90,7 +95,7 @@ var Page = React.createClass({
         </p>
         
         <form onSubmit={this.handleSubmit}>
-          <button type="submit">SUBMIT</button>
+          <button type="submit">Submit</button>
         </form>
 
       </div>

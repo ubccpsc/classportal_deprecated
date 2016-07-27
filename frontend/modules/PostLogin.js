@@ -7,7 +7,8 @@ var Page = React.createClass({
       authCode: '', redirect:''
     };
   },
-  getCode: function () {
+
+  sendAuthCode: function () {
       // Extract the auth code from the original URL
       function getAuthCode(url){
           var error = url.match(/[&\?]error=([^&]+)/);
@@ -18,12 +19,10 @@ var Page = React.createClass({
       }
       
       console.log("getting code..");
-      // Get the authorization code from the url that was returned by GitHub
       this.state.authCode = getAuthCode(window.location.href);
       console.log("code is: " + this.state.authCode);
     
-      //todo: figure out - do we need the "var saveData"? or just "$.ajax"?
-      var saveData = $.ajax({
+      $.ajax({
           type: 'POST',
           url: this.props.url + '/api/authenticate',
           data: {
@@ -50,17 +49,15 @@ var Page = React.createClass({
             }
           }.bind(this),
           error: function (xhr, status, err) {
-            console.log("fail!");
-            console.error(this.props.url);
-            console.error(status);
-            console.error(err.toString());
+            console.log("failed to get authcode.."+ this.props.url + status + err.toString());
           }.bind(this)
-      });  
+      });
   },
+
   componentDidMount: function () {
-    console.log("yass");
-    this.getCode();
+    this.sendAuthCode();
   },
+
   render: function () {
     return (
       <div className="page">

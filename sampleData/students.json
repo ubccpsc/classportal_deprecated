@@ -1,13 +1,13 @@
 {
   "students": [
     {
-      "sid": "00000001",
-      "csid": "a1b1",
+      "sid": "54813118",
+      "csid": "a6j8",
       "firstname": "Michael",
       "lastname": "Sargent",
-      "email": null,
+      "email": "ms@mg.com",
       "github": null,
-      "accesstoken": "d853585d54884c179c88448e2e510582c576e16a",
+      "accesstoken": null,
       "courses": 310,
       "assn1": 0,
       "assn2": 0,
