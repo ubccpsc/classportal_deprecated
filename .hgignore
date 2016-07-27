@@ -7,3 +7,4 @@ src/.*\.js
 src/.*\.map
 test/.*\.js
 test/.*\.map
+frontend/public/bundle.js
