@@ -93,8 +93,9 @@ var Page = React.createClass({
   },
   
   componentDidMount: function () {
-    this.setState({ github: localStorage.username });
-    this.getUserInfo();
+    this.setState({ github: localStorage.username }, function () {
+      this.getUserInfo();
+    });
   },
 
   render: function () {

@@ -153,11 +153,12 @@ export default class RouteHandler {
                             !!file.students[i].email && 
                             !!file.students[i].lastname && 
                             !!file.students[i].firstname ) {
-                            Log.trace(file.students[i].github + " is already registered, but needs to be updated. Redirecting to registration page.");
-                            callback(1);
-                        } else {
                             Log.trace(file.students[i].github + " is already registered. Redirecting to portal.");
                             callback(2);
+                            return;
+                        } else {
+                            Log.trace(file.students[i].github + " is already registered, but needs to be updated. Redirecting to registration page.");
+                            callback(1);
                             return;
                         }
                     }
@@ -173,28 +174,31 @@ export default class RouteHandler {
     //NEEDS FIXING    
     static getUserInfo(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::getUserInfo(..) - params: ' + JSON.stringify(req.params));
-
-        function readStudentFile (index: number) {
-            var fileName = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
-
-            function readFileSuccess(err: any, data: any) {
-                if (err) {
-                    Log.trace("Error reading file: " + err.toString());
-                }
-                else {
-                    var file = JSON.parse(data);
-                    Log.trace("File: "+ file + " parsed successfully");
-                    
-                    res.json(200, file.students[index]);   
-                }
-            }
-            
-            fs.readFile(fileName, readFileSuccess);
-        }
-
-        //todo: need better way to specify index        
-        readStudentFile(req.params.id);
+        
+        var fileName = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
+        fs.readFile(fileName, onSuccess);
         return next();
+
+        function onSuccess(err: any, data: any) {
+            if (err) {
+                Log.trace("Error reading file: " + err.toString());
+            }
+            else {
+                var file = JSON.parse(data);
+                Log.trace("File: "+ file + " parsed successfully");
+                
+                for (var index = 0; index < file.students.length; index++){
+                    if (file.students[index].github == req.params.id){
+                        Log.trace("name found.");
+                        res.json(200, file.students[index]);
+                        return;
+                    }
+                }
+                //FAIL
+                Log.trace("name not found. FAIL");
+                return;
+            }
+        }
     }
 
     static updateUserInfo(req: restify.Request, res: restify.Response, next: restify.Next) {

@@ -85,6 +85,7 @@ var Page = React.createClass({
   },
 
   getUserInfo: function () {
+    console.log("using " + this.state.github + " to request other info:");
     $.ajax({
       url: this.props.url + '/api/getUserInfo/'+this.state.github,
       method: "GET",
@@ -115,8 +116,11 @@ var Page = React.createClass({
     };
   },
   componentDidMount: function () {
-    this.setState({ github: localStorage.username });
-    this.getUserInfo();
+    this.setState({ github: localStorage.username }, function () {
+      //lesson learned: use a callback containing the function you want to pass, do not
+      //pass the function directly!! Why?
+      this.getUserInfo();
+    });
   },
   render: function () {
     return (
