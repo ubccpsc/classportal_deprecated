@@ -94,8 +94,8 @@ export default class Server {
                 that.rest.post('/api/authenticate', RouteHandler.authenticateGithub);
                 
                 //get + update user info
-                that.rest.get('/api/getUserInfo', RouteHandler.getUserInfo);
-                that.rest.post('/api/updateUserInfo', RouteHandler.updateUserInfo);
+                that.rest.get('/api/getUserInfo/:id', RouteHandler.getUserInfo);
+                that.rest.post('/api/updateUserInfo/:id', RouteHandler.updateUserInfo);
 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({

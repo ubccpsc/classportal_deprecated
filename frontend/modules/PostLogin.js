@@ -32,7 +32,7 @@ var Page = React.createClass({
           success: function (response) {
             console.log("success! response: " + response);
             //first, split response
-            var fields = response.split('~');
+            var fields = response.split('?');
             var redirect = fields[0] ,attribute = fields[1];
             console.log("redirect: " + redirect);
             console.log("attribute: " + attribute);
@@ -45,7 +45,7 @@ var Page = React.createClass({
             //if we already have user info, redirect to STUDENT PORTAL
             else if (redirect == "/register") {
               console.log("redirecting to registration");
-              browserHistory.push(redirect);
+              browserHistory.push(response);
             }
           }.bind(this),
           error: function (xhr, status, err) {

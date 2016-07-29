@@ -15,7 +15,7 @@ var Page = React.createClass({
 
   getUserInfo: function () {
     $.ajax({
-      url: this.props.url + '/api/getUserInfo',
+      url: this.props.url + '/api/getUserInfo/'+this.state.github,
       method: "GET",
       dataType: 'json',
       cache: false,
@@ -54,7 +54,7 @@ var Page = React.createClass({
     }
 
     $.ajax({
-      url: this.props.url + '/api/updateUserInfo',
+      url: this.props.url + '/api/updateUserInfo/'+this.state.github,
       type: "POST",
       data: dataObj,
       dataType: 'json',
@@ -68,7 +68,20 @@ var Page = React.createClass({
     });
   },
 
+  // Extract the auth code from the original URL
+  getUsername: function(url){
+          var error = url.match(/[&\?]error=([^&]+)/);
+          if (error) {
+              throw 'Error getting authorization code: ' + error[1];
+          }
+          return url.match(/[&\?]user=([\w\/\-]+)/)[1];
+  },
+  
   componentDidMount: function () {
+    this.setState({ github: this.getUsername(window.location.href) }, function () {
+      console.log(this.state.github);
+    });
+    
     this.getUserInfo();
   },
 
@@ -76,7 +89,7 @@ var Page = React.createClass({
     return (
       <div className="page">
         <p>Please complete your registration by updating your student info below.</p>
-        <h4>GitHub user: {this.state.github}</h4>        
+        <h4>GitHub user: {this.state.github}</h4>
         <form onSubmit={this.handleUpdate}>
           <input type="text" placeholder="first name"/><br/>
           <input type="text" placeholder="last name"/><br/>

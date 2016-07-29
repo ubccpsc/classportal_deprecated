@@ -1,36 +1,20 @@
 {
   "students": [
     {
-      "sid": "54813118",
-      "csid": "a6j8",
+      "sid": "",
+      "csid": "",
       "firstname": "Michael",
       "lastname": "Sargent",
-      "email": "ms@mg.com",
-      "github": null,
-      "accesstoken": null,
-      "courses": 310,
-      "assn1": 0,
-      "assn2": 0,
-      "assn3": 0,
-      "midterm": 0,
-      "final": 0,
-      "total": 0
-    },
-    {
-      "sid": "00000002",
-      "csid": "a2b2",
-      "firstname": "John",
-      "lastname": "Smith",
-      "email": null,
-      "github": null,
-      "accesstoken": null,
-      "courses": 310,
-      "assn1": 10,
-      "assn2": 10,
-      "assn3": 10,
-      "midterm": 10,
-      "final": 10,
-      "total": 50
+      "email": "",
+      "github": "mksarge",
+      "accesstoken": "0f12d6772fd51dca74598f97a7e33ded56cbba56",
+      "courses": "",
+      "assn1": "",
+      "assn2": "",
+      "assn3": "",
+      "midterm": "",
+      "final": "",
+      "total": ""
     }
   ],
   "admins": [

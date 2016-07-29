@@ -51,11 +51,11 @@ export default class RouteHandler {
     }
 
     /* description:
-        request an access token from Github
-        get username from github.
-        check students.json if username already exists.
-        if yes, update the user's accesstoken(?) and redirect to student portal
-        if no, redirect to register page
+        - request an access token from Github
+        - use token get username from github.
+        - check students.json if username already exists.
+        - if yes, update the user's accesstoken(?) and redirect to student portal
+        - if no, redirect to register page
      */
     static authenticateGithub(req: restify.Request, res1: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::authenticateGithub(..) - params: ' + JSON.stringify(req.params));
@@ -75,39 +75,6 @@ export default class RouteHandler {
             headers: {}
         };
     
-        //todo: right now, the success and fail implementations are baked-in to the function.
-        function checkFileForUser(username: string, accessToken: any) {
-            var fileName = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
-
-            fs.readFile(fileName, function read(err: any, data: any) {
-                if (err) {
-                    Log.trace("Error reading file: " + err.toString());
-                }
-                else {
-                    Log.trace("Searching students.json for username : " + username);
-                    var file = JSON.parse(data);
-                    Log.trace("File: "+ file + " parsed successfully");
-                    
-                    for (var i = 0; i < file.students.length; i++) {
-                        Log.trace("index = " + i);
-                        if (file.students[i].github == username) {
-                            //case: SUCCESS
-                            Log.trace(file.students[i].github + " is already registered. Redirecting to portal.");
-                            //NEED SOME WAY TO LET PORTAL KNOW WHICH STUDENT IS LOGGED IN though.
-                            //todo: find a more elegant way to refer to res1
-                            //todo: need to update accesstoken on file??? not sure
-                            res1.json(200, "/portal~" + username);
-                            return;
-                        }
-                    }
-                    //case: FAIL- send directly to register page with WHAT? Username or AccessToken, or both????
-                    Log.trace("user not found. sending to registration page. (this SHOULDNT execute if student is found in FILE!)");
-                    res1.json(200, "/register~" + accessToken);
-                    return;
-                }
-            })
-        }
-        
         //todo: clean up use of "body0:"
         function requestCallback (err: any, res: any, body0: any) {
 
@@ -126,7 +93,27 @@ export default class RouteHandler {
                         Log.trace("getUserFromGithub-success");
                         var obj = JSON.parse(body);
                         Log.trace("parse: " + obj);
-                        checkFileForUser(obj.login, body0.access_token);
+                        RouteHandler.checkFileForUser(obj.login, function (success:number) {
+                            if (success==1) {
+                                Log.trace("success-1");
+                                
+                                //send user to update page
+                                res1.json(200, "/register?user=" + obj.login);
+                            } else if (success == 2) {
+                                Log.trace("success-2");
+
+                                //send user to portal
+                                res1.json(200, "/portal");
+                            } else {
+                                Log.trace("success-0");
+
+                                //no user, so create blank user with user+token
+                                RouteHandler.createBlankStudent(obj.login, body0.access_token);
+                                
+                                //send user to registration to fill in more info
+                                res1.json(200, "/register?user="+obj.login);
+                            }
+                        });
                     }
                     else {
                         Log.trace("getUserFromGithub - Error: " + err +  res + body);
@@ -142,6 +129,48 @@ export default class RouteHandler {
         return next();        
     }
 
+    //checks students.json for matching username. Executes callback after success.    
+    static checkFileForUser(username: string, callback:any) {
+        Log.trace('RoutHandler::checkFileForUser()');
+        var fileName = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
+        
+        fs.readFile(fileName, function read(err: any, data: any) {
+            if (err) {
+                Log.trace("Error reading file: " + err.toString());
+            }
+            else {
+                Log.trace("Searching students.json for username : " + username);
+                var file = JSON.parse(data);
+                Log.trace("File: "+ file + " parsed successfully");
+                
+                for (var i = 0; i < file.students.length; i++) {
+                    Log.trace("index = " + i);
+                    if (file.students[i].github == username) {
+                        //SUCCESS
+                        //check for missing info
+                        if (!!file.students[i].sid && 
+                            !!file.students[i].csid && 
+                            !!file.students[i].email && 
+                            !!file.students[i].lastname && 
+                            !!file.students[i].firstname ) {
+                            Log.trace(file.students[i].github + " is already registered, but needs to be updated. Redirecting to registration page.");
+                            callback(1);
+                        } else {
+                            Log.trace(file.students[i].github + " is already registered. Redirecting to portal.");
+                            callback(2);
+                            return;
+                        }
+                    }
+                }
+                //FAIL- send directly to register page with WHAT? Username or AccessToken, or both????
+                Log.trace("user not found. sending to registration page. (this SHOULDNT execute if student is found in FILE!)");
+                callback(0);
+                return;
+            }
+        })
+    }    
+
+    //NEEDS FIXING    
     static getUserInfo(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::getUserInfo(..) - params: ' + JSON.stringify(req.params));
 
@@ -171,18 +200,24 @@ export default class RouteHandler {
     static updateUserInfo(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::writeInfoToFile(..) - params: ' + JSON.stringify(req.params));
 
-        //todo: deal with index variable!         
-        var index = 0;
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
-        var file = require(filename)
+        function findAndReplace(object: any, userName:string){//keyvalue: string, name: string) {            
+            Log.trace('findAndReplace()');
+            object.map(function (obj: any) {
+                if (obj.github == userName) {
+                    obj.sid = req.params.sid;
+                    obj.csid = req.params.csid;
+                    obj.firstname = req.params.firstname;
+                    obj.lastname = req.params.lastname;
+                    obj.email = req.params.email;
+                    Log.trace('mapped new!');
+                }
+                Log.trace('didnt map new!');
+            })
+        }
 
-        //update the values in the file.
-        //todo: use forEach?
-        file.students[index].sid = req.params.sid;
-        file.students[index].csid = req.params.csid;
-        file.students[index].firstname = req.params.firstname;
-        file.students[index].lastname = req.params.lastname;
-        file.students[index].email = req.params.email;
+        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
+        var file = require(filename);
+        findAndReplace(file.students, req.params.id);
 
         //write to file
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err:any) {
@@ -201,6 +236,44 @@ export default class RouteHandler {
         return next();
     }
     
+    static createBlankStudent(githubUser: string, accessToken: string) {
+        Log.trace('RoutHandler::createBlankStudent()');
+
+        //todo: deal with index variable!         
+        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
+        var file = require(filename);
+        var newObj = {
+            "sid": '',
+            "csid": '',
+            "firstname": '',
+            "lastname": '',
+            "email": '',
+            "github": githubUser,
+            "accesstoken": accessToken,
+            "courses": '',
+            "assn1": '',
+            "assn2": '',
+            "assn3": '',
+            "midterm": '',
+            "final": '',
+            "total": ''
+        };
+
+        file.students.push(newObj);
+        
+        //write to file
+        fs.writeFile(filename, JSON.stringify(file, null, 2), function (err:any) {
+            if (err) {
+                Log.trace("New student error: " + err.toString());
+            }  
+            else {
+                Log.trace("New student created!");
+            }
+        });
+        
+        return;
+    }   
+
     static getStudentById(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::getStudentById(..) - params: ' + JSON.stringify(req.params));
         
@@ -219,7 +292,7 @@ export default class RouteHandler {
         store.persist();
         return next();
     }
-
+    
     static createStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::createStudent(..) - params: ' + JSON.stringify(req.params));
 
