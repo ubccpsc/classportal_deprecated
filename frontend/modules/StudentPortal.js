@@ -4,11 +4,10 @@ var InfoComponent = React.createClass({
   render: function() {
     return (
       <div className="infoComponent">
-        student #: {this.props.data.stdnum} <br/>
-        cs id: {this.props.data.csid}<br/>
-        full name: {this.props.data.fullname}<br/>
-        github: {this.props.githubUser}<br/>
-        courses: {this.props.data.courses}<br/>
+        {this.props.data.firstname} {this.props.data.lastname}<br/><br/>
+        student #: {this.props.data.sid} <br/>
+        cpsc id: {this.props.data.csid}<br/>
+        github: {this.props.data.github}<br/>
       </div>
     );
   }
@@ -70,23 +69,8 @@ var GradesComponent = React.createClass({
 });
 
 var Page = React.createClass({
-  loadStudentsFromServer: function () {
-    //not ideal, but for now, the client gets ALL ids and checks if 
-    //student logging in is on the list.
-    console.log("getting all student ids");
-    $.ajax({
-      url: this.props.url + '/api/students',
-      dataType: 'json',
-      cache: false,
-      success: function(data) {
-        this.setState({data: data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
-  },
-  loadNewStudent: function(num) {
+  
+  loadNewStudent: function (num) {
     $.ajax({
       url: this.props.url + '/api/students/' + num,
       dataType: 'json',
@@ -99,62 +83,40 @@ var Page = React.createClass({
       }.bind(this)
     });
   },
-  handleSubmit: function () {
-    console.log("accessing api to start github get...");
 
+  getUserInfo: function () {
     $.ajax({
-      url: this.props.url + '/api/github',
-      dataType: 'text',
+      url: this.props.url + '/api/getUserInfo/'+this.state.github,
+      method: "GET",
+      dataType: 'json',
       cache: false,
-      success: function(response) {
-        console.log("Success!!");
-        console.log(response);
-        this.setState({ githubUser: response });
+      success: function(data) {
+        console.log("Response:  " + JSON.stringify(data));
+        this.setState({ sid: data.sid });
+        this.setState({ csid: data.csid });
+        this.setState({ firstname: data.firstname });
+        this.setState({ lastname: data.lastname });
+        this.setState({ email: data.email });
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url);
-        console.error(status);
-        console.error(err.toString());
+        console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
-  },  
-  handleLoginSubmit: function (currentStudent) {
-    //get new list
-    //PROBLEM: this function takes longer to execute than the code below: thus, it takes
-    //the second time running the login button to do the stuff below properly.
-    //this.loadStudentsFromServer();
-
-    //TODO (what should happen):
-    //ACTUALLY send User/Pass to server to verify; after server verifies, it will send all the student data back.
-    
-    //do stuff
-    //var allStudents = this.state.data;
-    //console.log("currentStudent: ");
-    //console.log(currentStudent);
-    //console.log("allStudents :");
-    //console.log(allStudents);
-
-    //search allStudents for stdnum matching currentStudent (who is trying to log in)
-    /*
-    for (let i = 0; i < allStudents.length; i++) {
-      console.log("i: ");
-      console.log(i);
-      if (allStudents[i].stdnum == currentStudent.stdnum) {
-        console.log("login is valid!");
-        //valid stdnum, therefore load student's info
-        this.loadNewStudent(i);
-        return;
-      }
-    }
-    console.log("login is invalid!");
-    alert("Login failed!");*/
-
   },
+
   getInitialState: function() {
-    return { githubUser: 'not logged in', data: []};
+    return {
+      sid:'',
+      csid:'',
+      firstname:'',
+      lastname:'',
+      email:'',
+      github: ''
+    };
   },
   componentDidMount: function () {
-    //this.handleSubmit();
+    this.setState({ github: localStorage.username });
+    this.getUserInfo();
   },
   render: function () {
     return (
@@ -162,7 +124,11 @@ var Page = React.createClass({
         <h1>STUDENT PORTAL</h1>
         
         <h3>Info</h3>
-        <InfoComponent githubUser={this.state.githubUser} data={this.state.data}/><br/>
+        {this.state.firstname} {this.state.lastname}<br/><br/>
+        student #: {this.state.sid} <br/>
+        cpsc id: {this.state.csid}<br/>
+        github: {this.state.github}<br/>
+        email: {this.state.email}<br/>
         
         {/*
         <h3>Team</h3>

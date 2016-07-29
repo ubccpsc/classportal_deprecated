@@ -80,6 +80,8 @@ var Page = React.createClass({
     return {data: []};
   },
   componentDidMount: function() {
+    console.log(JSON.stringify(localStorage));
+    
     //this.loadStudentsFromServer();
     //this continuously polls all the students. Disabled, because we simply want
     //to poll ONE student, the CURRENT user, ONLY at the moment they log in!

@@ -9,7 +9,8 @@ var Page = React.createClass({
       firstname:'',
       lastname:'',
       email:'',
-      github: ''
+      github: '',
+      data:[]
     };
   },
 
@@ -34,12 +35,26 @@ var Page = React.createClass({
   },
 
   handleUpdate: function (event) {
-    event.preventDefault()
-    this.setState({ firstname: event.target.elements[0].value });
-    this.setState({ lastname: event.target.elements[1].value });
-    this.setState({ sid: event.target.elements[2].value });
-    this.setState({ csid: event.target.elements[3].value });
-    this.setState({ email: event.target.elements[4].value });
+    event.preventDefault();
+    
+    /* need to figure out how to do arrays in react..
+    for (index = 0; index < event.target.elements.length; i++){
+      if (!!event.target.elements[index].value) {
+            this.setState({ data[index]: event.target.elements[index].value });  
+      }    
+    }*/
+
+    if (!!event.target.elements[0].value)
+      this.setState({ firstname: event.target.elements[0].value });  
+    if (!!event.target.elements[1].value)
+      this.setState({ lastname: event.target.elements[1].value });
+    if (!!event.target.elements[2].value)
+      this.setState({ sid: event.target.elements[2].value });
+    if (!!event.target.elements[3].value)
+      this.setState({ csid: event.target.elements[3].value });
+    if (!!event.target.elements[4].value)
+      this.setState({ email: event.target.elements[4].value });
+    
   },
 
   handleSubmit: function (event) {
@@ -78,17 +93,14 @@ var Page = React.createClass({
   },
   
   componentDidMount: function () {
-    this.setState({ github: this.getUsername(window.location.href) }, function () {
-      console.log(this.state.github);
-    });
-    
+    this.setState({ github: localStorage.username });
     this.getUserInfo();
   },
 
   render: function () {
     return (
       <div className="page">
-        <p>Please complete your registration by updating your student info below.</p>
+        <p>Please update your student info below.</p>
         <h4>GitHub user: {this.state.github}</h4>
         <form onSubmit={this.handleUpdate}>
           <input type="text" placeholder="first name"/><br/>

@@ -50,7 +50,7 @@ export default class RouteHandler {
         store.persist();
     }
 
-    /* description:
+    /*
         - request an access token from Github
         - use token get username from github.
         - check students.json if username already exists.
@@ -98,12 +98,12 @@ export default class RouteHandler {
                                 Log.trace("success-1");
                                 
                                 //send user to update page
-                                res1.json(200, "/register?user=" + obj.login);
+                                res1.json(200, "/update~" + obj.login);
                             } else if (success == 2) {
                                 Log.trace("success-2");
 
                                 //send user to portal
-                                res1.json(200, "/portal");
+                                res1.json(200, "/portal~" + obj.login);
                             } else {
                                 Log.trace("success-0");
 
@@ -111,7 +111,7 @@ export default class RouteHandler {
                                 RouteHandler.createBlankStudent(obj.login, body0.access_token);
                                 
                                 //send user to registration to fill in more info
-                                res1.json(200, "/register?user="+obj.login);
+                                res1.json(200, "/update~" + obj.login);
                             }
                         });
                     }
@@ -168,7 +168,7 @@ export default class RouteHandler {
                 return;
             }
         })
-    }    
+    }
 
     //NEEDS FIXING    
     static getUserInfo(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -193,7 +193,7 @@ export default class RouteHandler {
         }
 
         //todo: need better way to specify index        
-        readStudentFile(0);
+        readStudentFile(req.params.id);
         return next();
     }
 
@@ -211,7 +211,6 @@ export default class RouteHandler {
                     obj.email = req.params.email;
                     Log.trace('mapped new!');
                 }
-                Log.trace('didnt map new!');
             })
         }
 

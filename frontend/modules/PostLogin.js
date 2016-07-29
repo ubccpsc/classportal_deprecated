@@ -23,19 +23,21 @@ var Page = React.createClass({
       console.log("code is: " + this.state.authCode);
     
       $.ajax({
-          type: 'POST',
-          url: this.props.url + '/api/authenticate',
-          data: {
-            authCode: this.state.authCode
-          },
-          dataType: "json",
-          success: function (response) {
-            console.log("success! response: " + response);
-            //first, split response
-            var fields = response.split('?');
-            var redirect = fields[0] ,attribute = fields[1];
-            console.log("redirect: " + redirect);
-            console.log("attribute: " + attribute);
+        type: 'POST',
+        url: this.props.url + '/api/authenticate',
+        data: {
+          authCode: this.state.authCode
+        },
+        dataType: "json",
+        success: function (response) {
+          console.log("success! response: " + response);
+          //first, split response
+          var fields = response.split('~');
+          var redirect = fields[0], username = fields[1];
+          console.log("redirect: " + redirect);
+          console.log("username: " + username);
+
+          localStorage.setItem('username', username);
             
             //if we need to redirect to registration, do this
             if (redirect == "/portal") {
@@ -43,9 +45,9 @@ var Page = React.createClass({
               browserHistory.push(redirect);
             }
             //if we already have user info, redirect to STUDENT PORTAL
-            else if (redirect == "/register") {
+            else if (redirect == "/update") {
               console.log("redirecting to registration");
-              browserHistory.push(response);
+              browserHistory.push("/update");
             }
           }.bind(this),
           error: function (xhr, status, err) {

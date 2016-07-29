@@ -5,7 +5,7 @@ import App from './modules/App'
 import About from './modules/About'
 import Login from './modules/Login'
 import PostLogin from './modules/PostLogin'
-import Register from './modules/Register'
+import Update from './modules/Update'
 import StudentPortal from './modules/StudentPortal'
 
 render((
@@ -14,7 +14,7 @@ render((
 			<IndexRoute component={Login}/>
 			<Route path="/about" component={About} />
 			<Route path="/postlogin" component={PostLogin} />
-			<Route path="/register" component={Register} />
+			<Route path="/update" component={Update} />
 			<Route path="/portal" component={StudentPortal} />
 		</Route>
   </Router>
