@@ -1,5 +1,6 @@
 {
   "students": [
+    {},
     {
       "sid": "54813118",
       "csid": "a6j8",
@@ -7,7 +8,7 @@
       "lastname": "Sargent",
       "email": "michael-sargent@hotmail.com",
       "github": "mksarge",
-      "accesstoken": "0f12d6772fd51dca74598f97a7e33ded56cbba56",
+      "accesstoken": "099596d34a8ee9e567c041aaa728db6f95bfb2e2",
       "courses": "",
       "assn1": "",
       "assn2": "",
@@ -23,14 +24,7 @@
       "lastname": " Holmes",
       "email": null,
       "github": null,
-      "accesstoken": null,
-      "courses": 310,
-      "assn1": 10,
-      "assn2": 10,
-      "assn3": 10,
-      "midterm": 10,
-      "final": 10,
-      "total": 50
+      "accesstoken": null
     }
   ]
 }

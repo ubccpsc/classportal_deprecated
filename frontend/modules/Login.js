@@ -1,5 +1,6 @@
 // modules/Login.js
 import React from 'react'
+import { Col, Row, Button, Alert, Spinner } from 'elemental'
 
 var GithubComponent = React.createClass({
   render: function () {
@@ -89,8 +90,12 @@ var Page = React.createClass({
   },
   render: function () {
     return (
-      <div className="page">
-        <GithubComponent data={this.state.data} url = {this.props.url}/><br/>
+      <div className="module">
+        <Row>
+          <Col sm="1">
+            <GithubComponent data={this.state.data} url = {this.props.url}/>
+          </Col>  
+        </Row>
       </div>
     );
   }     

@@ -124,7 +124,7 @@ var Page = React.createClass({
   },
   render: function () {
     return (
-      <div className="page">
+      <div className="module">
         <h1>STUDENT PORTAL</h1>
         
         <h3>Info</h3>

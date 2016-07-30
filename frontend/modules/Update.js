@@ -1,6 +1,7 @@
 import React from 'react'
 import {browserHistory } from 'react-router'
-
+import {Row,Col,Form,FormField,Button,FormInput,Checkbox } from 'elemental'
+  
 var Page = React.createClass({
   getInitialState: function () {
     return {
@@ -61,12 +62,20 @@ var Page = React.createClass({
     event.preventDefault();
     
     var dataObj = {
+      "sid": event.target.elements[2].value,
+      "csid": event.target.elements[3].value,
+      "firstname": event.target.elements[0].value,
+      "lastname": event.target.elements[1].value,
+      "email": event.target.elements[4].value
+    };
+    
+    var dataObj2 = {
       "sid": this.state.sid,
       "csid": this.state.csid,
       "firstname": this.state.firstname,
       "lastname": this.state.lastname,
       "email": this.state.email
-    }
+    };
 
     $.ajax({
       url: this.props.url + '/api/updateUserInfo/'+this.state.github,
@@ -100,30 +109,19 @@ var Page = React.createClass({
 
   render: function () {
     return (
-      <div className="page">
-        <p>Please update your student info below.</p>
+      <div className="module">
+        <p>Please update your student info below.</p>  
         <h4>GitHub user: {this.state.github}</h4>
-        <form onSubmit={this.handleUpdate}>
-          <input type="text" placeholder="first name"/><br/>
-          <input type="text" placeholder="last name"/><br/>
-          <input type="text" placeholder="student number"/><br/>
-          <input type="text" placeholder="csid"/><br/>
-          <input type="text" placeholder="preferred email"/><br/>
-          <button type="submit">Update</button><br/><br/>
-        </form>
-        
-        <p id="userInfo">
-          first name: {this.state.firstname}<br/>
-          last name: {this.state.lastname}<br/>
-          student #: {this.state.sid} <br/>
-          cs id: {this.state.csid}<br/>
-          email: {this.state.email}<br/>  
-        </p>
-        
-        <form onSubmit={this.handleSubmit}>
-          <button type="submit">Submit</button>
-        </form>
-
+        <Form onSubmit={this.handleSubmit} className="form">
+          <FormField>
+            <FormInput autoFocus placeholder="First name"/>
+            <FormInput placeholder="Last name"/>
+            <FormInput placeholder="Student number"/>
+            <FormInput placeholder="CS ID"/>
+            <FormInput placeholder="Email"/>
+          </FormField>
+          <Button submit>Update</Button>
+        </Form>  
       </div>
     );
   }
@@ -135,3 +133,14 @@ export default React.createClass({
       <Page url="http://localhost:4321" pollInterval={2000} />
     )}
 })
+
+/*
+
+        <p id="userInfo">
+          first name: {this.state.firstname}<br/>
+          last name: {this.state.lastname}<br/>
+          student #: {this.state.sid} <br/>
+          cs id: {this.state.csid}<br/>
+          email: {this.state.email}<br/>  
+        </p>
+        */
