@@ -1,16 +1,15 @@
 // modules/Login.js
 import React from 'react'
-import { Col, Row, Button, Alert, Spinner } from 'elemental'
+import { Glyph, Col, Row, Button, Alert, Spinner } from 'elemental'
 
 var GithubComponent = React.createClass({
   render: function () {
     return (
-      <div>
-        <p>
-          <a href="https://github.com/login/oauth/authorize?client_id=97ae59518a9d5cae2550&redirect_uri=http://localhost:4321/postlogin">
-            Authenticate with GitHub
-          </a>
-        </p>
+      <div>        
+        <a href="https://github.com/login/oauth/authorize?client_id=97ae59518a9d5cae2550&redirect_uri=http://localhost:4321/postlogin">
+          <Button><Glyph icon="mark-github" /> | 
+          Authenticate with GitHub</Button>
+        </a>
       </div>
     );
   }
@@ -93,7 +92,7 @@ var Page = React.createClass({
       <div className="module">
         <Row>
           <Col sm="1">
-            <GithubComponent data={this.state.data} url = {this.props.url}/>
+            <GithubComponent/>
           </Col>  
         </Row>
       </div>

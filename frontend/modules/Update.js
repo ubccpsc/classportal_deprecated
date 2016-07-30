@@ -5,13 +5,12 @@ import {Row,Col,Form,FormField,Button,FormInput,Checkbox } from 'elemental'
 var Page = React.createClass({
   getInitialState: function () {
     return {
-      sid:'',
-      csid:'',
-      firstname:'',
-      lastname:'',
-      email:'',
+      sid: '',
+      csid: '',
+      firstname: '',
+      lastname: '',
+      email: '',
       github: '',
-      data:[]
     };
   },
 
@@ -35,52 +34,24 @@ var Page = React.createClass({
     });
   },
 
-  handleUpdate: function (event) {
-    event.preventDefault();
-    
-    /* need to figure out how to do arrays in react..
-    for (index = 0; index < event.target.elements.length; i++){
-      if (!!event.target.elements[index].value) {
-            this.setState({ data[index]: event.target.elements[index].value });  
-      }    
-    }*/
-
-    if (!!event.target.elements[0].value)
-      this.setState({ firstname: event.target.elements[0].value });  
-    if (!!event.target.elements[1].value)
-      this.setState({ lastname: event.target.elements[1].value });
-    if (!!event.target.elements[2].value)
-      this.setState({ sid: event.target.elements[2].value });
-    if (!!event.target.elements[3].value)
-      this.setState({ csid: event.target.elements[3].value });
-    if (!!event.target.elements[4].value)
-      this.setState({ email: event.target.elements[4].value });
-    
-  },
-
   handleSubmit: function (event) {
     event.preventDefault();
+    var asdf = this.state;
+    if (!!event.target.elements[0].value)
+      asdf.firstname = event.target.elements[0].value;
+    if (!!event.target.elements[1].value)
+      asdf.lastname = event.target.elements[1].value;
+    if (!!event.target.elements[2].value)
+      asdf.sid = event.target.elements[2].value;
+    if (!!event.target.elements[3].value)
+      asdf.csid = event.target.elements[3].value;
+    if (!!event.target.elements[4].value)
+      asdf.email = event.target.elements[4].value;
     
-    var dataObj = {
-      "sid": event.target.elements[2].value,
-      "csid": event.target.elements[3].value,
-      "firstname": event.target.elements[0].value,
-      "lastname": event.target.elements[1].value,
-      "email": event.target.elements[4].value
-    };
-    
-    var dataObj2 = {
-      "sid": this.state.sid,
-      "csid": this.state.csid,
-      "firstname": this.state.firstname,
-      "lastname": this.state.lastname,
-      "email": this.state.email
-    };
-
     $.ajax({
       url: this.props.url + '/api/updateUserInfo/'+this.state.github,
       type: "POST",
-      data: dataObj,
+      data: asdf,
       dataType: 'json',
       cache: false,
       success: function(data) {
@@ -112,15 +83,25 @@ var Page = React.createClass({
       <div className="module">
         <p>Please update your student info below.</p>  
         <h4>GitHub user: {this.state.github}</h4>
-        <Form onSubmit={this.handleSubmit} className="form">
-          <FormField>
-            <FormInput autoFocus placeholder="First name"/>
-            <FormInput placeholder="Last name"/>
-            <FormInput placeholder="Student number"/>
-            <FormInput placeholder="CS ID"/>
-            <FormInput placeholder="Email"/>
+        <Form onSubmit={this.handleSubmit} className="form" type="horizontal">
+          <FormField label="First name">
+            <FormInput placeholder={this.state.firstname} />
           </FormField>
-          <Button submit>Update</Button>
+          <FormField label="Last name">
+            <FormInput placeholder={this.state.lastname}/>
+          </FormField>
+          <FormField label="Student number">
+            <FormInput placeholder={this.state.sid}/>
+          </FormField>
+          <FormField label="Computer Science ID">
+            <FormInput placeholder={this.state.csid}/>
+          </FormField>
+          <FormField label="Email address">
+            <FormInput placeholder={this.state.email}/>
+          </FormField>
+          <FormField offsetAbsentLabel>
+            <Button submit>Update</Button>
+          </FormField>
         </Form>  
       </div>
     );

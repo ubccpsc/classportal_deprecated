@@ -125,8 +125,6 @@ var Page = React.createClass({
   render: function () {
     return (
       <div className="module">
-        <h1>STUDENT PORTAL</h1>
-        
         <h3>Info</h3>
         {this.state.firstname} {this.state.lastname}<br/><br/>
         student #: {this.state.sid} <br/>

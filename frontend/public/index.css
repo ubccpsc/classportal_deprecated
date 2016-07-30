@@ -62,8 +62,8 @@ h4 {
   position:absolute;
   top: 0%;
   right: 0%;
-  color: white;
-  background: grey;
+  background:lightgrey;
+  text-align: center;
 }
 
 #NavLinks{
@@ -80,9 +80,14 @@ h4 {
   border: 2px solid mediumblue;
   border-radius: 5px;
   text-align: center;
+  padding: 20px;
+}.module p, h3 {
+  padding: 0;
+}.module .Form{
+  text-align: left;
 }
 
 .form{
-  margin-left: 400px;
-  margin-right: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }

@@ -3,15 +3,15 @@ import { Link } from 'react-router'
 import NavLink from './NavLink'
 import { IndexLink } from 'react-router'
 import { Row, Col, Button, Alert, Spinner } from 'elemental' 
+import LoginBar from './LoginBar'
 
 export default React.createClass({
   render() {
     return (
       <div id="App">
-        <div id="LoginBar">
-          LOG IN
-        </div>
         
+        <LoginBar/>
+
         <div id="Title">
           <h1>Course Portal</h1>
         </div>
@@ -29,6 +29,7 @@ export default React.createClass({
               </Col>  
             </Row>
         </div>
+
         {this.props.children}
       </div>
     )}
