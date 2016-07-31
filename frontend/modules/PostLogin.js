@@ -1,7 +1,8 @@
 import React from 'react'
-import {browserHistory } from 'react-router'
+import {Spinner} from 'elemental'
+import {browserHistory} from 'react-router'
 
-var Page = React.createClass({
+export default React.createClass({
   getInitialState: function() {
     return {
       authCode: '', redirect:''
@@ -24,7 +25,7 @@ var Page = React.createClass({
     
       $.ajax({
         type: 'POST',
-        url: this.props.url + '/api/authenticate',
+        url: 'http://localhost:4321/api/authenticate',
         data: {
           authCode: this.state.authCode
         },
@@ -42,7 +43,7 @@ var Page = React.createClass({
             //if we need to redirect to registration, do this
             if (redirect == "/portal") {
               console.log("redirecting to portal");
-              browserHistory.push('/');
+              browserHistory.push("/");
             }
             //if we already have user info, redirect to STUDENT PORTAL
             else if (redirect == "/update") {
@@ -59,19 +60,10 @@ var Page = React.createClass({
   componentDidMount: function () {
     this.sendAuthCode();
   },
-
-  render: function () {
-    return (
-      <div className="page">
-        <p>Loading...</p>
-      </div>
-    );
-  }     
-});
-
-export default React.createClass({
   render() {
     return (
-      <Page url="http://localhost:4321" pollInterval={2000} />
+      <div>
+        <Spinner size="lg" />
+      </div>
     )}
 })
