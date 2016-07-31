@@ -2,13 +2,12 @@
 import React from 'react'
 import { Glyph, Col, Row, Button, Alert, Spinner } from 'elemental'
 
-var GithubComponent = React.createClass({
+export var GithubComponent = React.createClass({
   render: function () {
     return (
       <div>        
         <a href="https://github.com/login/oauth/authorize?client_id=97ae59518a9d5cae2550&redirect_uri=http://localhost:4321/postlogin">
-          <Button><Glyph icon="mark-github" /> | 
-          Authenticate with GitHub</Button>
+          <Button><Glyph icon="mark-github"/> | Log in with GitHub</Button>
         </a>
       </div>
     );
@@ -89,7 +88,7 @@ var Page = React.createClass({
   },
   render: function () {
     return (
-      <div className="module">
+      <div>
         <Row>
           <Col sm="1">
             <GithubComponent/>

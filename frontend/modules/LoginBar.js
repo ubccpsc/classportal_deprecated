@@ -1,6 +1,7 @@
 // modules/Login.js
 import React from 'react'
-import { Glyph, Col, Row, Button, Alert, Spinner } from 'elemental'
+import {Login, GithubComponent} from './Login'
+import { Form, FormField, Glyph, Col, Row, Button, Alert, Spinner } from 'elemental'
 
 var LoginBar = React.createClass({
   getInitialState: function() {
@@ -30,27 +31,46 @@ var LoginBar = React.createClass({
     });
   },
   
+  logoutSubmit: function (e) {
+    e.preventDefault();
+    console.log("LOGGED OUT");
+    localStorage.removeItem("username");
+    this.setState({ loggedIn: false });
+
+    //also need to clear all variables in the app
+  },
+
   componentDidMount: function () {
-    this.setState({ github: localStorage.username }, function () {
-      //lesson learned: use a callback containing the function you want to pass, do not
-      //pass the function directly!! Why?
-      this.getUserInfo();
-      
-      //async
-      this.setState({ loggedIn: true });
-    });
+    //polling for login status update. Better way??
+    //YES! USE REACT EVENT SYSTEM.
+    setInterval(dothis, 2000);
+    let that = this;
+
+    function dothis() {
+      if (!!localStorage.username) {
+        that.setState({ github: localStorage.username }, function () {
+          //lesson learned: use a callback containing the function you want to pass, do not
+          //pass the function directly!! Why?
+          that.getUserInfo();
+
+          //async
+          that.setState({ loggedIn: true });
+        }); 
+      }  
+    }
   },
   render: function () {
     return (
       <div id="LoginBar">
-        {this.state.loggedIn
-          ? (
+        {this.state.loggedIn ? (
             <div>
-              <p>Logged in as {this.state.firstname} {this.state.lastname}</p>
-              <Button>Log out<Glyph icon="log-out"/></Button>
-            </div>
-            )
-          : (<p>Log In</p>)
+            <Form onSubmit={this.logoutSubmit}>
+              <FormField>Logged in as {this.state.firstname} {this.state.lastname}
+                <Button submit><Glyph icon="log-out"/> | Log out</Button>
+              </FormField>
+            </Form>
+            </div>)
+          : (<GithubComponent/>)
         }
       </div>
     );

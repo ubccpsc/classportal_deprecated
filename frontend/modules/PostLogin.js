@@ -42,7 +42,7 @@ var Page = React.createClass({
             //if we need to redirect to registration, do this
             if (redirect == "/portal") {
               console.log("redirecting to portal");
-              browserHistory.push(redirect);
+              browserHistory.push('/');
             }
             //if we already have user info, redirect to STUDENT PORTAL
             else if (redirect == "/update") {

@@ -18,15 +18,13 @@ export default React.createClass({
         
         <div id="NavLinks">
             <Row>
-              <Col sm="1/3">
-              <NavLink to="/" onlyActiveOnIndex={true}>Login</NavLink>
+              <Col sm="1/2">
+                <NavLink to="/" onlyActiveOnIndex={true}>Portal</NavLink>
               </Col>
-              <Col sm="1/3">
+              <Col sm="1/2">
                 <NavLink to="/update">Update Info</NavLink>
               </Col>
-              <Col sm="1/3">
-                <NavLink to="/portal">Portal</NavLink>
-              </Col>  
+                
             </Row>
         </div>
 
