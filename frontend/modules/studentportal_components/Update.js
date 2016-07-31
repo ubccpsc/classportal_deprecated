@@ -1,8 +1,8 @@
 import React from 'react'
 import {browserHistory } from 'react-router'
 import {Row,Col,Form,FormField,Button,FormInput,Checkbox } from 'elemental'
-  
-var Page = React.createClass({
+
+export default React.createClass({
   getInitialState: function () {
     return {
       sid: '',
@@ -16,7 +16,7 @@ var Page = React.createClass({
 
   getUserInfo: function () {
     $.ajax({
-      url: this.props.url + '/api/getUserInfo/'+this.state.github,
+      url: 'http://localhost:4321/api/getUserInfo/'+this.state.github,
       method: "GET",
       dataType: 'json',
       cache: false,
@@ -62,15 +62,6 @@ var Page = React.createClass({
       }.bind(this)
     });
   },
-
-  // Extract the auth code from the original URL
-  getUsername: function(url){
-          var error = url.match(/[&\?]error=([^&]+)/);
-          if (error) {
-              throw 'Error getting authorization code: ' + error[1];
-          }
-          return url.match(/[&\?]user=([\w\/\-]+)/)[1];
-  },
   
   componentDidMount: function () {
     this.setState({ github: localStorage.username }, function () {
@@ -104,24 +95,5 @@ var Page = React.createClass({
           </FormField>
         </Form>  
       </div>
-    );
-  }
-})
-
-export default React.createClass({
-  render() {
-    return (
-      <Page url="http://localhost:4321" pollInterval={2000} />
     )}
 })
-
-/*
-
-        <p id="userInfo">
-          first name: {this.state.firstname}<br/>
-          last name: {this.state.lastname}<br/>
-          student #: {this.state.sid} <br/>
-          cs id: {this.state.csid}<br/>
-          email: {this.state.email}<br/>  
-        </p>
-        */

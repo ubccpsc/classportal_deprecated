@@ -1,6 +1,4 @@
-// modules/Login.js
 import React from 'react'
-import {LoginPage, GithubComponent} from './LoginPage'
 import { Form, FormField, Glyph, Col, Row, Button, Alert, Spinner } from 'elemental'
 
 export default React.createClass({
@@ -14,7 +12,7 @@ export default React.createClass({
   },
   render: function () {
     return (
-      <div id="LoginBar">
+      <div id="LogoutBar">
         <Form onSubmit={this.logoutSubmit}>
           <Button submit><Glyph icon="log-out"/> | Log out</Button>
         </Form>
