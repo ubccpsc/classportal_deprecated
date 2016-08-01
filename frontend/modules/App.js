@@ -17,17 +17,43 @@ export default React.createClass({
     //TODO: learn React event system
 
     console.log(JSON.stringify(localStorage));
-    console.log("checking login..." + localStorage.username);
-    if (localStorage.username != null) {
+    console.log("checking login..." + localStorage.token + localStorage.username);
+    if (localStorage.token != null) {
       this.setState({ loggedIn: true }, function () {
         console.log("logged in!");
       });
     }
   },
   render: function () {
+    var showLogout;
+    if (this.state.loggedIn) {
+      showLogout = <LogoutBar />;
+    } else {
+      showLogout = null;
+    }
     return (
       <div id="App">
-        {this.state.loggedIn ?
+        {showLogout}
+        <div id="Title">
+          <h1>Course Portal</h1>
+        </div>
+        <div id="NavLinks">
+          <Row>
+            <Col sm="1/2">
+              <NavLink to="/" onlyActiveOnIndex={true}>Portal</NavLink>
+            </Col>
+            <Col sm="1/2">
+              <NavLink to="/update">Update Info</NavLink>
+            </Col>
+          </Row>
+        </div>
+        {this.props.children}
+      </div>
+    )}
+})
+
+/*
+{this.state.loggedIn ?
           (<div>
             <LogoutBar/>
             <div id="Title">
@@ -45,7 +71,5 @@ export default React.createClass({
             </div>
           </div>
       ): (<LoginPage/>) }
-        {this.props.children}
-      </div>
-    )}
-})
+
+      */

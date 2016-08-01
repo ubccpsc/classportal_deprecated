@@ -29,7 +29,7 @@ export default React.createClass({
         this.setState({ email: data.email });
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error("getuserInfo", status, err.toString());
       }.bind(this)
     });
   },
@@ -49,13 +49,13 @@ export default React.createClass({
       asdf.email = event.target.elements[4].value;
     
     $.ajax({
-      url: this.props.url + '/api/updateUserInfo/'+this.state.github,
+      url: 'http://localhost:4321/api/updateUserInfo/'+this.state.github,
       type: "POST",
       data: asdf,
       dataType: 'json',
       cache: false,
       success: function(data) {
-        browserHistory.push(data);
+        browserHistory.push("/");
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -64,7 +64,9 @@ export default React.createClass({
   },
   
   componentDidMount: function () {
+    console.log("test 1");
     this.setState({ github: localStorage.username }, function () {
+      console.log("test 2");
       this.getUserInfo();
     });
   },

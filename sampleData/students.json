@@ -7,14 +7,17 @@
       "lastname": "Sargent",
       "email": "michael-sargent@hotmail.com",
       "github": "mksarge",
-      "accesstoken": "099596d34a8ee9e567c041aaa728db6f95bfb2e2",
-      "courses": "",
-      "assn1": "",
-      "assn2": "",
-      "assn3": "",
-      "midterm": "",
-      "final": "",
-      "total": ""
+      "accesstoken": "7748ac22b6a7e69e288b327c5ab2506d9453e457",
+      "servertokens": {},
+      "grades": {
+        "courses": "",
+        "assn1": "",
+        "assn2": "",
+        "assn3": "",
+        "midterm": "",
+        "final": "",
+        "total": ""
+      }
     }
   ],
   "admins": [

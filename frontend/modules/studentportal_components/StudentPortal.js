@@ -35,7 +35,7 @@ export default React.createClass({
         this.setState({ email: data.email });
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error("getUserInfo", status, err.toString());
       }.bind(this)
     });
   },

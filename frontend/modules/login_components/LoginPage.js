@@ -4,7 +4,7 @@ import GithubButton from './GithubButton'
 export default React.createClass({
   render() {
     return (
-      <div>
+      <div className="module">
         UBC CPSC 413 Course Portal
         <br/>
         Reid Holmes 

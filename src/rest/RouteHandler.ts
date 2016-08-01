@@ -102,8 +102,11 @@ export default class RouteHandler {
                             } else if (success == 2) {
                                 Log.trace("success-2");
 
+                                //update accesstoken
+                                RouteHandler.updateStudent(obj.login, { "accesstoken": body0.access_token });
+
                                 //send user to portal
-                                res1.json(200, "/portal~" + obj.login);
+                                res1.json(200, "/portal~" + obj.login + "~12345");
                             } else {
                                 Log.trace("success-0");
 
@@ -111,7 +114,7 @@ export default class RouteHandler {
                                 RouteHandler.createBlankStudent(obj.login, body0.access_token);
                                 
                                 //send user to registration to fill in more info
-                                res1.json(200, "/update~" + obj.login);
+                                res1.json(200, "/update~" + obj.login + "~12345");
                             }
                         });
                     }
@@ -253,13 +256,16 @@ export default class RouteHandler {
             "email": '',
             "github": githubUser,
             "accesstoken": accessToken,
-            "courses": '',
-            "assn1": '',
-            "assn2": '',
-            "assn3": '',
-            "midterm": '',
-            "final": '',
-            "total": ''
+            "servertokens": {},
+            "grades": {
+                "courses": '',
+                "assn1": '',
+                "assn2": '',
+                "assn3": '',
+                "midterm": '',
+                "final": '',
+                "total": ''
+            }
         };
 
         file.students.push(newObj);
@@ -315,9 +321,9 @@ export default class RouteHandler {
         return next();
     }
 
-    static updateStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-       
-        return next();
+    static updateStudent(username:string, object:any) {
+       //update keys in object in username file
+        Log.trace("username: " + username + "object: " + JSON.stringify(object));
     }
 
     static deleteStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
