@@ -13,8 +13,8 @@ export default React.createClass({
       localStorage.setItem('username', username);
       localStorage.setItem('servertoken', servertoken);
 
-      //unlock restricted pages
-      localStorage.token = servertoken;
+      //unlock restricted pages(?)
+      localStorage.servertoken = servertoken;
       
       //redirect to update if needed, else to portal
       if (redirect == "/update") {

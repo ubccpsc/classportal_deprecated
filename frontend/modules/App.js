@@ -7,21 +7,23 @@ import { Row, Col, Button, Alert, Spinner } from 'elemental'
 
 export default React.createClass({
   getInitialState: function () {
-    //TODO: store copy of all variables in this top-level component?
+    //TODO: decide which variables to be storing here.
+    //figure out how to keep only 1 copy of all variables needed in this app.
     return {
       loggedIn: '',
       username: ''
     };
   },
   componentDidMount: function () {
-    //TODO: learn React event system
-
+    //TODO: learn React event system so i don't have to keep looping the below code.
+    console.log("checking login..."); 
     console.log(JSON.stringify(localStorage));
-    console.log("checking login..." + localStorage.token + localStorage.username);
-    if (localStorage.token != null) {
+    if (!!localStorage.servertoken) {
       this.setState({ loggedIn: true }, function () {
-        console.log("logged in!");
+        console.log("you are logged in!");
       });
+    } else {
+      console.log("you are NOT logged in!");
     }
   },
   render: function () {
@@ -51,25 +53,3 @@ export default React.createClass({
       </div>
     )}
 })
-
-/*
-{this.state.loggedIn ?
-          (<div>
-            <LogoutBar/>
-            <div id="Title">
-            <h1>Course Portal</h1>
-            </div>
-            <div id="NavLinks">
-            <Row>
-            <Col sm="1/2">
-              <NavLink to="/" onlyActiveOnIndex={true}>Portal</NavLink>
-            </Col>
-            <Col sm="1/2">
-              <NavLink to="/update">Update Info</NavLink>
-            </Col>
-            </Row>
-            </div>
-          </div>
-      ): (<LoginPage/>) }
-
-      */

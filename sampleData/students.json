@@ -1,14 +1,33 @@
 {
   "students": [
     {
+      "github": "mksarge",
       "sid": "54813118",
       "csid": "a6j8",
       "firstname": "Michael",
       "lastname": "Sargent",
       "email": "michael-sargent@hotmail.com",
-      "github": "mksarge",
-      "accesstoken": "7748ac22b6a7e69e288b327c5ab2506d9453e457",
-      "servertokens": {},
+      "accesstoken": "8f1a6c30c20cdfa46494f39e20ebaad620cfa11d",
+      "servertokens": "cqic0lbdy4i0btrt1e1ocrf6r",
+      "grades": {
+        "courses": "",
+        "assn1": "",
+        "assn2": "",
+        "assn3": "",
+        "midterm": "",
+        "final": "",
+        "total": ""
+      }
+    },
+    {
+      "sid": "12345678",
+      "csid": "a1b2",
+      "firstname": "John",
+      "lastname": "Doe",
+      "email": "michael-sargent@hotmail.com",
+      "github": "msarge2015",
+      "accesstoken": "5a0cc383fadee7e5409785d541e16049d228cb9b",
+      "servertokens": "",
       "grades": {
         "courses": "",
         "assn1": "",

@@ -14,6 +14,8 @@ import EchoController from '../controller/EchoController';
 import Student from '../model/Student';
 import Log from '../Util';
 
+import config2 from './config2';
+
 export default class RouteHandler {
 
     static getEcho(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -59,11 +61,10 @@ export default class RouteHandler {
      */
     static authenticateGithub(req: restify.Request, res1: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::authenticateGithub(..) - params: ' + JSON.stringify(req.params));
-        
+
         var postData = {
-            //TODO: do not post these here
-            client_id: "97ae59518a9d5cae2550",
-            client_secret: "92b13f20a11919e1b223c16b049283da82dc3638",
+            client_id: config2.client_id,
+            client_secret: config2.client_secret,
             code: req.params.authCode
         };
         
@@ -75,7 +76,7 @@ export default class RouteHandler {
             headers: {}
         };
     
-        //todo: clean up use of "body0:"
+        //TODO: find a more elegant way to reference body0?
         function requestCallback (err: any, res: any, body0: any) {
 
             //todo: un-nest this function
@@ -88,6 +89,8 @@ export default class RouteHandler {
                     }
                 };
                 
+                //TODO: decide whether to use createBlankStudent or updateStudent
+                //for a new user, and implement the correct logic to do so. 
                 request(options, function (err: any, res: any, body: any) {
                     if (!err && res.statusCode == 200) {
                         Log.trace("getUserFromGithub-success");
@@ -95,26 +98,34 @@ export default class RouteHandler {
                         Log.trace("parse: " + obj);
                         RouteHandler.checkFileForUser(obj.login, function (success:number) {
                             if (success==1) {
-                                Log.trace("success-1");
-                                
-                                //send user to update page
-                                res1.json(200, "/update~" + obj.login);
+                                Log.trace("success. Sending user to update page after updating accesstoken");
+                                RouteHandler.updateStudent(obj.login, { "accesstoken": body0.access_token }, function () {
+                                    Log.trace("Updated Accesstoken!");
+                                    RouteHandler.createServerToken(obj.login, function (token: any) {
+                                        //send user to update page, while providing servertoken
+                                        res1.json(200, "/update~" + obj.login + "~" + token);
+                                    })                                    
+                                });
                             } else if (success == 2) {
-                                Log.trace("success-2");
-
+                                Log.trace("success. Sending user to portal after updating accesstoken");
                                 //update accesstoken
-                                RouteHandler.updateStudent(obj.login, { "accesstoken": body0.access_token });
-
-                                //send user to portal
-                                res1.json(200, "/portal~" + obj.login + "~12345");
+                                RouteHandler.updateStudent(obj.login, { "accesstoken": body0.access_token }, function () {
+                                    Log.trace("Updated Accesstoken!");
+                                    RouteHandler.createServerToken(obj.login, function (token: any) {
+                                        //send user to portal, while providing servertoken
+                                        res1.json(200, "/portal~" + obj.login + "~" + token);
+                                    })
+                                });
                             } else {
-                                Log.trace("success-0");
-
                                 //no user, so create blank user with user+token
-                                RouteHandler.createBlankStudent(obj.login, body0.access_token);
-                                
-                                //send user to registration to fill in more info
-                                res1.json(200, "/update~" + obj.login + "~12345");
+                                Log.trace("success. Creating new student, then sending to update page");
+                                RouteHandler.createBlankStudent(obj.login, body0.access_token, function () {
+                                    //after creating blank student, create server token and add to database.
+                                    RouteHandler.createServerToken(obj.login, function (token: any) {
+                                        //send user to registration to fill in more info, while providing servertoken
+                                        res1.json(200, "/update~" + obj.login + "~"+token);
+                                    })
+                                });
                             }
                         });
                     }
@@ -123,11 +134,11 @@ export default class RouteHandler {
                     }
                 });
             }
-            
+        
             Log.trace("successfully acquired accesstoken: " + body0.access_token + "..getUserFromGithub() executing...");
             getUserFromGithub(body0.access_token);
         }
-        
+
         request(options, requestCallback);
         return next();        
     }
@@ -242,7 +253,7 @@ export default class RouteHandler {
         return next();
     }
     
-    static createBlankStudent(githubUser: string, accessToken: string) {
+    static createBlankStudent(githubUser: string, accessToken: string, callback:any) {
         Log.trace('RoutHandler::createBlankStudent()');
 
         //todo: deal with index variable!         
@@ -256,7 +267,7 @@ export default class RouteHandler {
             "email": '',
             "github": githubUser,
             "accesstoken": accessToken,
-            "servertokens": {},
+            "servertokens": '',
             "grades": {
                 "courses": '',
                 "assn1": '',
@@ -277,6 +288,7 @@ export default class RouteHandler {
             }  
             else {
                 Log.trace("New student created!");
+                callback();
             }
         });
         
@@ -321,16 +333,73 @@ export default class RouteHandler {
         return next();
     }
 
-    static updateStudent(username:string, object:any) {
-       //update keys in object in username file
-        Log.trace("username: " + username + "object: " + JSON.stringify(object));
+    //update keys in object in username file    
+    static updateStudent(username:string, paramsObject:any, callback:any) {
+        Log.trace("username: " + username + ", paramsObject: " + JSON.stringify(paramsObject));
+        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
+        var file = require(filename);
+        var index:number;
+        var i = 0;
+        var cont:boolean = false;
+
+        //step 1: check if username exists
+        for (index = 0; index < file.students.length; index++){
+            if (file.students[index].github == username) {
+                Log.trace("User found!");
+                cont = true;
+            }
+        }
+
+        //only continue if user was found.
+        if (cont) {
+            
+            //step 2: update student object
+            //TODO: do i need to worry about mapping to a new object instead of
+            //modifying the original object?
+            for (var key in paramsObject) {
+                Log.trace('key: '+ key +', '+ 'value: '+ paramsObject[key] +', '+ 'current value: '+ JSON.stringify(file.students[0][key]));
+                if(file.students[0].hasOwnProperty(key)) {
+                    file.students[0][key] = paramsObject[key];
+                    i++;
+                }
+            }
+            Log.trace('Mapped ' + i + ' key(s) in ' + username + '\'s file.');
+
+            //step 3: write to file
+            fs.writeFile(filename, JSON.stringify(file, null, 2), function (err:any) {
+                if (err) {
+                    Log.trace("Write unsuccessful: " + err.toString());
+                    return;
+                }  
+                else {
+                    Log.trace("Write successful! Executing callback..");
+                    callback();
+                    return;
+                }
+            });   
+        }
+        else {
+            Log.trace("Error: User was not found..");
+        }
     }
 
     static deleteStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-       
         return next();
     }
 
+    static createServerToken(username:string, callback:any) {
+        //generate unique string
+        var servertoken: string = Math.random().toString(36).slice(2);
+
+        //add servertoken to database
+        RouteHandler.updateStudent(username, { "servertokens": servertoken }, function () {
+            Log.trace("servertoken: " + servertoken + " given to " + username);
+            
+            //do something with the servertoken
+            callback(servertoken);
+        })
+    }
+    
     static putSay(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RouteHandler::putSay(..) - params: ' + JSON.stringify(req.params));
         try {
@@ -348,7 +417,7 @@ export default class RouteHandler {
                 res.send(403);
             }
         } catch (err) {
-            console.log('RouteHandler::putSay(..) - ERROR: ' + err.message);
+            Log.trace('RouteHandler::putSay(..) - ERROR: ' + err.message);
             res.send(404);
         }
 

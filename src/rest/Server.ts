@@ -87,7 +87,7 @@ export default class Server {
                 //get, add, update, delete students
                 that.rest.get('/api/students/:id', RouteHandler.getStudentById);
                 that.rest.post('/api/students', RouteHandler.createStudent);
-                that.rest.put('/api/students/:id', RouteHandler.updateStudent);
+                //that.rest.put('/api/students/:id', RouteHandler.updateStudent);
                 that.rest.del('/api/students/:id', RouteHandler.deleteStudent);
 
                 //used for authenticating with Github

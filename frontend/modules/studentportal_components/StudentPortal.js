@@ -20,6 +20,9 @@ export default React.createClass({
     };
   },
   getUserInfo: function () {
+    //TODO: VALIDATED REQUESTS ONLY (using servertoken)
+    //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json
+    
     console.log("using " + this.state.github + " to request other info:");
     $.ajax({
       url: 'http://localhost:4321/api/getUserInfo/'+this.state.github,

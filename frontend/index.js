@@ -15,9 +15,19 @@ require("./public/index.css");
 
 function requireAuth(nextState, replace) {
   if (!Auth.loggedIn()) {
-    console.log("not logged in..."+localStorage.token)
+    console.log("not logged in..." + JSON.stringify(localStorage));
     replace({
       pathname: '/login',
+      state: { nextPathname: nextState.location.pathname }
+    })
+  }
+}
+
+function requireNotAuth(nextState, replace) {
+  if (Auth.loggedIn()) {
+    console.log("you are logged in..." + JSON.stringify(localStorage));
+    replace({
+      pathname: '/',
       state: { nextPathname: nextState.location.pathname }
     })
   }
@@ -27,7 +37,7 @@ render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={StudentPortal} onEnter={requireAuth}/>
-      <Route path="login" component={LoginPage} />
+      <Route path="login" component={LoginPage} onEnter={requireNotAuth} />
       <Route path="postlogin" component={PostLogin} />
       <Route path="update" component={Update} onEnter={requireAuth}/>
     </Route>

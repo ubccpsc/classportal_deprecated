@@ -5,9 +5,8 @@ export default React.createClass({
   render() {
     return (
       <div className="module">
-        UBC CPSC 413 Course Portal
+        UBC CPSC Course Portal<br/>
         <br/>
-        Reid Holmes 
         <GithubButton/>
       </div>
     )}
