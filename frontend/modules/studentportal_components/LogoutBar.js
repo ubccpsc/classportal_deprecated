@@ -4,13 +4,10 @@ import Auth from '../Auth'
 
 export default React.createClass({
   logoutSubmit: function (e) {
-    //e.preventDefault();
+    //clear all variables in the app (then refresh?)
+    Auth.logout();
+    localStorage.clear();
     console.log("LOGGED OUT");
-    //localStorage.removeItem("username");
-    //this.setState({ loggedIn: false });
-
-    //also need to clear all variables in the app
-    Auth.logout(); 
   },
   render: function () {
     return (

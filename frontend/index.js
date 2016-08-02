@@ -44,4 +44,20 @@ render((
   </Router>
 ), document.getElementById('app'))
 
-//onEnter={requireAuth}
+/* ALL TODOS
+
+REACT:
+  Decide which variables to be storing in App.js
+  Figure out how to keep only 1 copy of all variables needed in this app (is redux needed?)
+  DON'T RETURN ALL INFO on student. Make public and private keys in students.json
+  DRY - getStudentInfo function is repeated in update.js
+  Reloading after /postlogin is only a temp solution to the Logout Button display issue.
+  Learn react events
+  Limit login requests?
+
+SERVER:
+  Implement validated api requests using servertoken
+  RouteHandler.ts: clean up file, imeplement functions. more todos in file.
+  MemoryStore.ts: implement functions
+
+*/

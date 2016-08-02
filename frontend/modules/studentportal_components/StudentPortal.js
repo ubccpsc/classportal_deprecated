@@ -22,7 +22,7 @@ export default React.createClass({
   getUserInfo: function () {
     //TODO: VALIDATED REQUESTS ONLY (using servertoken)
     //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json
-    
+    //TODO: DRY - this function is repeated in update.js
     console.log("using " + this.state.github + " to request other info:");
     $.ajax({
       url: 'http://localhost:4321/api/getUserInfo/'+this.state.github,
@@ -38,14 +38,19 @@ export default React.createClass({
         this.setState({ email: data.email });
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error("getUserInfo", status, err.toString());
+        console.error("getUserInfo-studentportal", status, err.toString());
       }.bind(this)
     });
   },
   componentDidMount: function () {
-    this.setState({ github: localStorage.username }, function () {
-      this.getUserInfo();
-    });
+    if (!!localStorage.username) {
+      console.log("localStorage.username is: " + localStorage.username);
+      this.setState({ github: localStorage.username }, function () {
+        this.getUserInfo();
+      });  
+    } else {
+      console.log("localStorage.username is not defined yet..");
+    }
   },
   render: function () {
     return (

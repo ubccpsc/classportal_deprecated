@@ -35,9 +35,6 @@ export default class RouteHandler {
 
     static getStudents(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::getStudents(..) - params: ' + JSON.stringify(req.params));
-
-        // TODO: make sure authorized?
-
         let store = new MemoryStore();
         store.createData();
         res.json(200, store.getStudents());
@@ -255,8 +252,7 @@ export default class RouteHandler {
     
     static createBlankStudent(githubUser: string, accessToken: string, callback:any) {
         Log.trace('RoutHandler::createBlankStudent()');
-
-        //todo: deal with index variable!         
+        
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
         var file = require(filename);
         var newObj = {
