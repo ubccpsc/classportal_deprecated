@@ -12,10 +12,11 @@ export default React.createClass({
     return {
       sid:'',
       csid:'',
-      firstname:'',
+      firstname:'Michael',
       lastname:'',
       email:'',
-      github: ''
+      github: '',
+      data: []
     };
   },
 
@@ -43,14 +44,14 @@ export default React.createClass({
   },
   
   componentDidMount: function () {
-    if (!!localStorage.username) {
+    /*if (!!localStorage.username) {
       console.log("localStorage.username is: " + localStorage.username);
       this.setState({ github: localStorage.username }, function () {
         //this.getUserInfo();
       });  
     } else {
       console.log("localStorage.username is not defined yet..");
-    }
+    }*/
   },
   render: function () {
     return (
@@ -58,25 +59,21 @@ export default React.createClass({
         <LogoutBar/>
         
         <div className="module">
-          <h3>Info</h3>
-          {this.state.firstname} {this.state.lastname}<br/><br/>
-          student #: {this.state.sid} <br/>
-          cpsc id: {this.state.csid}<br/>
+          <h3>Welcome, {this.state.firstname}</h3><br/>
+          sid: {this.state.sid} <br/>
+          csid: {this.state.csid}<br/>
           github: {this.state.github}<br/>
-          email: {this.state.email}<br/>
-          
-          {/*
-          <h3>Team</h3>
-          <TeamComponent data={this.state.data}/><br/>
-
-          <h3>Deliverables</h3>
-          <DeliverablesComponent data={this.state.data}/><br/>
-          
-          <h3>Grades</h3>
-          <GradesComponent data={this.state.data}/>
-          */}
-
         </div>
+        
+        <Deliverables data={this.state.data}/>
+
+        <Grades data={this.state.data}/><br/>
+        
       </div>
     )}
 })
+
+/*
+<h3>Team</h3>
+<TeamComponent data={this.state.data}/><br/>
+*/
