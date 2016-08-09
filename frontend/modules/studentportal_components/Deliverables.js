@@ -3,7 +3,7 @@ import React from 'react'
 export default React.createClass({
   render: function() {
     return (
-      <div>
+      <div className="module">
         {/*
         <h4>Assignment 1</h4>
         open date: {this.state.open}<br/>

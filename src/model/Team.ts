@@ -11,7 +11,8 @@ import Student from './Student';
 export default class Team {
 
     public id:string;
-    public name:string;
+    public name: string;
+    //public githubProjectURL:string;
     public members:Student[] = [];
 
     constructor(id:string, name:string, members:Student[]) {

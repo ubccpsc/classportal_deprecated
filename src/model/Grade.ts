@@ -16,7 +16,8 @@ export default class Grade {
 
     public student:Student;
     public deliverable:Deliverable;
-    public value:number;
+    public value: number;
+    //public feedback:string;
 
     constructor(student:Student, deliverable:Deliverable, value:number) {
         this.student = student;

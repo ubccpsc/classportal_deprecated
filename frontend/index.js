@@ -1,9 +1,9 @@
 import React from 'react'
-import { Router, Route, browserHistory, IndexRoute } from 'react-router'
+import { Router, Route, browserHistory, IndexRoute, IndexRedirect } from 'react-router'
 import { render } from 'react-dom'
 import App from './modules/App'
 import PostLogin from './modules/PostLogin'
-import Update from './modules/studentportal_components/Update'
+import Register from './modules/Register'
 import StudentPortal from './modules/studentportal_components/StudentPortal'
 import Either from './modules/Either'
 import Auth from './modules/Auth'
@@ -39,7 +39,7 @@ render((
       <IndexRoute component={StudentPortal} onEnter={requireAuth}/>
       <Route path="login" component={LoginPage} onEnter={requireNotAuth} />
       <Route path="postlogin" component={PostLogin} />
-      <Route path="update" component={Update} onEnter={requireAuth}/>
+      <Route path="register" component={Register} onEnter={requireAuth} />
     </Route>
   </Router>
 ), document.getElementById('app'))
@@ -47,17 +47,16 @@ render((
 /* ALL TODOS
 
 REACT:
-  Decide which variables to be storing in App.js
-  Figure out how to keep only 1 copy of all variables needed in this app (is redux needed?)
-  DON'T RETURN ALL INFO on student. Make public and private keys in students.json
-  DRY - getStudentInfo function is repeated in update.js
-  Reloading after /postlogin is only a temp solution to the Logout Button display issue.
-  Learn react events
-  Limit login requests?
+  -Decide which variables to be storing in App.js
+  -Figure out how to keep only 1 copy of all variables needed in this app (is redux needed?)
+  -DON'T RETURN ALL INFO on student. Make public and private keys in students.json
+  -Reloading after /postlogin is only a temp solution to the Logout Button display issue.
+  -Learn react events
+  -Limit login requests?
 
 SERVER:
-  Implement validated api requests using servertoken
-  RouteHandler.ts: clean up file, imeplement functions. more todos in file.
-  MemoryStore.ts: implement functions
+  -Implement validated api requests using servertoken
+  -RouteHandler.ts: clean up file, imeplement functions. more todos in file.
+  -MemoryStore.ts: implement functions
 
-*/
+*///<IndexRoute component={StudentPortal} onEnter={requireAuth}/>

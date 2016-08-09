@@ -27,29 +27,25 @@ export default React.createClass({
     }
   },
   render: function () {
-    var showLogout;
-    if (this.state.loggedIn) {
-      showLogout = <LogoutBar />;
-    } else {
-      showLogout = null;
-    }
     return (
       <div id="App">
-        {showLogout}
         <div id="Title">
           <h1>Course Portal</h1>
-        </div>
-        <div id="NavLinks">
-          <Row>
-            <Col sm="1/2">
-              <NavLink to="/" onlyActiveOnIndex={true}>Portal</NavLink>
-            </Col>
-            <Col sm="1/2">
-              <NavLink to="/update">Update Info</NavLink>
-            </Col>
-          </Row>
         </div>
         {this.props.children}
       </div>
     )}
 })
+
+/*
+<div id="NavLinks">
+          <Row>
+            <Col sm="1/2">
+              <NavLink to="/" onlyActiveOnIndex={true}>Portal</NavLink>
+            </Col>
+            <Col sm="1/2">
+              <NavLink to="/link">Update Info</NavLink>
+            </Col>
+          </Row>
+        </div>
+        */

@@ -91,11 +91,28 @@ export default class Server {
                 that.rest.del('/api/students/:id', RouteHandler.deleteStudent);
 
                 //used for authenticating with Github
-                that.rest.post('/api/authenticate', RouteHandler.authenticateGithub);
+                //that.rest.post('/api/authenticate', RouteHandler.requestAccessToken);
+
+                that.rest.post('/api/authenticate', function (req: restify.Request, res: restify.Response, next: restify.Next) {
+                    if (req.params.servertoken == "temp") {
+                        Log.trace("servertoken: "+req.params.servertoken);
+                        RouteHandler.requestAccessToken(req, res, next);
+                    }
+                    else if (req.params.servertoken == "legit") {
+                        Log.trace("servertoken: "+req.params.servertoken);
+                        RouteHandler.requestAccessToken(req, res, next);
+                    }
+                    else {
+                        //error
+                        Log.trace("servertoken: "+req.params.servertoken);
+                        next();
+                    }
+                    
+                });
                 
-                //get + update user info
-                that.rest.get('/api/getUserInfo/:id', RouteHandler.getUserInfo);
-                that.rest.post('/api/updateUserInfo/:id', RouteHandler.updateUserInfo);
+                //get + update user info (old/unneeded?)
+                //that.rest.get('/api/getUserInfo/:id', RouteHandler.getUserInfo);
+                that.rest.post('/api/register', RouteHandler.registerAccount);
 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({

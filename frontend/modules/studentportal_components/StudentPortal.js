@@ -4,7 +4,6 @@ import Grades from './Grades'
 import Info from './Info'
 import LogoutBar from './LogoutBar'
 import Teams from './Teams'
-import Update from './Update'
 import NavLink from '../NavLink'
 import { Row, Col, Button, Alert, Spinner } from 'elemental'
 
@@ -19,10 +18,10 @@ export default React.createClass({
       github: ''
     };
   },
+
   getUserInfo: function () {
     //TODO: VALIDATED REQUESTS ONLY (using servertoken)
     //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json
-    //TODO: DRY - this function is repeated in update.js
     console.log("using " + this.state.github + " to request other info:");
     $.ajax({
       url: 'http://localhost:4321/api/getUserInfo/'+this.state.github,
@@ -42,11 +41,12 @@ export default React.createClass({
       }.bind(this)
     });
   },
+  
   componentDidMount: function () {
     if (!!localStorage.username) {
       console.log("localStorage.username is: " + localStorage.username);
       this.setState({ github: localStorage.username }, function () {
-        this.getUserInfo();
+        //this.getUserInfo();
       });  
     } else {
       console.log("localStorage.username is not defined yet..");
@@ -55,6 +55,7 @@ export default React.createClass({
   render: function () {
     return (
       <div>
+        <LogoutBar/>
         
         <div className="module">
           <h3>Info</h3>
@@ -79,18 +80,3 @@ export default React.createClass({
       </div>
     )}
 })
-
-/*
-loadNewStudent: function (num) {
-    $.ajax({
-      url: this.props.url + '/api/students/' + num,
-      dataType: 'json',
-      cache: false,
-      success: function(data) {
-        this.setState({data: data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
-*/

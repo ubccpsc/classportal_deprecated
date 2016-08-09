@@ -10,26 +10,26 @@ export default React.createClass({
       console.log("success! response: " + response);
       var fields = response.split('~');
       var redirect = fields[0], username = fields[1], servertoken = fields[2];
-      localStorage.setItem('username', username);
-      localStorage.setItem('servertoken', servertoken);
 
-      //unlock restricted pages(?)
-      localStorage.servertoken = servertoken;
-      
-      //redirect to update if needed, else to portal
-      if (redirect == "/update") {
+      //redirect to Registration if needed, else to portal
+      if (redirect == "/register") {
         console.log("redirecting to registration");
-        browserHistory.push("/update");
-        
+        localStorage.setItem('username', username);
+        localStorage.setItem('servertoken', servertoken);
+        browserHistory.push("/register");
+        //TODO: is reloading a temporary solution?
+        window.location.reload(false);
+      }
+      else if (redirect == "/") {
+        console.log("redirecting to portal");
+        localStorage.setItem('username', username);
+        localStorage.setItem('servertoken', servertoken);
+        browserHistory.push("/");
         //TODO: is reloading a temporary solution?
         window.location.reload(false);
       }
       else {
-        console.log("redirecting to portal");
-        browserHistory.push("/");
-
-        //TODO: is reloading a temporary solution?
-        window.location.reload(false);
+        //TODO: ERROR handling
       }
     }
     
@@ -65,12 +65,13 @@ export default React.createClass({
         type: 'POST',
         url: 'http://localhost:4321/api/authenticate',
         data: {
+          servertoken:"temp",
           authCode: authCode
         },
         dataType: "json",
         success: onSuccess.bind(this),
         error: function (xhr, status, err) {
-          console.log("failed to get authcode..", status, err.toString());
+          console.log("failed to get authcode..", xhr, status, err.toString());
         }.bind(this)
       });
     }
