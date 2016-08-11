@@ -16,17 +16,13 @@ export default React.createClass({
         console.log("redirecting to registration");
         localStorage.setItem('username', username);
         localStorage.setItem('servertoken', servertoken);
-        browserHistory.push("/register");
-        //TODO: is reloading a temporary solution?
-        window.location.reload(false);
+        browserHistory.push("/register"); 
       }
       else if (redirect == "/") {
         console.log("redirecting to portal");
         localStorage.setItem('username', username);
         localStorage.setItem('servertoken', servertoken);
         browserHistory.push("/");
-        //TODO: is reloading a temporary solution?
-        window.location.reload(false);
       }
       else {
         //TODO: ERROR handling

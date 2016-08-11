@@ -24,11 +24,11 @@ export default class RouteHandler {
         1) request an access token from github.
         2) use token to get user info from github.
         3) check if username exists in database
-        4a) if yes, update the user's accesstoken and redirect app to the homepage.
+        4a) if yes, update the user's githubtoken and redirect app to the homepage.
         4b) if no, create blank student and redirect app to registration page.
     */
-    static requestAccessToken(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::requestAccessToken(..) - params: ' + JSON.stringify(req.params));
+    static requestGithubToken(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RouteHandler::requestGithubToken(..) - params: ' + JSON.stringify(req.params));
 
         var options = {
             method: 'post',
@@ -40,25 +40,25 @@ export default class RouteHandler {
             headers: {}
         };
     
-        function requestAccessTokenCallback(err1: any, res1: any, body1: any) {
+        function requestGithubTokenCallback(err1: any, res1: any, body1: any) {
             if (!err1 && res1.statusCode == 200) {
-                var accesstoken = body1.access_token;
-                Log.trace("Successfully acquired accesstoken: " + accesstoken);
+                var githubtoken = body1.access_token;
+                Log.trace("Successfully acquired githubtoken: " + githubtoken);
 
-                //next, request github username using accesstoken.
-                RouteHandler.requestGithubInfo(accesstoken, function (err2: any, res2: any, body2: any) {
+                //next, request github username using githubtoken.
+                RouteHandler.requestGithubInfo(githubtoken, function (err2: any, res2: any, body2: any) {
                     if (!err2 && res2.statusCode == 200) {
                         var obj = JSON.parse(body2);
                         var username = obj.login;
-                        Log.trace("Successfully! Now checking file for registration status..");
+                        Log.trace("User is: "+username+". Now checking file for registration status..");
                         
                         //next, request student info from database by providing github username.
                         RouteHandler.readJSON("students", username, function (studentObject: any) {
                             //if student does not exist in database, create new user.
                                 //TODO: but what if it was becuase of file read error?
                             if (studentObject == null) {
-                                //create new student with gitub username and accesstoken.
-                                RouteHandler.createBlankStudent(username, accesstoken, function () {
+                                //create new student with gitub username and githubtoken.
+                                RouteHandler.createBlankStudent(username, githubtoken, function () {
                                     //finally, send app to registration page.
                                     //todo: double check this action
                                     Log.trace("Redirecting to registration page.");
@@ -69,9 +69,9 @@ export default class RouteHandler {
                                 //if a match is found, check if they have the required info from registration.
                                 if (!!studentObject.csid && !!studentObject.sid && !!studentObject.firstname ) {
                                     
-                                    //next, update accesstoken
-                                    RouteHandler.writeJSON(username, { "accesstoken": accesstoken }, function () {
-                                        Log.trace("Updated student's accesstoken. Sending user to homepage..");
+                                    //next, update githubtoken
+                                    RouteHandler.writeJSON(username, { "githubtoken": githubtoken }, function () {
+                                        Log.trace("Updated student's githubtoken. Sending user to homepage..");
                                         res.json(200, "/~" + username + "~legit");
                                         //next, create servertoken
                                         /*RouteHandler.createServerToken(username, function (servertoken:string) {
@@ -99,9 +99,9 @@ export default class RouteHandler {
             }
         }
 
-        //request accesstoken from Github using authcode and client id + secret
+        //request githubtoken from Github using authcode and client id + secret
         Log.trace("Requesting access token from github.com..");
-        request(options, requestAccessTokenCallback);
+        request(options, requestGithubTokenCallback);
         return next();
     }
 
@@ -122,7 +122,7 @@ export default class RouteHandler {
         //validate sid and csid
         
         //get class list then check if csid and sid exist and are a valid combination
-        RouteHandler.getClassList(function (csidArray: any, sidArray: any, lastArray: any, firstArray: any) {
+        RouteHandler.getClassList2(function (csidArray: any, sidArray: any, lastArray: any, firstArray: any) {
             //check if csid exists
             Log.trace("Checking CSID..");
             for (var index = 0; index < csidArray.length; index++){
@@ -154,14 +154,61 @@ export default class RouteHandler {
         });
     }
 
+    static getDeliverables(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RouteHandler::getDeliverables(..) - params: ' + JSON.stringify(req.params));
+        //read deliverables.json
+        RouteHandler.returnFile("deliverables.json", function (data:any) {
+            //return all the deliverables for the current couse
+            var deliverables = JSON.parse(data);
+            res.json(200, deliverables);
+            return next();
+        });
+    }
+
+    static getGrades(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RouteHandler::getGrades(..) - params: ' + JSON.stringify(req.params));
+        //read grades.csv
+        RouteHandler.returnFile("grades.csv", function (data:any) {
+            var lines = data.toString().split(/\n/);
+            Log.trace("There are " + (lines.length-1) + " students in the class list.");
+            
+            var myGrades: any[] = []
+            // Split up the comma seperated values and sort into arrays
+            for (var index = 1; index < lines.length; index++) {
+                var values = lines[index].split(',');
+                if (values[0] == req.params.sid) {
+                    myGrades.push(values[1]);
+                    myGrades.push(values[2]);
+                    myGrades.push(values[3]);
+                    myGrades.push(values[4]);
+                    myGrades.push(values[5]);
+                }
+            }
+            Log.trace("Grades acquired. Returning grades: " + myGrades);
+            res.json(200, myGrades);
+            return next();
+        });
+    }
+
+    static getStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RouteHandler::getStudent(..) - params: ' + JSON.stringify(req.params));
+        //read deliverables.json
+        RouteHandler.readJSON("students", req.params.username, function (response:any) {
+            //return current student
+            Log.trace("getStudent success! returning..");
+            res.json(200, response);
+            return next();
+        });
+    }
+
     //***HELPER FUNCTIONS***//
-    static requestGithubInfo(accessToken: string, callback: any) {
+    static requestGithubInfo(githubtoken: string, callback: any) {
         Log.trace('RouteHandler::requestGithubInfo(..)');
         var options = {
             url: 'https://api.github.com/user',
             headers: {
                 "User-Agent": "ClassPortal-Student",
-                "Authorization": "token " + accessToken
+                "Authorization": "token " + githubtoken
             }
         };
         
@@ -169,8 +216,8 @@ export default class RouteHandler {
         request(options, callback);
     }
 
-    static createBlankStudent(username: string, accessToken: string, callback: any) {
-        Log.trace('RouteHandler::createBlankStudent():: '+username+', '+accessToken);
+    static createBlankStudent(username: string, githubtoken: string, callback: any) {
+        Log.trace('RouteHandler::createBlankStudent():: '+username+', '+githubtoken);
         
         //RouteHandler.createServerToken(githubUser, function (response: string) { });
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
@@ -179,17 +226,9 @@ export default class RouteHandler {
             "sid": "",
             "csid": "",
             "firstname": "",
-            "accesstoken": accessToken,
-            "grades": {
-                "courses": "",
-                "assn1": "",
-                "assn2": "",
-                "assn3": "",
-                "midterm": "",
-                "final": "",
-                "total": ""
-            }
+            "githubtoken": githubtoken
         };
+        
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
             if (err) {
                 Log.trace("writeFile error: " + err.toString());
@@ -272,6 +311,24 @@ export default class RouteHandler {
             }
         });
     }
+
+    static returnFile(fileName: string, callback: any) {
+        Log.trace('RouteHandler::returnFile(..) - params: ' + fileName);
+        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/"+fileName;
+        Log.trace("Accessing file "+fileName+"..");
+
+        fs.readFile(filename, function read(err: any, data: any) {
+            if (err) {
+                Log.trace("Error reading file: " + err.toString());
+                return;
+            }
+            else {
+                Log.trace("File read successfully. Executing callback..");
+                callback(data);
+                return;
+            }
+        });
+    }
     
     static createServerToken(username: string, callback: any) {
         //generate unique string
@@ -342,7 +399,37 @@ export default class RouteHandler {
             }
         });
     }
-    
+
+    static getClassList2(callback:any) {
+        Log.trace('RouteHandler::getClassList2()');
+
+        RouteHandler.returnFile("classList.csv", function (data:any) {
+            var lines = data.toString().split(/\n/);
+            Log.trace("There are " + (lines.length-1) + " students in the class list.");
+
+            // Splice up the first row to get the headings
+            var headings = lines[0].split(',');
+            
+            //data arrays are set up specifically for our classList.csv format
+            var csid: any[] = [];
+            var sid: any[] = [];
+            var last: any[] = [];
+            var first: any[] = [];
+            
+            // Split up the comma seperated values and sort into arrays
+            for (var index = 1; index < lines.length; index++) {
+                var values = lines[index].split(','); 
+                csid.push(values[0]);
+                sid.push(values[1]);
+                last.push(values[2]);
+                first.push(values[3]);
+            }
+
+            Log.trace("Classlist parsed. Executing callback..");
+            callback( csid, sid, last, first );    
+        });
+    }
+
     //***OLD FUNCTIONS***//
 
     static putSay(req: restify.Request, res: restify.Response, next: restify.Next) {

@@ -1,20 +1,20 @@
 [
-{
-"id":"d1a",
-"name":"Deliverable 1 (Group)",
-"description":"D1 Group Short Description.",
-"url":"http://link-to-deliverable-description",
-"open": true,
-"isTeam": true,
-"uploadKind": ""
-},
-{
-"id":"d1b",
-"name":"Deliverable 1 (Individual)",
-"description":"D1 Individual Short Description.",
-"url":"http://link-to-deliverable-description",
-"open": false,
-"isTeam": false,
-"uploadKind": "pdf"
-}
+    {
+        "id":"d1a",
+        "name":"Deliverable 1 (Group)",
+        "description":"D1 Group Short Description.",
+        "url":"http://link-to-deliverable-description",
+        "open": "Sept. 21, 2016",
+        "isTeam": true,
+        "uploadKind": ""
+    },
+    {
+        "id":"d1b",
+        "name":"Deliverable 1 (Individual)",
+        "description":"D1 Individual Short Description.",
+        "url":"http://link-to-deliverable-description",
+        "open": false,
+        "isTeam": false,
+        "uploadKind": "pdf"
+    }
 ]

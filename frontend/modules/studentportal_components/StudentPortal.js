@@ -9,49 +9,33 @@ import { Row, Col, Button, Alert, Spinner } from 'elemental'
 
 export default React.createClass({
   getInitialState: function() {
-    return {
-      sid:'',
-      csid:'',
-      firstname:'Michael',
-      lastname:'',
-      email:'',
-      github: '',
-      data: []
-    };
+    return { studentObject: '' };
   },
-
-  getUserInfo: function () {
-    //TODO: VALIDATED REQUESTS ONLY (using servertoken)
-    //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json
-    console.log("using " + this.state.github + " to request other info:");
+  //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json  
+  getStudent: function () {  
+    console.log("StudentPortal.js| getStudent()");
     $.ajax({
-      url: 'http://localhost:4321/api/getUserInfo/'+this.state.github,
-      method: "GET",
-      dataType: 'json',
+      type: 'POST',
+      url: 'http://localhost:4321/api/getStudent',
+      data: {
+        servertoken: localStorage.servertoken,
+        username: localStorage.username
+      },
+      dataType: "json",
       cache: false,
       success: function(data) {
-        console.log("Response:  " + JSON.stringify(data));
-        this.setState({ sid: data.sid });
-        this.setState({ csid: data.csid });
-        this.setState({ firstname: data.firstname });
-        this.setState({ lastname: data.lastname });
-        this.setState({ email: data.email });
+        console.log("StudentPortal.js| Response: \n"+JSON.stringify(data, null, 2));
+        this.setState({ studentObject: data }, function () {
+          console.log("StudentPortal.js| this.state.studentObject updated");
+        });
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error("getUserInfo-studentportal", status, err.toString());
+        console.error("StudentPortal.js| getStudent error", status, err.toString());
       }.bind(this)
     });
   },
-  
   componentDidMount: function () {
-    /*if (!!localStorage.username) {
-      console.log("localStorage.username is: " + localStorage.username);
-      this.setState({ github: localStorage.username }, function () {
-        //this.getUserInfo();
-      });  
-    } else {
-      console.log("localStorage.username is not defined yet..");
-    }*/
+    this.getStudent();
   },
   render: function () {
     return (
@@ -59,21 +43,15 @@ export default React.createClass({
         <LogoutBar/>
         
         <div className="module">
-          <h3>Welcome, {this.state.firstname}</h3><br/>
-          sid: {this.state.sid} <br/>
-          csid: {this.state.csid}<br/>
-          github: {this.state.github}<br/>
+          <h3>Welcome, {this.state.studentObject.firstname}!</h3>
         </div>
         
-        <Deliverables data={this.state.data}/>
+        <Teams team={this.state.studentObject}/>
 
-        <Grades data={this.state.data}/><br/>
+        <Deliverables/><br/>
         
+        {!!this.state.studentObject && (<Grades sid={this.state.studentObject.sid}/>)}<br/>
+
       </div>
     )}
 })
-
-/*
-<h3>Team</h3>
-<TeamComponent data={this.state.data}/><br/>
-*/

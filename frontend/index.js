@@ -36,7 +36,7 @@ function requireNotAuth(nextState, replace) {
 render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
-      <IndexRoute component={StudentPortal}/> {/*onEnter={requireAuth}/>*/}
+      <IndexRoute component={StudentPortal} onEnter={requireAuth}/>
       <Route path="login" component={LoginPage} onEnter={requireNotAuth} />
       <Route path="postlogin" component={PostLogin} />
       <Route path="register" component={Register} onEnter={requireAuth} />

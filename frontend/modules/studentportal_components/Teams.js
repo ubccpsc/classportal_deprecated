@@ -3,9 +3,10 @@ import React from 'react'
 export default React.createClass({
    render: function() {
     return (
-      <div>
-        team #: {this.props.data.team} <br/>
-        team members: {this.props.data.members} <br/>
+      <div className="module">
+        <h3>Team</h3><br/>
+        Create a team:<br/>
+        Members:<br/>
       </div>
     )}
 })

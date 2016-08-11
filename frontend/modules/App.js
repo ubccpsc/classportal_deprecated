@@ -16,14 +16,14 @@ export default React.createClass({
   },
   componentDidMount: function () {
     //TODO: learn React event system so i don't have to keep looping the below code.
-    console.log("checking login..."); 
-    console.log(JSON.stringify(localStorage));
+    console.log("App.js | checking login..."); 
+    console.log("App.js | " + JSON.stringify(localStorage));
     if (!!localStorage.servertoken) {
       this.setState({ loggedIn: true }, function () {
-        console.log("you are logged in!");
+        console.log("App.js | you are logged in as: "+localStorage.username);
       });
     } else {
-      console.log("you are NOT logged in!");
+      console.log("App.js | you are NOT logged in!");
     }
   },
   render: function () {
