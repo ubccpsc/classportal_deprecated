@@ -11,10 +11,8 @@ export default React.createClass({
   },
   render: function () {
     return (
-      <div id="LogoutBar">
-        <Form onSubmit={this.logoutSubmit}>
-          <Button submit><Glyph icon="log-out"/> | Log out</Button>
-        </Form>
-      </div>
+      <Form id="text-center" onSubmit={this.logoutSubmit}>
+        <Button submit><Glyph icon="sign-out"/>&nbsp; Log out</Button>
+      </Form>
     )}
 })

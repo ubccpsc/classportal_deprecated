@@ -78,7 +78,8 @@ export default React.createClass({
   render() {
     return (
       <div className="module">
-        <Spinner size="lg" />
+        <h3>Logging In</h3><br/><br/>
+        <Spinner size="lg" type="primary"/>
       </div>
     )}
 })

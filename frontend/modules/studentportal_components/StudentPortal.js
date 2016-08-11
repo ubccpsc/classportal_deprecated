@@ -40,15 +40,14 @@ export default React.createClass({
   render: function () {
     return (
       <div>
-        <LogoutBar/>
-        
         <div className="module">
-          <h3>Welcome, {this.state.studentObject.firstname}!</h3>
+          <h3>Welcome, {this.state.studentObject.firstname}!</h3><br/>
+          <LogoutBar/>
         </div>
         
         <Teams team={this.state.studentObject}/>
 
-        <Deliverables/><br/>
+        <Deliverables/>
         
         {!!this.state.studentObject && (<Grades sid={this.state.studentObject.sid}/>)}<br/>
 

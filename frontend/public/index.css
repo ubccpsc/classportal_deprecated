@@ -38,6 +38,11 @@ h3 {
 h4 {
   font-size: 1.1em;
 }
+h5{
+  font-size: 0.9em;
+  line-height: 1.1;
+  padding-bottom:5px
+}
 
 .active {
   color: black;
@@ -56,14 +61,6 @@ h4 {
   background: darkblue;
 } #Title h1 {
   color: white;
-}
-
-#LogoutBar{
-  position:absolute;
-  top: 0%;
-  right: 0%;
-  background:lightgrey;
-  text-align: center;
 }
 
 #NavLinks{
@@ -97,6 +94,14 @@ h4 {
   width:100%;
 }
 
+.text-left{
+  text-align:left;
+}
+
+#text-center {
+  text-align:center;
+}
+
 .tg  {
   border-collapse:collapse;
   border-spacing:0;
@@ -113,8 +118,6 @@ h4 {
   border-color:#aabcfe;
   color:#669;
   background-color:#e8edff;
-  border-top-width:1px;
-  border-bottom-width:1px;
 } .tg th{
   font-family:Arial, sans-serif;
   font-size:14px;
@@ -127,26 +130,36 @@ h4 {
   border-color:#aabcfe;
   color:#039;
   background-color:#b9c9fe;
-  border-top-width:1px;
-  border-bottom-width:1px;
 } .tg .tg-yw4l{
   vertical-align:top
+} .tg-wrap-deliverables > table {
+  width:100%;
 }
 @media screen and (max-width: 767px) {
   .tg {
     width: auto !important;
   }.tg col {
     width: auto !important;
-  }.tg-wrap {
+  }.tg-wrap, .tg-wrap-deliverables {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     margin: auto 0px;
   }
 }
-
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;margin:0px auto;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:5px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:5px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
-.tg .tg-7wrc{background-color:#b9c9fe;color:#003399;vertical-align:top}
-.tg .tg-edam{background-color:#e8edff;color:#666699;vertical-align:top}
-@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}
+.tg .tg-7wrc{
+  background-color:#b9c9fe;
+  color:#003399;
+  vertical-align:top
+}
+.tg .tg-edam {
+  background-color:#e8edff;
+  color:#666699;
+  vertical-align:top;
+  text-align:left;
+}.tg .tg-value {
+  background-color:#e8edff;
+  color:#666699;
+  vertical-align:top;
+  text-align:left;
+  width:100%;
+}

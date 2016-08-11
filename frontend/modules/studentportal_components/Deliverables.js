@@ -44,7 +44,7 @@ export default React.createClass({
       for (var index = 0; index < this.state.numDeliverables; index++){
         console.log("Deliverables.js| rendering deliverable: " + index);      
         block[index] = (
-          <div className="tg-wrap" key={index}>
+          <div className="tg-wrap-deliverables" key={index}>
             <table className="tg">
               <tbody>
                 <tr>
@@ -52,23 +52,23 @@ export default React.createClass({
                 </tr>
                 <tr>
                   <td className="tg-edam">Description</td>
-                  <td className="tg-edam">{data[index].description}</td>
+                  <td className="tg-value">{data[index].description}</td>
                 </tr>
                 <tr>
                   <td className="tg-edam">Criteria</td>
-                  <td className="tg-edam">{data[index].url}</td>
+                  <td className="tg-value">{data[index].url}</td>
                 </tr>
                 <tr>
                   <td className="tg-edam">Date open</td>
-                  <td className="tg-edam">{data[index].open}</td>
+                  <td className="tg-value">{data[index].open}</td>
                 </tr>
                 <tr>
                   <td className="tg-edam">Date due</td>
-                  <td className="tg-edam">{data[index].due}</td>
+                  <td className="tg-value">{data[index].due}</td>
                 </tr>
                 <tr>
                   <td className="tg-edam">Submit</td>
-                  <td className="tg-edam">www.github.com</td>
+                  <td className="tg-value">www.github.com</td>
                 </tr>
               </tbody>
             </table><br/>
