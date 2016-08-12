@@ -14,23 +14,29 @@ import EchoController from '../controller/EchoController';
 import Student from '../model/Student';
 import Log from '../Util';
 
-import config2 from './config2';
-
 export default class RouteHandler {
-    
     static validateServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
         var username = req.params.username;
         var servertoken = req.params.servertoken;
+        var file = require(__dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/tokens.json");
 
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/tokens.json";
-        var file = require(filename);
-
-        if (file[username] == servertoken){
-            Log.trace("Valid servertoken! Continue..");
+        console.log("username: "+username +", servertoken: "+servertoken);
+        if (!!username && !!servertoken && servertoken == file[username]) {
+            console.log("Valid servertoken");
             next();
         }
+        else if (servertoken == "temp") {
+            console.log("Temporary servertoken for login");
+            if (!!req.params.authCode) {
+                RouteHandler.requestGithubToken(req, res, next);
+            }
+            else {
+                console.log("Bad request. Returning..");
+                res.send(500, "badlogin");
+            }
+        }
         else {
-            Log.trace("Bad servertoken! Returning...");
+            console.log("Bad servertoken. Returning..");
             res.send(500, "badlogin");
         }
     }
@@ -46,12 +52,13 @@ export default class RouteHandler {
         4b) if no, create blank student and redirect app to registration page.
     */
     static requestGithubToken(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::requestGithubToken(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.requestGithubToken()\nparams: ' + JSON.stringify(req.params));
+        var config = require(__dirname + "/config.json");
 
         var options = {
             method: 'post',
-            body: { client_id: config2.client_id,
-                    client_secret: config2.client_secret,
+            body: { client_id: config.client_id,
+                    client_secret: config.client_secret,
                     code: req.params.authCode },
             json: true,
             url: 'https://github.com/login/oauth/access_token',
@@ -136,7 +143,7 @@ export default class RouteHandler {
             3b) no matching csid's, so send error to app.
     */    
     static registerAccount(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::registerAccount(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.registerAccount()\nparams: ' + JSON.stringify(req.params));
         //start, as always, by checking servertoken. if fail, return error response.
         //validate sid and csid
         
@@ -174,7 +181,7 @@ export default class RouteHandler {
     }
 
     static getDeliverables(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::getDeliverables(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.getDeliverables()\nparams: ' + JSON.stringify(req.params));
         //read deliverables.json
         RouteHandler.returnFile("deliverables.json", function (data:any) {
             //return all the deliverables for the current couse
@@ -185,32 +192,44 @@ export default class RouteHandler {
     }
 
     static getGrades(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::getGrades(..) - params: ' + JSON.stringify(req.params));
-        //read grades.csv
-        RouteHandler.returnFile("grades.csv", function (data:any) {
-            var lines = data.toString().split(/\n/);
-            Log.trace("There are " + (lines.length-1) + " students in the class list.");
-            
-            var myGrades: any[] = []
-            // Split up the comma seperated values and sort into arrays
-            for (var index = 1; index < lines.length; index++) {
-                var values = lines[index].split(',');
-                if (values[0] == req.params.sid) {
-                    myGrades.push(values[1]);
-                    myGrades.push(values[2]);
-                    myGrades.push(values[3]);
-                    myGrades.push(values[4]);
-                    myGrades.push(values[5]);
+        Log.trace('RouteHandler.getGrades()\nparams: ' + JSON.stringify(req.params));
+        
+        //TODO: use regex to validate 8-digit sid
+        if (req.params.sid.match(/^\d{8}$/)) {
+            //read grades.csv
+            RouteHandler.returnFile("grades.csv", function (data:any) {
+                var lines = data.toString().split(/\n/);
+                Log.trace("There are " + (lines.length-1) + " students in grades.csv");
+                
+                var myGrades: any[] = [];
+                // Split up the comma seperated values and sort into arrays
+                for (var i = 1; i < lines.length; i++) {
+                    var values = lines[i].split(',');
+                    if (values[0] == req.params.sid) {
+                        for (var j = 1; j < values.length; j++){
+                            myGrades.push(values[j]);
+                        }
+                    }
                 }
-            }
-            Log.trace("Grades acquired. Returning grades: " + myGrades);
-            res.json(200, myGrades);
-            return next();
-        });
+
+                if (myGrades.length > 0) {
+                    Log.trace("Grades acquired. Returning grades: " + myGrades);
+                    res.json(200, myGrades);    
+                }
+                else {
+                    Log.trace("Sid not found. Returning error..");
+                    res.json(500, "student not found");
+                }
+            });
+        }
+        else {
+            Log.trace("Bad sid. Returning..")
+            res.json(500, "bad sid");
+        }
     }
 
     static getStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::getStudent(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.getStudent()\nparams: ' + JSON.stringify(req.params));
         //read deliverables.json
         RouteHandler.readJSON("students", req.params.username, function (response:any) {
             //return current student
@@ -222,7 +241,7 @@ export default class RouteHandler {
 
     //***HELPER FUNCTIONS***//
     static requestGithubInfo(githubtoken: string, callback: any) {
-        Log.trace('RouteHandler::requestGithubInfo(..)');
+        Log.trace('RouteHandler.requestGithubInfo()');
         var options = {
             url: 'https://api.github.com/user',
             headers: {
@@ -236,7 +255,7 @@ export default class RouteHandler {
     }
 
     static createBlankStudent(username: string, githubtoken: string, callback: any) {
-        Log.trace('RouteHandler::createBlankStudent():: '+username+', '+githubtoken);
+        Log.trace('RouteHandler.createBlankStudent():: '+username+', '+githubtoken);
         
         //RouteHandler.createServerToken(githubUser, function (response: string) { });
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
@@ -263,7 +282,7 @@ export default class RouteHandler {
     //update keys in object in username file
     //more like: update student   
     static writeJSON(username: string, paramsObject: any, callback: any) {
-        Log.trace("RouteHandler::writeJSON():: username: " + username + ", paramsObject: " + JSON.stringify(paramsObject));
+        Log.trace("RouteHandler.writeJSON():: username: " + username + ", paramsObject: " + JSON.stringify(paramsObject));
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
         var file = require(filename);
         Log.trace("Accessed file: students.json. Checking for user: " + username);
@@ -305,7 +324,7 @@ export default class RouteHandler {
     }
 
     static readJSON(accessType: string, username: string, callback: any) {
-        Log.trace('RouteHandler::readJSON(..) - params: ' + accessType + ', ' + username);
+        Log.trace('RouteHandler.readJSON()\nparams: ' + accessType + ', ' + username);
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
         Log.trace("Accessing file: students.json");
 
@@ -332,10 +351,9 @@ export default class RouteHandler {
         });
     }
 
-    static returnFile(fileName: string, callback: any) {
-        Log.trace('RouteHandler::returnFile(..) - params: ' + fileName);
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/"+fileName;
-        Log.trace("Accessing file "+fileName+"..");
+    static returnFile(file: string, callback: any) {
+        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/"+file;
+        Log.trace("Accessing file "+file);
 
         fs.readFile(filename, function read(err: any, data: any) {
             if (err) {
@@ -377,7 +395,7 @@ export default class RouteHandler {
     }
     
     static getClassList(callback:any) {
-        Log.trace('RouteHandler::getClassList(..)');
+        Log.trace('RouteHandler.getClassList()');
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/classList.csv";
         
         Log.trace("Reading from file: classList.csv");
@@ -415,7 +433,7 @@ export default class RouteHandler {
     }
 
     static getClassList2(callback:any) {
-        Log.trace('RouteHandler::getClassList2()');
+        Log.trace('RouteHandler.getClassList2()');
 
         RouteHandler.returnFile("classList.csv", function (data:any) {
             var lines = data.toString().split(/\n/);
@@ -447,7 +465,7 @@ export default class RouteHandler {
     //***OLD FUNCTIONS***//
 
     static putSay(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::putSay(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.putSay()\nparams: ' + JSON.stringify(req.params));
         try {
             // validate params
             if (typeof req.params.val !== 'undefined') {
@@ -463,7 +481,7 @@ export default class RouteHandler {
                 res.send(403);
             }
         } catch (err) {
-            Log.trace('RouteHandler::putSay(..) - ERROR: ' + err.message);
+            Log.trace('RouteHandler.putSay() - ERROR: ' + err.message);
             res.send(404);
         }
 
@@ -471,7 +489,7 @@ export default class RouteHandler {
     }
     
     static getEcho(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::getEcho(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.getEcho()\nparams: ' + JSON.stringify(req.params));
 
         if (typeof req.params.message !== 'undefined' && req.params.message.length > 0) {
             let val = req.params.message;
@@ -490,7 +508,7 @@ export default class RouteHandler {
     }
     
     static getStudents(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::getStudents(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.getStudents()\nparams: ' + JSON.stringify(req.params));
         let store = new MemoryStore();
         store.createData();
         res.json(200, store.getStudents());
@@ -506,7 +524,7 @@ export default class RouteHandler {
     }
 
     static getStudentById(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::getStudentById(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.getStudentById()\nparams: ' + JSON.stringify(req.params));
         
         
         let store = new MemoryStore();
@@ -525,7 +543,7 @@ export default class RouteHandler {
     }
     
     static createStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::createStudent(..) - params: ' + JSON.stringify(req.params));
+        Log.trace('RouteHandler.createStudent()\nparams: ' + JSON.stringify(req.params));
 
         var newStudent = new Student(req.body.id, req.body.name, req.body.studentNumber);
 

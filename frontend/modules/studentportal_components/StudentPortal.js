@@ -93,7 +93,7 @@ export default React.createClass({
         
         <Teams team={this.state.studentObject}/>
 
-        <Deliverables deliverables={this.state.deliverablesObject}/><br/>
+        <Deliverables deliverables={this.state.deliverablesObject}/>
         
         <Grades grades={this.state.gradesObject} deliverables={this.state.deliverablesObject}/><br/>
 

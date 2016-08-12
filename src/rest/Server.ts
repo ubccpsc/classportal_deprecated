@@ -62,7 +62,7 @@ export default class Server {
                     // Disable caching so we'll always get the latest students.
                     res.setHeader('Cache-Control', 'no-cache');
                     
-                    console.log(req.method + ' ' + req.url);
+                    console.log('\n' + req.method + ' ' + req.url);
                     return next();
                 });
 
@@ -75,48 +75,29 @@ export default class Server {
                 //rest.use(restify.authorizationParser());
                 //rest.use(restify.fullResponse());                
                 
-                // clear; curl -is  http://localhost:4321/echo/foo
-                that.rest.get('/echo/:message', RouteHandler.getEcho);
 
-                // clear; curl -is -X PUT -d '{"key":"val","key2":"val2"}' http://localhost:3031/say/randomKey67
-                // rest.put('/say/:val', portal.rest.RouteHandler.putSay);
 
-                // clear; curl -is  http://localhost:4321/students
-                that.rest.get('/api/students', RouteHandler.getStudents);
-                
-                //get, add, update, delete students
-                that.rest.get('/api/students/:id', RouteHandler.getStudentById);
-                that.rest.post('/api/students', RouteHandler.createStudent);
-                //that.rest.put('/api/students/:id', RouteHandler.updateStudent);
-                that.rest.del('/api/students/:id', RouteHandler.deleteStudent);
 
-                //used for authenticating with Github
-                that.rest.post('/api/authenticate', function (req: restify.Request, res: restify.Response, next: restify.Next) {
-                    if (req.params.servertoken == "temp") {
-                        Log.trace("servertoken: "+req.params.servertoken);
-                        RouteHandler.requestGithubToken(req, res, next);
-                    }
-                    else if (req.params.servertoken == "legit") {
-                        Log.trace("servertoken: "+req.params.servertoken);
-                        RouteHandler.requestGithubToken(req, res, next);
-                    }
-                    else {
-                        //error
-                        Log.trace("servertoken: "+req.params.servertoken);
-                        next();
-                    }
-                    
-                });
-                
-                //get + update user info (old/unneeded?)
-                //that.rest.get('/api/getUserInfo/:id', RouteHandler.getUserInfo);
-                that.rest.post('/api/register', RouteHandler.registerAccount);
-                
-                //that.rest.post('/api/getDeliverables', RouteHandler.getDeliverables);
+                //called upon login
+                that.rest.post('/api/authenticate', RouteHandler.validateServerToken);
+
+                //called after submitting registration
+                that.rest.post('/api/register', RouteHandler.validateServerToken, RouteHandler.registerAccount);
+
+                //called upon arriving at student portal
+                that.rest.post('/api/getStudent', RouteHandler.validateServerToken, RouteHandler.getStudent);
                 that.rest.post('/api/getDeliverables', RouteHandler.validateServerToken, RouteHandler.getDeliverables);
                 that.rest.post('/api/getGrades', RouteHandler.validateServerToken, RouteHandler.getGrades);
-                that.rest.post('/api/getStudent', RouteHandler.validateServerToken, RouteHandler.getStudent);
 
+                
+                
+                
+                
+                
+                
+                
+                
+                
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({
                     directory: __dirname.substring(0, __dirname.lastIndexOf("/src")) + '/frontend/public',
@@ -139,3 +120,22 @@ export default class Server {
         });
     }
 }
+
+/*  Unused api routes
+
+// clear; curl -is  http://localhost:4321/echo/foo
+that.rest.get('/echo/:message', RouteHandler.getEcho);
+
+// clear; curl -is -X PUT -d '{"key":"val","key2":"val2"}' http://localhost:3031/say/randomKey67
+// rest.put('/say/:val', portal.rest.RouteHandler.putSay);
+
+// clear; curl -is  http://localhost:4321/students
+that.rest.get('/api/students', RouteHandler.getStudents);
+
+//get, add, update, delete students
+that.rest.get('/api/students/:id', RouteHandler.getStudentById);
+that.rest.post('/api/students', RouteHandler.createStudent);
+//that.rest.put('/api/students/:id', RouteHandler.updateStudent);
+that.rest.del('/api/students/:id', RouteHandler.deleteStudent);
+
+*/
