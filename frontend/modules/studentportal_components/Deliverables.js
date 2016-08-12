@@ -2,32 +2,11 @@ import React from 'react'
 import {Modal, ModalHeader, ModalFooter, ModalBody, Button, Card, Row, Col} from 'elemental'
 
 export default React.createClass({
-  getInitialState: function () {
-    return {deliverablesObject:''};
-  },
-  getDeliverables: function () {
-    console.log("Deliverables.js| Requesting deliverables");
-    $.ajax({
-      type: 'POST',
-      url: 'http://localhost:4321/api/getDeliverables',
-      data: {
-        servertoken: localStorage.servertoken,
-        username: localStorage.username,
-        course: this.state.course
-      },
-      dataType: "json",
-      success: function (response) {
-        console.log("Deliverables.js| Retrieved "+response.length+" deliverables");
-        this.setState({ deliverablesObject: response });
-      }.bind(this),
-      error: function (xhr, status, err) {
-        console.log("Deliverables.js| Error retrieving deliverables!");
-      }.bind(this)
-    });
-  },
   renderDeliverables: function () {
+    console.log("Deliverables.js| Rendering deliverables");
     var block = [];
-    var deliverables = this.state.deliverablesObject;
+    var deliverables = this.props.deliverables;
+    
     for (var index = 0; index < deliverables.length; index++){
       block[index] = (
         <div className="tg-wrap-deliverables" key={index}>
@@ -42,7 +21,7 @@ export default React.createClass({
               </tr>
               <tr>
                 <td className="tg-edam">Criteria</td>
-                <td className="tg-value">{deliverables[index].url}</td>
+                <td className="tg-value"><a href={deliverables[index].url} target="blank">{deliverables[index].url}</a></td>
               </tr>
               <tr>
                 <td className="tg-edam">Date open</td>
@@ -54,24 +33,20 @@ export default React.createClass({
               </tr>
               <tr>
                 <td className="tg-edam">Submit</td>
-                <td className="tg-value">www.github.com</td>
+                <td className="tg-value"><a href="http://www.github.com" target="blank">http://www.github.com</a></td>
               </tr>
             </tbody>
           </table><br/>
         </div>);
-    }
-
-    console.log("Deliverables.js| Rendering " + index + " deliverables");    
+    };
+    
     return (<div>{block}</div>);
-  },
-  componentDidMount:function(){
-    this.getDeliverables();
   },
   render: function () {
     return (
       <div className="module">
         <h3>Deliverables</h3><br/>
-        {!!this.state.deliverablesObject && this.renderDeliverables()}
+        {!!this.props.deliverables && this.renderDeliverables()}
       </div>
     )}
 })

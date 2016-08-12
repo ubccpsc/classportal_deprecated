@@ -46,6 +46,6 @@ render((
 
 /*
 react events
-limit login requests?
+limit login requests
 work on memoryStore
 */
