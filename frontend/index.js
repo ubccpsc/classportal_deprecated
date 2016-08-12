@@ -15,7 +15,7 @@ require("./public/index.css");
 
 function requireAuth(nextState, replace) {
   if (!Auth.loggedIn()) {
-    console.log("not logged in..." + JSON.stringify(localStorage));
+    console.log("Index.js| Not logged in: redirecting to login page. localStorage: " + JSON.stringify(localStorage));
     replace({
       pathname: '/login',
       state: { nextPathname: nextState.location.pathname }
@@ -25,7 +25,7 @@ function requireAuth(nextState, replace) {
 
 function requireNotAuth(nextState, replace) {
   if (Auth.loggedIn()) {
-    console.log("you are logged in..." + JSON.stringify(localStorage));
+    console.log("Index.js| Logged in: redirecting to homepage. localStorage: " + JSON.stringify(localStorage));
     replace({
       pathname: '/',
       state: { nextPathname: nextState.location.pathname }
@@ -44,21 +44,8 @@ render((
   </Router>
 ), document.getElementById('app'))
 
-/* ALL TODOS
- onEnter={requireAuth}
-
-
-REACT:
-  -Decide which variables to be storing in App.js
-  -Figure out how to keep only 1 copy of all variables needed in this app (is redux needed?)
-  -DON'T RETURN ALL INFO on student. Make public and private keys in students.json
-  -Reloading after /postlogin is only a temp solution to the Logout Button display issue.
-  -Learn react events
-  -Limit login requests?
-
-SERVER:
-  -Implement validated api requests using servertoken
-  -RouteHandler.ts: clean up file, imeplement functions. more todos in file.
-  -MemoryStore.ts: implement functions
-
-*///<IndexRoute component={StudentPortal} onEnter={requireAuth}/>
+/*
+react events
+limit login requests?
+work on memoryStore
+*/

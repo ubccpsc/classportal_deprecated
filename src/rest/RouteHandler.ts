@@ -17,6 +17,24 @@ import Log from '../Util';
 import config2 from './config2';
 
 export default class RouteHandler {
+    
+    static validateServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var username = req.params.username;
+        var servertoken = req.params.servertoken;
+
+        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/tokens.json";
+        var file = require(filename);
+
+        if (file[username] == servertoken){
+            Log.trace("Valid servertoken! Continue..");
+            next();
+        }
+        else {
+            Log.trace("Bad servertoken! Returning...");
+            res.send(500, "badlogin");
+        }
+    }
+    
     /*
         This function is called from the "post-login" page, after a successful Github login.
         Parameters: Github authcode 
@@ -65,27 +83,28 @@ export default class RouteHandler {
                                     res.json(200, "/register~" + username + "~temp");
                                 });
                             }
+                            //student exists in database
                             else {
-                                //if a match is found, check if they have the required info from registration.
-                                if (!!studentObject.csid && !!studentObject.sid && !!studentObject.firstname ) {
+                                //update githubtoken
+                                RouteHandler.writeJSON(username, { "githubtoken": githubtoken }, function () {
+                                    Log.trace("Updated student's githubtoken.");
                                     
-                                    //next, update githubtoken
-                                    RouteHandler.writeJSON(username, { "githubtoken": githubtoken }, function () {
-                                        Log.trace("Updated student's githubtoken. Sending user to homepage..");
-                                        res.json(200, "/~" + username + "~legit");
-                                        //next, create servertoken
-                                        /*RouteHandler.createServerToken(username, function (servertoken:string) {
-                                            Log.trace("Updated student's servertoken. Redirecting to home page.");
-                                            
-                                            //finally, redirect app to home page with user and new servertoken.
-                                            res.json(200, "/~" + username + "~" + servertoken);
-                                        });*/
+                                    //create new servertoken
+                                    RouteHandler.createServerToken(username, function (servertoken:string) {
+                                        Log.trace("Updated student's servertoken.");
+
+                                        //check if they have the required info from registration.
+                                        if (!!studentObject.csid && !!studentObject.sid && !!studentObject.firstname ) {
+                                        Log.trace("Sending user to homepage..");
+                                            res.json(200, "/~" + username + "~"+servertoken);
+                                        }
+                                        else {
+                                            Log.trace("User has not completed registration. Redirecting to registration page.");
+                                            //TODO: what's stopping someone from manually entering the student portal from the registration screen?'
+                                            res.json(200, "/register~" + username + "~"+servertoken);
+                                        }
                                     });
-                                }
-                                else {
-                                    Log.trace("User has not completed registration. Redirecting to registration page.");
-                                    res.json(200, "/register~" + username + "~temp");
-                                }
+                                });
                             }
                         });
                     }
@@ -241,7 +260,8 @@ export default class RouteHandler {
         });
     }
     
-    //update keys in object in username file    
+    //update keys in object in username file
+    //more like: update student   
     static writeJSON(username: string, paramsObject: any, callback: any) {
         Log.trace("RouteHandler::writeJSON():: username: " + username + ", paramsObject: " + JSON.stringify(paramsObject));
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/students.json";
@@ -334,33 +354,27 @@ export default class RouteHandler {
         //generate unique string
         var servertoken: string = Math.random().toString(36).slice(2);
 
-        //add servertoken to database
-        RouteHandler.writeJSON(username, { "servertoken": servertoken }, function () {
-            Log.trace("servertoken: " + servertoken + " given to " + username);
-            
-            //do something with the servertoken
-            callback(servertoken);
-        })
-    }
-
-/*    
-    static checkServerToken(serverToken: string, github: string, callback: any) {
-        Log.trace('RouteHandler::checkServerToken(..) - params: ' + serverToken + ', ' + github);
-        RouteHandler.readJSON("students", serverToken, github, function (userObject: any) {
-            Log.trace("readJSON() successful. Checking token...");
-            var existing_token = userObject.servertoken;
-            if (!!existing_token && existing_token == serverToken) {
-                Log.trace("Good servertoken. Executing callback...");
-                callback(userObject);
+        //access file
+        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/tokens.json";
+        var file = require(filename);
+        Log.trace("Current token: " + file[username] + " | New token: " + servertoken);
+        
+        //overwrite or create
+        file[username] = servertoken;
+        
+        //step 3: write to file
+        fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
+            if (err) {
+                Log.trace("Write unsuccessful: " + err.toString());
                 return;
             }
             else {
-                Log.trace("Bad servertoken");
+                Log.trace("Write successful! Executing callback..");
+                callback(servertoken);
                 return;
             }
         });
     }
-*/
     
     static getClassList(callback:any) {
         Log.trace('RouteHandler::getClassList(..)');

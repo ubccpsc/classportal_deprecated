@@ -16,18 +16,18 @@ export default React.createClass({
     var csid = event.target.elements[2].value;
     
     if (!!sid == false || sidRegex.test(sid) == false) {
-      console.log("invalid sid: " + sid)
+      console.log("Register.js|invalid sid: " + sid)
       alert("Invalid entry. Please try again.");
       return;
     }
     
     if (!!sid == false || csidRegex.test(csid) == false) {
-      console.log("invalid csid: " + csid)
+      console.log("Register.js|invalid csid: " + csid)
       alert("Invalid entry. Please try again.");
       return;
     }
 
-    console.log("valid login:"+ sid + ', ' + csid)
+    console.log("Register.js|valid login:"+ sid + ', ' + csid)
     
     $.ajax({
       url: 'http://localhost:4321/api/register',
@@ -50,13 +50,13 @@ export default React.createClass({
           browserHistory.push("/");
         }
         else {
-          console.log("Invalid entry.");
+          console.log("Register.js|Invalid entry.");
           alert("Invalid entry. Please try again.");  
         }
         
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error("Invalid info. ", status, err.toString());
+        console.error("Register.js|Invalid info. ", status, err.toString());
         alert("Invalid entry. Please try again.");
       }.bind(this)
     });

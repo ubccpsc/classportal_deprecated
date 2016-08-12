@@ -7,7 +7,7 @@ export default React.createClass({
     //clear all variables in the app (then refresh?)
     Auth.logout();
     localStorage.clear();
-    console.log("LOGGED OUT");
+    console.log("Logout.js| Logged out!");
   },
   render: function () {
     return (

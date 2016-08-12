@@ -5,21 +5,39 @@ import Auth from './Auth'
 
 export default React.createClass({
   sendAuthCode: function(){
+    
+    // Extract the auth code from the original URL
+    function getAuthCode(url, callback){
+      console.log("PostLogin.js| Extracting authcode from url");
+      var error = url.match(/[&\?]error=([^&]+)/);
+      var code = url.match(/[&\?]code=([\w\/\-]+)/);
+      if (error|| !code) {
+        console.log('PostLogin.js| Error getting authcode: ' + error[1]);
+        //TODO: log user out
+        browserHistory.push("/");
+        return;
+      }
+      else {
+        console.log("PostLogin.js| Obtained authcode: " + code[1])
+        callback(code[1]);
+      }
+    };
+    
     function onSuccess (response) {
       //split response
-      console.log("success! response: " + response);
+      console.log("PostLogin.js| Github authentication success! Response: " + response);
       var fields = response.split('~');
       var redirect = fields[0], username = fields[1], servertoken = fields[2];
 
       //redirect to Registration if needed, else to portal
       if (redirect == "/register") {
-        console.log("redirecting to registration");
+        console.log("PostLogin.js| Redirecting to registration..");
         localStorage.setItem('username', username);
         localStorage.setItem('servertoken', servertoken);
         browserHistory.push("/register"); 
       }
       else if (redirect == "/") {
-        console.log("redirecting to portal");
+        console.log("PostLogin.js| Redirecting to student portal");
         localStorage.setItem('username', username);
         localStorage.setItem('servertoken', servertoken);
         browserHistory.push("/");
@@ -27,36 +45,9 @@ export default React.createClass({
       else {
         //TODO: ERROR handling
       }
-    }
-    
-    // Extract the auth code from the original URL
-    function getAuthCode(url){
-      console.log(url);
-      var error = url.match(/[&\?]error=([^&]+)/);
-      console.log(error);
-      var code = url.match(/[&\?]code=([\w\/\-]+)/);
-      console.log(code);
-      console.log(error);
-      if (error) {
-        throw 'Error getting authorization code: ' + error[1];
-      } else if (!code) {
-        console.log("no code!")
-        return;
-      } else {
-        console.log("good code!")
-        return code[1];
-      }   
-    }
-    
-    console.log("getting code..");
-    var authCode = getAuthCode(window.location.href);
-    console.log(authCode);
-    if (authCode == null) {
-      console.log("error");
-      browserHistory.push("/");
-      return;
-    } else {
-      console.log("code is: " + authCode);
+    };
+
+    getAuthCode(window.location.href, function (authCode) {
       $.ajax({
         type: 'POST',
         url: 'http://localhost:4321/api/authenticate',
@@ -67,10 +58,11 @@ export default React.createClass({
         dataType: "json",
         success: onSuccess.bind(this),
         error: function (xhr, status, err) {
-          console.log("failed to get authcode..", xhr, status, err.toString());
+          console.log("PostLogin.js| Failed to get authcode..", xhr, status, err.toString());
         }.bind(this)
       });
-    }
+    });
+
   },
   componentDidMount: function () {
     this.sendAuthCode();
@@ -78,7 +70,7 @@ export default React.createClass({
   render() {
     return (
       <div className="module">
-        <h3>Logging In</h3><br/><br/>
+        <h2>Logging In</h2><br/><br/>
         <Spinner size="lg" type="primary"/>
       </div>
     )}

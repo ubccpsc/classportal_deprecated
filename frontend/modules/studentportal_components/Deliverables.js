@@ -3,80 +3,66 @@ import {Modal, ModalHeader, ModalFooter, ModalBody, Button, Card, Row, Col} from
 
 export default React.createClass({
   getInitialState: function () {
-    return {
-      modalIsOpen: true,
-      data: [],
-      numDeliverables:'',
-      deliverablesObject: '',
-      deliverablesTrue: false
-    };
+    return {deliverablesObject:''};
   },
   getDeliverables: function () {
-    function onSuccess(response) {
-      console.log("Deliverables.js| getDeliverables() success! \nResponse: " + JSON.stringify(response, null, 2));
-      console.log("Deliverables.js| Response.length: " + response.length);
-      
-      this.setState({ numDeliverables: response.length, deliverablesObject:response, deliverablesTrue:true }, function () {
-        console.log("Deliverables.js| setState success! numDeliverables: " + this.state.numDeliverables);
-        console.log("Deliverables.js| setState success! deliverablesTrue: " + this.state.deliverablesTrue);
-      });
-    };
-
+    console.log("Deliverables.js| Requesting deliverables");
     $.ajax({
       type: 'POST',
       url: 'http://localhost:4321/api/getDeliverables',
       data: {
-        servertoken: "temp",
+        servertoken: localStorage.servertoken,
+        username: localStorage.username,
         course: this.state.course
       },
       dataType: "json",
-      success: onSuccess.bind(this),
+      success: function (response) {
+        console.log("Deliverables.js| Retrieved "+response.length+" deliverables");
+        this.setState({ deliverablesObject: response });
+      }.bind(this),
       error: function (xhr, status, err) {
-        console.log("getDeliverables() error!");
+        console.log("Deliverables.js| Error retrieving deliverables!");
       }.bind(this)
     });
   },
   renderDeliverables: function () {
-    console.log("Deliverables.js| renderDeliverable()");
-    if (this.state.numDeliverables > 1) {
-      var data = this.state.deliverablesObject;
-      var block = [];
-      for (var index = 0; index < this.state.numDeliverables; index++){
-        console.log("Deliverables.js| rendering deliverable: " + index);      
-        block[index] = (
-          <div className="tg-wrap-deliverables" key={index}>
-            <table className="tg">
-              <tbody>
-                <tr>
-                  <th className="tg-7wrc" colSpan="2">{data[index].name}</th>
-                </tr>
-                <tr>
-                  <td className="tg-edam">Description</td>
-                  <td className="tg-value">{data[index].description}</td>
-                </tr>
-                <tr>
-                  <td className="tg-edam">Criteria</td>
-                  <td className="tg-value">{data[index].url}</td>
-                </tr>
-                <tr>
-                  <td className="tg-edam">Date open</td>
-                  <td className="tg-value">{data[index].open}</td>
-                </tr>
-                <tr>
-                  <td className="tg-edam">Date due</td>
-                  <td className="tg-value">{data[index].due}</td>
-                </tr>
-                <tr>
-                  <td className="tg-edam">Submit</td>
-                  <td className="tg-value">www.github.com</td>
-                </tr>
-              </tbody>
-            </table><br/>
-          </div>
-        );
-      }  
-      return (<div>{block}</div>);
+    var block = [];
+    var deliverables = this.state.deliverablesObject;
+    for (var index = 0; index < deliverables.length; index++){
+      block[index] = (
+        <div className="tg-wrap-deliverables" key={index}>
+          <table className="tg">
+            <tbody>
+              <tr>
+                <th className="tg-7wrc" colSpan="2">{deliverables[index].name}</th>
+              </tr>
+              <tr>
+                <td className="tg-edam">Description</td>
+                <td className="tg-value">{deliverables[index].description}</td>
+              </tr>
+              <tr>
+                <td className="tg-edam">Criteria</td>
+                <td className="tg-value">{deliverables[index].url}</td>
+              </tr>
+              <tr>
+                <td className="tg-edam">Date open</td>
+                <td className="tg-value">{deliverables[index].open}</td>
+              </tr>
+              <tr>
+                <td className="tg-edam">Date due</td>
+                <td className="tg-value">{deliverables[index].due}</td>
+              </tr>
+              <tr>
+                <td className="tg-edam">Submit</td>
+                <td className="tg-value">www.github.com</td>
+              </tr>
+            </tbody>
+          </table><br/>
+        </div>);
     }
+
+    console.log("Deliverables.js| Rendering " + index + " deliverables");    
+    return (<div>{block}</div>);
   },
   componentDidMount:function(){
     this.getDeliverables();
@@ -85,7 +71,7 @@ export default React.createClass({
     return (
       <div className="module">
         <h3>Deliverables</h3><br/>
-        {this.state.deliverablesTrue && this.renderDeliverables()}
+        {!!this.state.deliverablesObject && this.renderDeliverables()}
       </div>
     )}
-});
+})

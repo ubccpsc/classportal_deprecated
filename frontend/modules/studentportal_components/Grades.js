@@ -3,56 +3,43 @@ import { Row, Col, Button, Alert, Spinner } from 'elemental'
 
 export default React.createClass({
   getInitialState: function() {
-    return {
-      course:'410',
-      numDeliverables:'0',
-      gradesTrue:false,
-      gradesObject:''
-    };
+    return {gradesObject:''};
   },
   getGrades: function () {
-    function onSuccess(response) {
-      console.log("Grades.js| getGrades() success! \nResponse: " + response);
-      console.log("Grades.js| Response.length: " + response.length);
-      //var arr = [0,2];
-      this.setState({ gradesObject:response, gradesTrue:true } , function () {
-        console.log("Grades.js| setState success! grades: " + this.state.gradesObject + this.state.gradesTrue.toString());
-      });
-    };
-
+    console.log("Grades.js| Requesting grades");
     $.ajax({
       type: 'POST',
       url: 'http://localhost:4321/api/getGrades',
       data: {
-        servertoken: "temp",
+        servertoken: localStorage.servertoken,
+        username: localStorage.username,
         sid: this.props.sid
       },
       dataType: "json",
-      success: onSuccess.bind(this),
+      success: function (response) {
+        console.log("Grades.js| Retrieved grades: " + response);
+        this.setState({ gradesObject: response });
+      }.bind(this),
       error: function (xhr, status, err) {
-        console.log("getGrades() error!");
+        console.log("Grades.js| Error getting grades!");
       }.bind(this)
     });
   },
   renderGrades: function () {
-    console.log("Grades.js| renderGrades");
     var block = [];
-
     for (var index = 0; index < this.state.gradesObject.length; index++){
-      console.log("index: "+index);
       block[index] = (
         <tr key={index}>
           <td className="tg-yw4l">{index+1}</td>
           <td className="tg-yw4l">{this.state.gradesObject[index]}</td>
           <td className="tg-yw4l">80</td>
-        </tr>
-      );
+        </tr>);
     }
 
+    console.log("Grades.js| Rendering grades");    
     return (<tbody>{block}</tbody>)
   },
-  componentDidMount:function(){
-    console.log("Grades.js| sid: " + JSON.stringify(this.props.sid, null, 2));
+  componentDidMount: function () {
     this.getGrades();    
   },
   render: function () {
@@ -69,11 +56,9 @@ export default React.createClass({
                 <th className="tg-yw4l">Class Average</th>
               </tr>
             </tbody>
-            {this.state.gradesTrue && this.renderGrades()}
+            {!!this.state.gradesObject && this.renderGrades()}
           </table>
         </div>
       </div>
     )}
 })
-
-//{this.state.gradesTrue && this.renderGrades()}

@@ -112,9 +112,10 @@ export default class Server {
                 //that.rest.get('/api/getUserInfo/:id', RouteHandler.getUserInfo);
                 that.rest.post('/api/register', RouteHandler.registerAccount);
                 
-                that.rest.post('/api/getDeliverables', RouteHandler.getDeliverables);
-                that.rest.post('/api/getGrades', RouteHandler.getGrades);
-                that.rest.post('/api/getStudent', RouteHandler.getStudent);
+                //that.rest.post('/api/getDeliverables', RouteHandler.getDeliverables);
+                that.rest.post('/api/getDeliverables', RouteHandler.validateServerToken, RouteHandler.getDeliverables);
+                that.rest.post('/api/getGrades', RouteHandler.validateServerToken, RouteHandler.getGrades);
+                that.rest.post('/api/getStudent', RouteHandler.validateServerToken, RouteHandler.getStudent);
 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({

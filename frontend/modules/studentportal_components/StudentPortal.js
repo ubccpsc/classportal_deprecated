@@ -13,7 +13,7 @@ export default React.createClass({
   },
   //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json  
   getStudent: function () {  
-    console.log("StudentPortal.js| getStudent()");
+    console.log("StudentPortal.js| Requesting student");
     $.ajax({
       type: 'POST',
       url: 'http://localhost:4321/api/getStudent',
@@ -24,13 +24,12 @@ export default React.createClass({
       dataType: "json",
       cache: false,
       success: function(data) {
-        console.log("StudentPortal.js| Response: \n"+JSON.stringify(data, null, 2));
         this.setState({ studentObject: data }, function () {
-          console.log("StudentPortal.js| this.state.studentObject updated");
+          console.log("StudentPortal.js| Retrieved student: \n"+JSON.stringify(data));
         });
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error("StudentPortal.js| getStudent error", status, err.toString());
+        console.error("StudentPortal.js| Error retrieving student file!", status, err.toString());
       }.bind(this)
     });
   },
