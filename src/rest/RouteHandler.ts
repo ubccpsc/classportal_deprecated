@@ -81,46 +81,57 @@ export default class RouteHandler {
                         var username = obj.login;
                         Log.trace("authenticateGithub| Successfully acquired username: "+username+". Checking registration status..");
                         
-                        //next, request student info from database by providing github username.
-                        RouteHandler.returnStudent("students", username, function (studentObject: any) {
-                            
-                            //first, create servertoken
-                            RouteHandler.createServerToken(username, function (servertoken: string) {
-                                Log.trace("authenticateGithub| Updated student's servertoken.");
-                                
-                                //if student does not exist in database, create new user.
-                                //TODO: but what if it was becuase of file read error?
-                                if (studentObject == null) {
+                        //first, check if username matches list of admin usernames.
+                        RouteHandler.isAdmin(username, function (response: boolean) {
+                            //check if admin
+                            if (response) {
+                                res.send(200, "/admin~" + username + "~servertoken");
+                                return next();
+                            }
+                            //student
+                            else {
+                                //first, create servertoken
+                                RouteHandler.createServerToken(username, function (servertoken: string) {
+                                    Log.trace("authenticateGithub| Updated student's servertoken.");
                                     
-                                    //create new student with gitub username and githubtoken.
-                                    RouteHandler.createBlankStudent(username, githubtoken, function () {
-                                        //finally, send app to registration page.
-                                        //todo: double check this action
-                                        Log.trace("authenticateGithub| Redirecting to registration page.");
-                                        res.json(200, "/register~"+username+"~"+servertoken);
-                                    });
-                                }
-                                //student exists in database
-                                else {
-                                
-                                    //update githubtoken
-                                    RouteHandler.writeStudent(username, { "githubtoken": githubtoken }, function () {
-                                        Log.trace("authenticateGithub| Updated student's githubtoken.");
-
-                                        //check if they have the required info from registration.
-                                        if (!!studentObject.csid && !!studentObject.sid && !!studentObject.firstname ) {
-                                        Log.trace("authenticateGithub| Sending user to homepage..");
-                                            res.json(200, "/~"+username+"~"+servertoken);
+                                    //next, request student info from database by providing github username.
+                                    RouteHandler.returnStudent("students", username, function (studentObject: any) {
+                                        
+                                        //if student does not exist in database, create new user.
+                                        //TODO: but what if it was becuase of file read error?
+                                        if (studentObject == null) {
+                                            
+                                            //create new student with gitub username and githubtoken.
+                                            RouteHandler.createBlankStudent(username, githubtoken, function () {
+                                                //finally, send app to registration page.
+                                                //todo: double check this action
+                                                Log.trace("authenticateGithub| Redirecting to registration page.");
+                                                res.json(200, "/register~" + username + "~" + servertoken);
+                                            });
                                         }
-                                
+                                        //student exists in database
                                         else {
-                                            Log.trace("authenticateGithub| User has not completed registration. Redirecting to registration page.");
-                                            //TODO: what's stopping someone from manually entering the student portal from the registration screen?'
-                                            res.json(200, "/register~"+username+"~"+servertoken);
+                                        
+                                            //update githubtoken
+                                            RouteHandler.writeStudent(username, { "githubtoken": githubtoken }, function () {
+                                                Log.trace("authenticateGithub| Updated student's githubtoken.");
+
+                                                //check if they have the required info from registration.
+                                                if (!!studentObject.csid && !!studentObject.sid && !!studentObject.firstname) {
+                                                    Log.trace("authenticateGithub| Sending user to homepage..");
+                                                    res.json(200, "/~" + username + "~" + servertoken);
+                                                }
+                                        
+                                                else {
+                                                    Log.trace("authenticateGithub| User has not completed registration. Redirecting to registration page.");
+                                                    //TODO: what's stopping someone from manually entering the student portal from the registration screen?'
+                                                    res.json(200, "/register~" + username + "~" + servertoken);
+                                                }
+                                            });
                                         }
                                     });
-                                }
-                            });
+                                });
+                            }
                         });
                     }
                     else {
@@ -466,6 +477,34 @@ export default class RouteHandler {
                 Log.trace("createServerToken| Write successful! Executing callback..");
                 callback(servertoken);
                 return;
+            }
+        });
+    }
+
+    static isAdmin(username: string, callback:any) {
+        Log.trace("isAdmin| Accessing admins.json");
+        
+        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/admins.json";
+        fs.readFile(filename, function read(err: any, data: any) {
+            if (err) {
+                Log.trace("isAdmin| Error reading file: "+err.toString());
+                callback(false);
+                return;
+            }
+            else {
+                var file = JSON.parse(data);
+                Log.trace("isAdmin| Checking for admin: "+username);
+                
+                if (!!file[username]) {
+                    Log.trace("isAdmin| Successfully accessed "+username+".");
+                    callback(true);
+                    return;
+                }
+                else {
+                    Log.trace("isAdmin| Username not found.");
+                    callback(false);
+                    return;
+                }
             }
         });
     }

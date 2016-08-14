@@ -1,8 +1,10 @@
 import React from 'react'
 import NavLink from './NavLink'
-import LoginPage from './login_components/LoginPage'
-import Logout from './studentportal_components/Logout'
-import StudentPortal from './studentportal_components/StudentPortal'
+import LoginPage from './login_page/LoginPage'
+import Logout from './student_portal/Logout'
+import StudentPortal from './student_portal/StudentPortal'
+import AdminPortal from './admin_portal/AdminPortal'
+
 import { Row, Col, Button, Alert, Spinner } from 'elemental' 
 
 export default React.createClass({

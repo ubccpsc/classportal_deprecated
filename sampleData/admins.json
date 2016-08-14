@@ -1,13 +1,17 @@
-[{
-	"id": "rtholmes",
-	"role": "prof",
-	"teams": []
-}, {
-	"id": "mksarge",
-	"role": "ta",
-	"teams": []
-}, {
-	"id": "vivianig",
-	"role": "ta",
-	"teams": []
-}]
+{
+	"rtholmes": {
+		"role": "prof",
+		"teams": [],
+		"githubtoken": "6f496bb3470f6dfa10afb21fe290c787dc686069"
+	},
+	"mksarge": {
+		"role": "ta",
+		"teams": [],
+		"githubtoken": ""
+	},
+	"vivianig":{
+		"role": "ta",
+		"teams": [],
+		"githubtoken": ""
+	}
+}

@@ -42,6 +42,12 @@ export default React.createClass({
         localStorage.setItem('servertoken', servertoken);
         browserHistory.push("/");
       }
+      else if (redirect == "/admin") {
+        console.log("PostLogin.js| Redirecting to student portal");
+        localStorage.setItem('admin', username);
+        localStorage.setItem('servertoken', servertoken);
+        browserHistory.push("/admin");
+      }
       else {
         //TODO: ERROR handling
       }
