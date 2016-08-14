@@ -23,21 +23,23 @@ export default class RouteHandler {
         RouteHandler.returnFile("tokens.json", function (response: any) {
             var file = JSON.parse(response);
             if (!!username && !!servertoken && servertoken == file[username]) {
-                Log.trace("validateServerToken| Valid servertoken!");
+                Log.trace("validateServerToken| Valid servertoken! Continue to next middleware");
+                Log.trace("");
                 return next();
             }
             else if (servertoken == "temp") {
-                Log.trace("validateServerToken| Temporary servertoken for login");
+                Log.trace("validateServerToken| Valid temporary servertoken. Continue to authentication");
+                Log.trace("");
                 if (!!req.params.authCode) {
                     RouteHandler.authenticateGithub(req, res, next);
                 }
                 else {
-                    Log.trace("validateServerToken| Invalid temp request. Returning..");
+                    Log.trace("validateServerToken| Error: Invalid temporary request.");
                     res.send(500, "badlogin");
                 }
             }
             else {
-                Log.trace("validateServerToken| Bad servertoken..tokens."+username+" = "+file[username]+". Returning..");
+                Log.trace("validateServerToken| Error: Bad servertoken: tokens."+username+" = "+file[username]);
                 res.send(500, "badlogin");
             } 
         });
@@ -54,7 +56,7 @@ export default class RouteHandler {
         4b) if no, create blank student and redirect app to registration page.
     */
     static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.authenticateGithub()\nparams: '+JSON.stringify(req.params));
+        Log.trace("authenticateGithub| params: "+JSON.stringify(req.params));
         var config = require(__dirname+"/config.json");
 
         var options = {
@@ -70,21 +72,21 @@ export default class RouteHandler {
         function requestGithubTokenCallback(err1: any, res1: any, body1: any) {
             if (!err1 && res1.statusCode == 200) {
                 var githubtoken = body1.access_token;
-                Log.trace("Successfully acquired github token.");
+                Log.trace("authenticateGithub| Successfully acquired github token.");
                 
                 //next, request github username using githubtoken.
                 RouteHandler.requestGithubInfo(githubtoken, function (err2: any, res2: any, body2: any) {
                     if (!err2 && res2.statusCode == 200) {
                         var obj = JSON.parse(body2);
                         var username = obj.login;
-                        Log.trace("Successfully acquired Username: "+username+". Checking registration status..");
+                        Log.trace("authenticateGithub| Successfully acquired username: "+username+". Checking registration status..");
                         
                         //next, request student info from database by providing github username.
-                        RouteHandler.readStudent("students", username, function (studentObject: any) {
+                        RouteHandler.returnStudent("students", username, function (studentObject: any) {
                             
                             //first, create servertoken
                             RouteHandler.createServerToken(username, function (servertoken: string) {
-                                Log.trace("Updated student's servertoken.");
+                                Log.trace("authenticateGithub| Updated student's servertoken.");
                                 
                                 //if student does not exist in database, create new user.
                                 //TODO: but what if it was becuase of file read error?
@@ -94,7 +96,7 @@ export default class RouteHandler {
                                     RouteHandler.createBlankStudent(username, githubtoken, function () {
                                         //finally, send app to registration page.
                                         //todo: double check this action
-                                        Log.trace("Redirecting to registration page.");
+                                        Log.trace("authenticateGithub| Redirecting to registration page.");
                                         res.json(200, "/register~"+username+"~"+servertoken);
                                     });
                                 }
@@ -103,16 +105,16 @@ export default class RouteHandler {
                                 
                                     //update githubtoken
                                     RouteHandler.writeStudent(username, { "githubtoken": githubtoken }, function () {
-                                        Log.trace("Updated student's githubtoken.");
+                                        Log.trace("authenticateGithub| Updated student's githubtoken.");
 
                                         //check if they have the required info from registration.
                                         if (!!studentObject.csid && !!studentObject.sid && !!studentObject.firstname ) {
-                                        Log.trace("Sending user to homepage..");
+                                        Log.trace("authenticateGithub| Sending user to homepage..");
                                             res.json(200, "/~"+username+"~"+servertoken);
                                         }
                                 
                                         else {
-                                            Log.trace("User has not completed registration. Redirecting to registration page.");
+                                            Log.trace("authenticateGithub| User has not completed registration. Redirecting to registration page.");
                                             //TODO: what's stopping someone from manually entering the student portal from the registration screen?'
                                             res.json(200, "/register~"+username+"~"+servertoken);
                                         }
@@ -122,17 +124,17 @@ export default class RouteHandler {
                         });
                     }
                     else {
-                        Log.trace("Error accessing public info from Github.");
+                        Log.trace("authenticateGithub| Error accessing public info from Github.");
                     }
                 });
             }
             else {
-                Log.trace("Error requesting access token from github.com: "+err1.toString());
+                Log.trace("authenticateGithub| Error requesting access token from github.com: "+err1.toString());
             }
         }
 
         //request githubtoken from Github using authcode and client id+secret
-        Log.trace("Requesting access token from Github..");
+        Log.trace("authenticateGithub| Requesting access token from Github..");
         request(options, requestGithubTokenCallback);
         return next();
     }
@@ -149,66 +151,80 @@ export default class RouteHandler {
             3b) no matching csid's, so send error to app.
     */
     static registerAccount(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.registerAccount()\nparams: '+JSON.stringify(req.params));
-        //TODO: validate sid and csid
-        //if (sid.match(/^\d{8}$/) && csid.match(/^[a-z]{1}\d{1}[a-z]{1}\d{1}$/)){
-
-        //get class list then check if csid and sid exist and are a valid combination
-        RouteHandler.returnFile("classList.csv", function (data:any) {
-            var lines = data.toString().split(/\n/);
-            Log.trace("Classlist retrieved. There are "+(lines.length-1)+" students in the class list.");
-                    
-            // Splice up the first row to get the headings
-            var headings = lines[0].split(',');
+        Log.trace("registerAccount| params: "+JSON.stringify(req.params));
+        var username = req.params.username; 
+        var csid = req.params.csid;
+        var sid = req.params.sid;
+        var validCSID = /^[a-z][0-9][a-z][0-9]$/;
+        var validSID = /^\d{8}$/; 
+        
+        //first, test CSID and SID regex
+        if (validCSID.test(csid) && validSID.test(sid)) {
+            Log.trace("registerAccount| Valid SID and CSID regex");
             
-            //data arrays are set up specifically for our classList.csv format
-            var csid: any[] = [];
-            var sid: any[] = [];
-            var last: any[] = [];
-            var first: any[] = [];
-            
-            // Split up the comma seperated values and sort into arrays
-            for (var index = 1; index < lines.length; index++) {
-                var values = lines[index].split(','); 
-                csid.push(values[0]);
-                sid.push(values[1]);
-                last.push(values[2]);
-                first.push(values[3]);
-            }
-            
-            //check if csid exists
-            Log.trace("Checking CSID..");
-            for (var index = 0; index < csid.length; index++){
-                if (req.params.csid == csid[index]) {
-                    //check if sid exists
-                    Log.trace("CSID Match! Checking SID..");
-                    if (req.params.sid == sid[index]) {
-                        Log.trace("SID Match! Updating student information..");
-                        RouteHandler.writeStudent(req.params.username, { "sid": req.params.sid, "csid": req.params.csid, "firstname":first[index] }, function () {
-                            Log.trace("Account updated successfully. Sending user to homepage.");
-                            res.json(200, "success");
+            //get class list then check if csid and sid exist and are a valid combination
+            RouteHandler.returnFile("classList.csv", function (data: any) {
+                var lines = data.toString().split(/\n/);
+                Log.trace("registerAccount| Classlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
+                        
+                // Splice up the first row to get the headings
+                var headings = lines[0].split(',');
+                
+                //data arrays are set up specifically for our classList.csv format
+                //TODO: last names are unused in this function.
+                var csidArray: any[] = [];
+                var sidArray: any[] = [];
+                var lastArray: any[] = [];
+                var firstArray: any[] = [];
+                
+                // Split up the comma seperated values and sort into arrays
+                for (var index = 1; index < lines.length; index++) {
+                    var values = lines[index].split(',');
+                    csidArray.push(values[0]);
+                    sidArray.push(values[1]);
+                    lastArray.push(values[2]);
+                    firstArray.push(values[3]);
+                }
+                
+                //check if csid exists
+                Log.trace("registerAccount| Checking CSID..");
+                for (var index = 0; index < csidArray.length; index++) {
+                    if (csid == csidArray[index]) {
+                        //check if sid exists
+                        Log.trace("registerAccount| CSID Match! Checking SID..");
+                        if (sid == sidArray[index]) {
+                            Log.trace("registerAccount| SID Match! Updating student information..");
+                            RouteHandler.writeStudent(username, { "sid": sid, "csid": csid, "firstname": firstArray[index] }, function () {
+                                Log.trace("registerAccount| Account updated successfully. Sending user to homepage.");
+                                res.json(200, "success");
+                                return next();
+                            });
+                            //Log.trace("Error: writeStudent failed");
+                            //????
                             return next();
-                        });
-                        //Log.trace("Error: writeStudent failed");
-                        //????
-                        return next();
-                    }
-                    else {
-                        //invalid login combination
-                        Log.trace("Error: Bad SID. Returning..");
-                        res.send(500, "bad login");
-                        return next();
+                        }
+                        else {
+                            //invalid login combination
+                            Log.trace("registerAccount| Error: Invalid CSID/SID combination. Returning..");
+                            res.send(500, "bad login");
+                            return next();
+                        }
                     }
                 }
-            }
-            Log.trace("Error: Bad CSID. Returning..");
+                Log.trace("registerAccount| Error: Invalid CSID. Returning..");
+                res.send(500, "bad login");
+                return next();
+            });
+        }
+        else {
+            Log.trace("registerAccount| Error: Invalid SID or CSID regex. Returning..");
             res.send(500, "bad login");
             return next();
-        });
+        }
     }
 
     static getDeliverables(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.getDeliverables()\nparams: '+JSON.stringify(req.params));
+        Log.trace("getDeliverables| params: "+JSON.stringify(req.params));
         //read deliverables.json
         RouteHandler.returnFile("deliverables.json", function (data:any) {
             //return all the deliverables for the current couse
@@ -258,13 +274,19 @@ export default class RouteHandler {
     }
 
     static getStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.getStudent()\nparams: '+JSON.stringify(req.params));
+        Log.trace("getStudent| params: "+JSON.stringify(req.params));
         //read deliverables.json
-        RouteHandler.readStudent("students", req.params.username, function (response:any) {
+        RouteHandler.returnStudent("students", req.params.username, function (response:any) {
             //return current student
-            Log.trace("getStudent success! returning..");
-            res.json(200, response);
-            return next();
+            if (response == null) {
+                Log.trace("getStudent| Error! Student object: "+response);
+                res.json(500, "error");
+            }
+            else {
+                Log.trace("getStudent| Success! Returning..");
+                res.json(200, response);
+                return next();
+            }
         });
     }
 
@@ -272,7 +294,7 @@ export default class RouteHandler {
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/tokens.json";
         var file = require(filename);
         var username = req.params.username;
-        Log.trace("Deleting servertoken for user: "+username);
+        Log.trace("deleteServerToken| Deleting servertoken for user: "+username);
         
         //overwrite or create
         file[username] = "";
@@ -280,17 +302,17 @@ export default class RouteHandler {
         //step 3: write to file
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
             if (err) {
-                Log.trace("Write unsuccessful: "+err.toString());
+                Log.trace("deleteServerToken| Write unsuccessful: "+err.toString());
                 res.send(500, "bad logout")
                 return next();
             }
             else {
-                Log.trace("Write successful!");
+                Log.trace("deleteServerToken| Write successful!");
                 res.send(200, "success")
                 return next();
             }
         });
-    }    
+    }
     
     //***HELPER FUNCTIONS***//
     static requestGithubInfo(githubtoken: string, callback: any) {
@@ -302,12 +324,12 @@ export default class RouteHandler {
             }
         };
         
-        Log.trace("Requesting public info from Github..");
+        Log.trace("requestGithubInfo| Requesting public info from Github..");
         request(options, callback);
     }
 
     static createBlankStudent(username: string, githubtoken: string, callback: any) {
-        Log.trace("Creating new student: "+username);
+        Log.trace("createBlankStudent| Creating new student: "+username);
         
         //RouteHandler.createServerToken(githubUser, function (response: string) { });
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/students.json";
@@ -321,22 +343,21 @@ export default class RouteHandler {
         
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
             if (err) {
-                Log.trace("writeFile error: "+err.toString());
+                Log.trace("createBlankStudent| Write error: "+err.toString());
                 return;
             }
             else {
-                Log.trace("New student created.");
+                Log.trace("createBlankStudent| New student created.");
                 callback();
             }
         });
     }
     
     //update keys in object in username file
-    //more like: update student   
     static writeStudent(username: string, paramsObject: any, callback: any) {
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/students.json";
         var file = require(filename);
-        Log.trace("Writing to user: "+username+" in students.json..");
+        Log.trace("writeStudent| Writing to user: "+username+" in students.json..");
 
         //step 1: check if username exists
         if (!!file.students[username]) {
@@ -345,52 +366,52 @@ export default class RouteHandler {
             var i = 0;
             for (var key in paramsObject) {
                 if (file.students[username].hasOwnProperty(key)) {
-                    Log.trace('Writing to '+key+': '+paramsObject[key]);
+                    Log.trace('writeStudent| Writing to '+key+': '+paramsObject[key]);
                     file.students[username][key] = paramsObject[key];
                     i++;
                 }
             }
-            Log.trace('Mapped '+i+' key(s).');
+            Log.trace('writeStudent| Mapped '+i+' key(s).');
 
             //step 3: write to file
             fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
                 if (err) {
-                    Log.trace("Write unsuccessful: "+err.toString());
+                    Log.trace("writeStudent| Write unsuccessful: "+err.toString());
                     return;
                 }
                 else {
-                    Log.trace("Write successful! Executing callback..");
+                    Log.trace("writeStudent| Write successful! Executing callback..");
                     callback();
                     return;
                 }
             });
         }
         else {
-            Log.trace("Error: User was not found..");
+            Log.trace("writeStudent| Error: User was not found..");
             return;
         }
     }
 
-    static readStudent(accessType: string, username: string, callback: any) {
-        Log.trace("Accessing students.json");
+    static returnStudent(accessType: string, username: string, callback: any) {
+        Log.trace("returnStudent| Accessing students.json");
         
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/students.json";
         fs.readFile(filename, function read(err: any, data: any) {
             if (err) {
-                Log.trace("Error reading file: "+err.toString());
+                Log.trace("returnStudent| Error reading file: "+err.toString());
                 return;
             }
             else {
                 var file = JSON.parse(data);
-                Log.trace("Checking for user "+username);
+                Log.trace("returnStudent| Checking for user "+username);
                 
                 if (!!file[accessType][username]) {
-                    Log.trace("Successfully accessed "+username+".");
+                    Log.trace("returnStudent| Successfully accessed "+username+".");
                     callback(file[accessType][username]);
                     return;
                 }
                 else {
-                    Log.trace("Username not found.");
+                    Log.trace("returnStudent| Username not found.");
                     callback(null);
                     return;
                 }
@@ -416,13 +437,14 @@ export default class RouteHandler {
     }
     
     static createServerToken(username: string, callback: any) {
+        Log.trace("createServerToken| Generating new servertoken for user "+username);
+        
         //generate unique string
         var servertoken: string = Math.random().toString(36).slice(2);
 
         //access file
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/tokens.json";
         var file = require(filename);
-        Log.trace("Generating new servertoken");
         
         //overwrite or create
         file[username] = servertoken;
@@ -430,11 +452,11 @@ export default class RouteHandler {
         //step 3: write to file
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
             if (err) {
-                Log.trace("Write unsuccessful: "+err.toString());
+                Log.trace("createServerToken| Write unsuccessful: "+err.toString());
                 return;
             }
             else {
-                Log.trace("Write successful! Executing callback..");
+                Log.trace("createServerToken| Write successful! Executing callback..");
                 callback(servertoken);
                 return;
             }
