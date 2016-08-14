@@ -16,24 +16,25 @@ export default React.createClass({
     var csid = event.target.elements[2].value;
     
     if (!!sid == false || sidRegex.test(sid) == false) {
-      console.log("Register.js|invalid sid: " + sid)
+      console.log("Register.js| invalid sid: " + sid)
       alert("Invalid entry. Please try again.");
       return;
     }
     
     if (!!sid == false || csidRegex.test(csid) == false) {
-      console.log("Register.js|invalid csid: " + csid)
+      console.log("Register.js| invalid csid: " + csid)
       alert("Invalid entry. Please try again.");
       return;
     }
 
-    console.log("Register.js|valid login:"+ sid + ', ' + csid)
+    console.log("Register.js| valid login:"+ sid + ', ' + csid)
     
     $.ajax({
       url: 'http://localhost:4321/api/register',
       type: "POST",
       data: {
-        "github": this.state.github,
+        "servertoken": localStorage.servertoken,
+        "username": localStorage.username,
         "sid": sid,
         "csid": csid
       },
@@ -41,22 +42,23 @@ export default React.createClass({
       cache: false,
       success: function(response) {
         //split response
-        console.log("response: " + response);
+        console.log("Register.js| Response: " + response);
         var fields = response.split('~');
         var redirect = fields[0];
         
         if (redirect == "success") {
-          localStorage.setItem('servertoken', fields[1] );
+          //TODO: need something here to "unlock" the student portal.
+          console.log("Register.js| Successful registration. Redirecting to portal..");
           browserHistory.push("/");
         }
         else {
-          console.log("Register.js|Invalid entry.");
+          console.log("Register.js| Invalid entry.");
           alert("Invalid entry. Please try again.");  
         }
         
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error("Register.js|Invalid info. ", status, err.toString());
+        console.error("Register.js| Invalid info. ", status, err.toString());
         alert("Invalid entry. Please try again.");
       }.bind(this)
     });

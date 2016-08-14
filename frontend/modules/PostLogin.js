@@ -52,8 +52,9 @@ export default React.createClass({
         type: 'POST',
         url: 'http://localhost:4321/api/authenticate',
         data: {
-          servertoken:"temp",
-          authCode: authCode
+          "username": "temp",
+          "servertoken": "temp",
+          "authCode": authCode
         },
         dataType: "json",
         success: onSuccess.bind(this),

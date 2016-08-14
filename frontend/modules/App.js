@@ -1,7 +1,7 @@
 import React from 'react'
 import NavLink from './NavLink'
 import LoginPage from './login_components/LoginPage'
-import LogoutBar from './studentportal_components/LogoutBar'
+import Logout from './studentportal_components/Logout'
 import StudentPortal from './studentportal_components/StudentPortal'
 import { Row, Col, Button, Alert, Spinner } from 'elemental' 
 

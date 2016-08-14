@@ -76,27 +76,21 @@ export default class Server {
                 //rest.use(restify.fullResponse());                
                 
 
-
-
+                /* API routes */
                 //called upon login
                 that.rest.post('/api/authenticate', RouteHandler.validateServerToken);
-
+                
                 //called after submitting registration
                 that.rest.post('/api/register', RouteHandler.validateServerToken, RouteHandler.registerAccount);
-
+                
                 //called upon arriving at student portal
                 that.rest.post('/api/getStudent', RouteHandler.validateServerToken, RouteHandler.getStudent);
                 that.rest.post('/api/getDeliverables', RouteHandler.validateServerToken, RouteHandler.getDeliverables);
                 that.rest.post('/api/getGrades', RouteHandler.validateServerToken, RouteHandler.getGrades);
-
                 
-                
-                
-                
-                
-                
-                
-                
+                //called by logout button
+                that.rest.post('/api/logout', RouteHandler.validateServerToken, RouteHandler.deleteServerToken);
+                /* API routes end */
                 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({

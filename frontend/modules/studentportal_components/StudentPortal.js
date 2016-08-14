@@ -2,7 +2,7 @@ import React from 'react'
 import Deliverables from './Deliverables'
 import Grades from './Grades'
 import Info from './Info'
-import LogoutBar from './LogoutBar'
+import Logout from './Logout'
 import Teams from './Teams'
 import NavLink from '../NavLink'
 import { Row, Col, Button, Alert, Spinner } from 'elemental'
@@ -22,8 +22,8 @@ export default React.createClass({
       type: 'POST',
       url: 'http://localhost:4321/api/getStudent',
       data: {
-        servertoken: localStorage.servertoken,
-        username: localStorage.username
+        "servertoken": localStorage.servertoken,
+        "username": localStorage.username
       },
       dataType: "json",
       cache: false,
@@ -44,9 +44,9 @@ export default React.createClass({
       type: 'POST',
       url: 'http://localhost:4321/api/getDeliverables',
       data: {
-        servertoken: localStorage.servertoken,
-        username: localStorage.username,
-        course: this.state.course
+        "servertoken": localStorage.servertoken,
+        "username": localStorage.username,
+        "course": this.state.course
       },
       dataType: "json",
       success: function (response) {
@@ -66,9 +66,9 @@ export default React.createClass({
       type: 'POST',
       url: 'http://localhost:4321/api/getGrades',
       data: {
-        servertoken: localStorage.servertoken,
-        username: localStorage.username,
-        sid: this.state.studentObject.sid
+        "servertoken": localStorage.servertoken,
+        "username": localStorage.username,
+        "sid": this.state.studentObject.sid
       },
       dataType: "json",
       success: function (response) {
@@ -88,7 +88,7 @@ export default React.createClass({
       <div>
         <div className="module">
           <h3>Welcome, {this.state.studentObject.firstname}!</h3><br/>
-          <LogoutBar/>
+          <Logout/>
         </div>
         
         <Teams team={this.state.studentObject}/>
