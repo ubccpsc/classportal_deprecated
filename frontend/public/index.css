@@ -163,3 +163,11 @@ h5{
   text-align:left;
   width:100%;
 }
+
+#logout-form {
+  text-align:center;
+  height:20px;
+}
+#logout-formfield {
+  max-width:20%;
+}

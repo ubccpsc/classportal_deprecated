@@ -36,7 +36,7 @@ function requireNotAuth(nextState, replace) {
 render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
-      <IndexRoute component={StudentPortal} onEnter={requireAuth} />
+      <IndexRoute component={StudentPortal} />
       <Route path="login" component={LoginPage} onEnter={requireNotAuth} />
       <Route path="postlogin" component={PostLogin} />
       <Route path="register" component={Register} onEnter={requireAuth} />
@@ -44,7 +44,7 @@ render((
   </Router>
 ), document.getElementById('app'))
 
-/*
+/* onEnter={requireAuth}
 react events
 limit login requests
 work on memoryStore

@@ -5,7 +5,7 @@ import Info from './Info'
 import Logout from './Logout'
 import Teams from './Teams'
 import NavLink from '../NavLink'
-import { Row, Col, Button, Alert, Spinner } from 'elemental'
+import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
 
 export default React.createClass({
   getInitialState: function() {
@@ -88,7 +88,7 @@ export default React.createClass({
       <div>
         <div className="module">
           <h3>Welcome, {this.state.studentObject.firstname}!</h3><br/>
-          <Logout/>
+          <Logout sid={this.state.studentObject.sid} username={localStorage.username}/><br/>
         </div>
         
         <Teams team={this.state.studentObject}/>

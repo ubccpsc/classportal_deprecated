@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, FormField, Glyph, Button } from 'elemental'
+import { Form, FormRow, FormField, FormInput, FormIconField, Glyph, Button } from 'elemental'
 import Auth from '../Auth'
 import {browserHistory} from 'react-router'
 
@@ -36,8 +36,16 @@ export default React.createClass({
   },
   render: function () {
     return (
-      <Form id="text-center" onSubmit={this.logoutSubmit}>
-        <Button submit><Glyph icon="sign-out"/>&nbsp; Log out</Button>
+      <Form id="logout-form" type="inline" onSubmit={this.logoutSubmit}>
+        <FormIconField id="logout-formfield" iconPosition="left" iconKey="mortar-board" >
+          <FormInput placeholder={" "+this.props.sid} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
+        </FormIconField>
+        <FormIconField id="logout-formfield" iconPosition="left" iconKey="mark-github" >
+          <FormInput placeholder={" "+this.props.username} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
+        </FormIconField>
+        <FormField id="logout-formfield">
+          <Button size="sm" submit><Glyph icon="sign-out"/>&nbsp; Log out</Button>
+        </FormField>
       </Form>
     )}
 })
