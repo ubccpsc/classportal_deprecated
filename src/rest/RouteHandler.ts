@@ -16,6 +16,7 @@ import Log from '../Util';
 
 export default class RouteHandler {
     static validateServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("req.params: " + JSON.stringify(req.params));
         var username = req.params.username;
         var servertoken = req.params.servertoken;
         Log.trace("validateServerToken| username: "+username+", servertoken: "+servertoken);
@@ -23,12 +24,12 @@ export default class RouteHandler {
         RouteHandler.returnFile("tokens.json", function (response: any) {
             var file = JSON.parse(response);
             if (!!username && !!servertoken && servertoken == file[username]) {
-                Log.trace("validateServerToken| Valid servertoken! Continue to next middleware");
+                Log.trace("validateServerToken| Valid servertoken! Continuing to next middleware..");
                 Log.trace("");
                 return next();
             }
             else if (servertoken == "temp") {
-                Log.trace("validateServerToken| Valid temporary servertoken. Continue to authentication");
+                Log.trace("validateServerToken| Valid temporary servertoken. Continuing to authentication..");
                 Log.trace("");
                 if (!!req.params.authCode) {
                     RouteHandler.authenticateGithub(req, res, next);
@@ -39,7 +40,7 @@ export default class RouteHandler {
                 }
             }
             else {
-                Log.trace("validateServerToken| Error: Bad servertoken: tokens."+username+" = "+file[username]);
+                Log.trace("validateServerToken| Error: Bad servertoken. Returning..");
                 res.send(500, "badlogin");
             } 
         });
@@ -56,7 +57,6 @@ export default class RouteHandler {
         4b) if no, create blank student and redirect app to registration page.
     */
     static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("authenticateGithub| params: "+JSON.stringify(req.params));
         var config = require(__dirname+"/config.json");
 
         var options = {
@@ -151,7 +151,6 @@ export default class RouteHandler {
             3b) no matching csid's, so send error to app.
     */
     static registerAccount(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("registerAccount| params: "+JSON.stringify(req.params));
         var username = req.params.username; 
         var csid = req.params.csid;
         var sid = req.params.sid;
@@ -159,8 +158,9 @@ export default class RouteHandler {
         var validSID = /^\d{8}$/; 
         
         //first, test CSID and SID regex
+        Log.trace("registerAccount| Testing CSID and SID regex..");
         if (validCSID.test(csid) && validSID.test(sid)) {
-            Log.trace("registerAccount| Valid SID and CSID regex");
+            Log.trace("registerAccount| Valid regex.");
             
             //get class list then check if csid and sid exist and are a valid combination
             RouteHandler.returnFile("classList.csv", function (data: any) {
@@ -224,28 +224,36 @@ export default class RouteHandler {
     }
 
     static getDeliverables(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("getDeliverables| params: "+JSON.stringify(req.params));
-        //read deliverables.json
-        RouteHandler.returnFile("deliverables.json", function (data:any) {
-            //return all the deliverables for the current couse
-            var deliverables = JSON.parse(data);
-            res.json(200, deliverables);
-            return next();
+        Log.trace("getDeliverables| Requesting file..");
+        RouteHandler.returnFile("deliverables.json", function (response: any) {
+            var data = JSON.parse(response);
+            if (data == null) {
+                Log.trace("getDeliverables| Error: Bad data. Returning..");
+                res.json(500, "null");
+                return next();
+            }
+            else {
+                Log.trace("getDeliverables| Success! Returning..");
+                res.json(200, data);
+                return next();    
+            }
         });
     }
 
     static getGrades(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('getGrades| params: '+JSON.stringify(req.params));
         var sid = req.params.sid;
         var csid = req.params.csid;
 
         //check sid with regex
-        if (sid.match(/^\d{8}$/)){
+        Log.trace("getGrades| Testing SID regex..");
+        if (sid.match(/^\d{8}$/)) {
+            Log.trace("getGrades| Valid regex.");
+
             //read grades.csv
             RouteHandler.returnFile("grades.csv", function (data:any) {
-                var lines = data.toString().split(/\n/);
-                Log.trace("getGrades| There are "+(lines.length-1)+" students in grades.csv");
+                Log.trace("getGrades| Getting grades..");
                 
+                var lines = data.toString().split(/\n/);
                 var myGrades: any[] = [];
                 // Split up the comma seperated values and sort into arrays
                 for (var i = 1; i < lines.length; i++) {
@@ -258,7 +266,7 @@ export default class RouteHandler {
                 }
 
                 if (myGrades.length > 0) {
-                    Log.trace("getGrades| Grades acquired. Returning grades: "+myGrades);
+                    Log.trace("getGrades| Success! Returning..");
                     res.json(200, myGrades);    
                 }
                 else {
@@ -268,14 +276,13 @@ export default class RouteHandler {
             });
         }
         else {
-            Log.trace("getGrades| Bad sid. Returning..")
+            Log.trace("getGrades| Invalid SID regex. Returning..")
             res.json(500, "bad sid");
         }
     }
 
     static getStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("getStudent| params: "+JSON.stringify(req.params));
-        //read deliverables.json
+        Log.trace("getStudent| Retrieving student file..");
         RouteHandler.returnStudent("students", req.params.username, function (response:any) {
             //return current student
             if (response == null) {
@@ -302,12 +309,12 @@ export default class RouteHandler {
         //step 3: write to file
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
             if (err) {
-                Log.trace("deleteServerToken| Write unsuccessful: "+err.toString());
+                Log.trace("deleteServerToken| Error: Write unsuccessful. Returning..");
                 res.send(500, "bad logout")
                 return next();
             }
             else {
-                Log.trace("deleteServerToken| Write successful!");
+                Log.trace("deleteServerToken| Success! Returning..");
                 res.send(200, "success")
                 return next();
             }
