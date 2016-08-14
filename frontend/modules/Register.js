@@ -15,13 +15,13 @@ export default React.createClass({
     var sid = event.target.elements[1].value; 
     var csid = event.target.elements[2].value;
     
-    if (!!sid == false || sidRegex.test(sid) == false) {
+    if (!sidRegex.test(sid)) {
       console.log("Register.js| invalid sid: " + sid)
       alert("Invalid entry. Please try again.");
       return;
     }
     
-    if (!!sid == false || csidRegex.test(csid) == false) {
+    if (!csidRegex.test(csid)) {
       console.log("Register.js| invalid csid: " + csid)
       alert("Invalid entry. Please try again.");
       return;
