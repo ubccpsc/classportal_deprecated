@@ -13,27 +13,6 @@ export default React.createClass({
       gradesObject: ''
     };
   },
-  getDeliverables: function () {
-    console.log("StudentPortal.js| Requesting deliverables");
-    $.ajax({
-      type: 'POST',
-      url: 'http://localhost:4321/api/getDeliverables',
-      data: {
-        "servertoken": localStorage.servertoken,
-        "admin": localStorage.admin,
-      },
-      dataType: "json",
-      success: function (response) {
-        console.log("StudentPortal.js| Retrieved "+response.length+" deliverables");
-        this.setState({ deliverablesObject: response }, function () {
-          console.log("AdminPortal.js| deliverablesObject set!");
-        });
-      }.bind(this),
-      error: function (xhr, status, err) {
-        console.log("StudentPortal.js| Error retrieving deliverables!");
-      }.bind(this)
-    });
-  },
   componentDidMount: function () {
     //this.getDeliverables();
   },

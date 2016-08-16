@@ -1,34 +1,26 @@
 import React from 'react'
 import {browserHistory } from 'react-router'
-import {Row,Col,Form,FormField,Button,FormInput,Checkbox } from 'elemental'
+import {Row,Col,Form,FormField,Button,FormInput,FormIconField,Glyph} from 'elemental'
 
 const sidRegex = /^([0-9]){8}$/;
 const csidRegex = /^[a-z][0-9][a-z][0-9]$/;
 
 export default React.createClass({
   getInitialState: function() {
-    return { github: '' };
+    return { github: 'Error: not logged in' };
   },
-
   handleSubmit: function (event) {
     event.preventDefault();
     var sid = event.target.elements[1].value; 
     var csid = event.target.elements[2].value;
     
-    if (!sidRegex.test(sid)) {
-      console.log("Register.js| invalid sid: " + sid)
+    if (!sidRegex.test(sid) || !csidRegex.test(csid)) {
+      console.log("Register.js| Error: Invalid input.");
       alert("Invalid entry. Please try again.");
       return;
     }
     
-    if (!csidRegex.test(csid)) {
-      console.log("Register.js| invalid csid: " + csid)
-      alert("Invalid entry. Please try again.");
-      return;
-    }
-
-    console.log("Register.js| valid login:"+ sid + ', ' + csid)
-    
+    console.log("Register.js| Valid login!");
     $.ajax({
       url: 'http://localhost:4321/api/register',
       type: "POST",
@@ -41,10 +33,9 @@ export default React.createClass({
       dataType: 'json',
       cache: false,
       success: function(response) {
-        //split response
-        console.log("Register.js| Response: " + response);
+        console.log("Register.js| Success: " + response);
         var fields = response.split('~');
-        var redirect = fields[0];
+        var redirect = fields[0];  
         
         if (redirect == "success") {
           //TODO: need something here to "unlock" the student portal.
@@ -55,42 +46,37 @@ export default React.createClass({
           console.log("Register.js| Invalid entry.");
           alert("Invalid entry. Please try again.");  
         }
-        
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error("Register.js| Invalid info. ", status, err.toString());
+        console.log("Register.js| Error: Invalid info.");
         alert("Invalid entry. Please try again.");
       }.bind(this)
     });
   },
-  
   componentDidMount: function () {
     if (!!localStorage.username) {
       this.setState({ github: localStorage.username });
-    } else {
-      this.setState({ github: "Error: not logged in" });
     }
   },
-  
   render: function () {
     return (
       <div className="module">
-        <h2>Register account</h2>
-        <p>Please confirm your student info below.</p><br/>
+        <h3>Register Account</h3><br/><br/>
+        <p>Please confirm your student info below to continue.</p><br/><br/>
         <Form onSubmit={this.handleSubmit} className="form" type="horizontal">
-          <FormField label="Github Username">
+          <FormIconField label="Github Username" iconPosition="left" iconKey="mark-github">
             <FormInput placeholder={this.state.github} name="supported-controls-input-disabled" disabled />
-          </FormField>
-          <FormField label="UBC Student Number">
+          </FormIconField>
+          <FormIconField label="UBC Student Number" iconPosition="left" iconKey="mortar-board">
             <FormInput placeholder="eg. 12345678"/>
-          </FormField>
-          <FormField label="CS Undergrad Account">
+          </FormIconField>
+          <FormIconField label="Computer Science ID" iconPosition="left" iconKey="keyboard">
             <FormInput placeholder="eg. a1b2"/>
-          </FormField>
+          </FormIconField>
           <FormField offsetAbsentLabel>
             <Button submit>Submit</Button>
           </FormField>
-        </Form>  
+        </Form>
       </div>
     )}
 })

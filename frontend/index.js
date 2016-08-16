@@ -50,7 +50,7 @@ render((
     <Route path="/" component={App}>
       <IndexRoute component={StudentPortal} onEnter={requireAuth}/>
       <Route path="login" component={LoginPage} onEnter={requireNotAuth} />
-      <Route path="postlogin" component={PostLogin} />
+      <Route path="postlogin" component={PostLogin} onEnter={requireNotAuth} />
       <Route path="register" component={Register} onEnter={requireAuth} />
       <Route path="admin" component={AdminPortal} >
         <IndexRedirect to="teams" />
@@ -67,6 +67,6 @@ onEnter={requireAuth}
 onEnter={requireAdminAuth}
 
 react events
-limit login requests
+limit login requests?
 work on memoryStore
 */

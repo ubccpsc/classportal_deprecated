@@ -9,21 +9,25 @@ export default React.createClass({
           <h3>Login</h3><br/>
           <GithubButton/>
         </div>
-        <div className="module">
-          <h3>About</h3>
-          <h5 className="text-left">
-            Copyright Reid Holmes 2016.
-            <br/><br/><a href="https://www.cs.ubc.ca/people/reid-holmes" target="blank">https://www.cs.ubc.ca/people/reid-holmes</a>
-          </h5>
-        </div>
+
         <div className="module">
           <h3>Privacy Policy</h3>
-          <h5 className="text-left">This website does not store or otherwise gain access to your Github login credentials, nor does it make any modifications to the your Github account.
-            <br/><br/>Upon first login, this application will request authorization to access your public Github profile information only.
-            Any time thereafter, you can view and/or revoke this access in the "OAuth Applications" tab of your Settings page on Github.  
-            <br/><br/>For more information, visit: <a href="https://developer.github.com/" target="blank">https://developer.github.com/</a>
+          <h5 className="text-left">This website uses GitHub's OAuth2 Web Application Flow to authenticate users and request access to your public GitHub profile. It never gains access to your login credentials, nor does it make any modifications your GitHub account.
+            <br/><br/>At any time, you can view and/or revoke the access token granted, by accessing the "OAuth Applications" tab of your settings page on GitHub.  
+            <br/><br/>For more information, visit: <a href="https://developer.github.com/v3/" target="blank">https://developer.github.com/v3/</a>
           </h5>
         </div>
+
+        <div className="module">
+          <h3>About</h3>
+          <h5 className="text-center">
+            Website developed by:
+            <br/>Reid Holmes | <a href="https://www.cs.ubc.ca/people/reid-holmes" target="blank">https://www.cs.ubc.ca/people/reid-holmes</a>
+            <br/>Michael Sargent | <a href="http://www.mksarge.io" target="blank">http://www.mksarge.io</a>
+            <br/>&copy; 2016
+          </h5>
+        </div>
+        
       </div>  
     )}
 })
