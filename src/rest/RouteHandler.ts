@@ -141,11 +141,13 @@ export default class RouteHandler {
                     }
                     else {
                         Log.trace("authenticateGithub| Error accessing public info from Github.");
+                        res.send(500, "error connecting to github");
                     }
                 });
             }
             else {
-                Log.trace("authenticateGithub| Error requesting access token from github.com: "+err1.toString());
+                Log.trace("authenticateGithub| Error requesting access token from github.com: " + err1.toString());
+                res.send(500, "error connecting to github");
             }
         }
 
