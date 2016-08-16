@@ -4,6 +4,9 @@ import {browserHistory} from 'react-router'
 import Auth from './Auth'
 
 export default React.createClass({
+  getInitialState: function () {
+    return { error: false };
+  },
   sendAuthCode: function(){
     
     // Extract the auth code from the original URL
@@ -36,23 +39,23 @@ export default React.createClass({
         localStorage.setItem('servertoken', servertoken);
         browserHistory.push("/register"); 
       }
-      else if (redirect == "/") {
+      if (redirect == "/") {
         console.log("PostLogin.js| Redirecting to student portal");
         localStorage.setItem('username', username);
         localStorage.setItem('servertoken', servertoken);
         browserHistory.push("/");
       }
-      else if (redirect == "/admin") {
+      if (redirect == "/admin") {
         console.log("PostLogin.js| Redirecting to student portal");
         localStorage.setItem('admin', username);
         localStorage.setItem('servertoken', servertoken);
-        browserHistory.push("/admin");
-      }
-      else {
-        //TODO: ERROR handling
+        setTimeout(function () {
+          browserHistory.push("/admin");
+        }, 5000);
       }
     };
-
+    
+    var that = this;
     getAuthCode(window.location.href, function (authCode) {
       $.ajax({
         type: 'POST',
@@ -65,7 +68,13 @@ export default React.createClass({
         dataType: "json",
         success: onSuccess.bind(this),
         error: function (xhr, status, err) {
-          console.log("PostLogin.js| Failed to get authcode..", xhr, status, err.toString());
+          console.log("PostLogin.js| Failed to get authcode!");
+          that.setState({ error: true }, function(){
+            console.log("PostLogin.js| Redirecting to login..");
+            setTimeout(function () {
+              browserHistory.push("/");
+            }, 3000);
+          });
         }.bind(this)
       });
     });
@@ -77,8 +86,8 @@ export default React.createClass({
   render() {
     return (
       <div className="module">
-        <h3>Connecting to Github</h3><br/><br/>
-        <Spinner size="lg" type="primary"/><br/><br/>
+        <h3>{this.state.error ? "Error! Redirecting to Login" : "Connecting to Github" }</h3><br/><br/>
+        <Spinner size="lg" type="primary"/><br/><br/>        
       </div>
     )}
 })
