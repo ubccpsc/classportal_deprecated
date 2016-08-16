@@ -2,20 +2,42 @@ import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
 
 export default React.createClass({
-  render: function () {
-    return (
-      <AdminDelivs deliverablesObject={{ "description": "description1" }}/>
-    )}
-})
-
-const AdminDelivs = React.createClass({
   getInitialState: function () {
     return { deliverablesObject: '' };
   },
   renderDeliverables: function () {
-    var deliverables = [];
-    for (var index = 1; index < 6; index++) {
-      deliverables[index] = this.renderDeliverable(index);
+    var deliverables = this.state.deliverablesObject;
+    for (var index = 0; index < deliverables.length; index++) {
+      deliverables[index] = (
+        <div className="tg-wrap-deliverables" key={index}>
+          <table className="tg">
+            <tbody>
+              <tr>
+                <th className="tg-7wrc" colSpan="2">{deliverables[index].name}</th>
+              </tr>
+              <tr>
+                <td className="tg-edam">Description</td>
+                <td className="tg-value">{deliverables[index].description}</td>
+              </tr>
+              <tr>
+                <td className="tg-edam">Criteria</td>
+                <td className="tg-value">{deliverables[index].url}</td>
+              </tr>
+              <tr>
+                <td className="tg-edam">Date open</td>
+                <td className="tg-value">{deliverables[index].open}</td>
+              </tr>
+              <tr>
+                <td className="tg-edam">Date due</td>
+                <td className="tg-value">{deliverables[index].due}</td>
+              </tr>
+              <tr>
+                <td className="tg-edam">Students Marked</td>
+                <td className="tg-value">0 / 50</td>
+              </tr>
+            </tbody>
+          </table><br/>
+        </div>);
     }
     return deliverables;
   },
@@ -40,45 +62,34 @@ const AdminDelivs = React.createClass({
       }.bind(this)
     });
   },
-  renderDeliverable: function(index) {
+  render: function () {
     return (
-      <div className="tg-wrap-deliverables" key={index}>
-        <table className="tg">
-          <tbody>
-            <tr>
-                <th className="tg-7wrc" colSpan="2">Deliverable {index}</th>
-            </tr>
-            <tr>
+      <div className="module">
+        <h3>Deliverables</h3><br/>
+        {!!this.state.deliverablesObject && this.renderDeliverables()}
+      </div>
+    )}
+})
+
+/*
+<tr>
               <td className="tg-edam">Description</td>
-              <td className="tg-value">{this.props.deliverablesObject.description}</td>
+              <td className="tg-value">{deliverables[index].description}</td>
             </tr>
             <tr>
               <td className="tg-edam">Criteria</td>
-              <td className="tg-value"></td>
+              <td className="tg-value">{deliverables[index].criteria}</td>
             </tr>
             <tr>
               <td className="tg-edam">Date open</td>
-              <td className="tg-value"></td>
+              <td className="tg-value">{deliverables[index].open}</td>
             </tr>
             <tr>
               <td className="tg-edam">Date due</td>
-              <td className="tg-value"></td>
+              <td className="tg-value">{deliverables[index].due}</td>
             </tr>
             <tr>
               <td className="tg-edam">Students Marked</td>
               <td className="tg-value">0 / 50</td>
             </tr>
-          </tbody>
-        </table><br/>
-      </div>
-    );
-  },
-  render: function () {
-    var options1 = [{"label":"Individual Marks"}];
-    return (
-      <div className="module">
-        <h3>Deliverables</h3><br/>
-        {this.renderDeliverables()}
-      </div>  
-    )}
-})
+            */
