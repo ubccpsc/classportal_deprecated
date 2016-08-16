@@ -17,13 +17,18 @@ import Log from '../Util';
 export default class RouteHandler {
     static validateServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("req.params: " + JSON.stringify(req.params));
-        var username = req.params.username;
+        var user: string;
         var servertoken = req.params.servertoken;
-        Log.trace("validateServerToken| username: "+username+", servertoken: "+servertoken);
+        if (req.params.hasOwnProperty("admin")) {
+            user = req.params.admin;    
+        } else if (req.params.hasOwnProperty("username")) {
+            user= req.params.username;    
+        }
+        Log.trace("validateServerToken| user: "+user+", servertoken: "+servertoken);
         
         RouteHandler.returnFile("tokens.json", function (response: any) {
             var file = JSON.parse(response);
-            if (!!username && !!servertoken && servertoken == file[username]) {
+            if (!!user && !!servertoken && servertoken == file[user]) {
                 Log.trace("validateServerToken| Valid servertoken! Continuing to next middleware..");
                 Log.trace("");
                 return next();
@@ -81,19 +86,19 @@ export default class RouteHandler {
                         var username = obj.login;
                         Log.trace("authenticateGithub| Successfully acquired username: "+username+". Checking registration status..");
                         
-                        //first, check if username matches list of admin usernames.
-                        RouteHandler.isAdmin(username, function (response: boolean) {
-                            //check if admin
-                            if (response) {
-                                res.send(200, "/admin~" + username + "~servertoken");
-                                return next();
-                            }
-                            //student
-                            else {
-                                //first, create servertoken
-                                RouteHandler.createServerToken(username, function (servertoken: string) {
-                                    Log.trace("authenticateGithub| Updated student's servertoken.");
+                        //first, create servertoken
+                        RouteHandler.createServerToken(username, function (servertoken: string) {
+                            Log.trace("authenticateGithub| Updated student's servertoken.");
                                     
+                            //next, check if username matches list of admin usernames.
+                            RouteHandler.isAdmin(username, function (response: boolean) {
+                                //check if admin
+                                if (response) {
+                                    res.send(200, "/admin~" + username + "~"+servertoken);
+                                    return next();
+                                }
+                                //student
+                                else {
                                     //next, request student info from database by providing github username.
                                     RouteHandler.returnStudent("students", username, function (studentObject: any) {
                                         
@@ -130,8 +135,8 @@ export default class RouteHandler {
                                             });
                                         }
                                     });
-                                });
-                            }
+                                }
+                            });
                         });
                     }
                     else {
