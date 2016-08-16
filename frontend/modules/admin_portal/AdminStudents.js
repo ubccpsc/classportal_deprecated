@@ -12,6 +12,7 @@ export default React.createClass({
     });
   },
   renderStudents: function () {
+    var allStudents = this.props.students;
     var students = [];
     if (this.state.viewAll) {
       for (var index = 1; index < 6; index++) {
@@ -72,7 +73,7 @@ export default React.createClass({
           </FormField>
         </Form>
 
-        {this.renderStudents()}
+        {!!this.props.students && this.renderStudents()}
       </div>
     )}
 })

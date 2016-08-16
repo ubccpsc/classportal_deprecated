@@ -13,6 +13,7 @@ import Store from '../store/Store';
 import EchoController from '../controller/EchoController';
 import Student from '../model/Student';
 import Log from '../Util';
+var config = require('./config.json');
 
 export default class RouteHandler {
     static validateServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -62,8 +63,6 @@ export default class RouteHandler {
         4b) if no, create blank student and redirect app to registration page.
     */
     static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {
-        var config = require(__dirname+"/config.json");
-
         var options = {
             method: 'post',
             body: { client_id: config.client_id,
