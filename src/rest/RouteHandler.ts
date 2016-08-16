@@ -15,43 +15,12 @@ import Student from '../model/Student';
 import Log from '../Util';
 var config = require('./config.json');
 
-export default class RouteHandler {
-    static validateServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("req.params: " + JSON.stringify(req.params));
-        var user: string;
-        var servertoken = req.params.servertoken;
-        if (req.params.hasOwnProperty("admin")) {
-            user = req.params.admin;    
-        } else if (req.params.hasOwnProperty("username")) {
-            user= req.params.username;    
-        }
-        Log.trace("validateServerToken| user: "+user+", servertoken: "+servertoken);
-        
-        RouteHandler.returnFile("tokens.json", function (response: any) {
-            var file = JSON.parse(response);
-            if (!!user && !!servertoken && servertoken == file[user]) {
-                Log.trace("validateServerToken| Valid servertoken! Continuing to next middleware..");
-                Log.trace("");
-                return next();
-            }
-            else if (servertoken == "temp") {
-                Log.trace("validateServerToken| Valid temporary servertoken. Continuing to authentication..");
-                Log.trace("");
-                if (!!req.params.authCode) {
-                    RouteHandler.authenticateGithub(req, res, next);
-                }
-                else {
-                    Log.trace("validateServerToken| Error: Invalid temporary request.");
-                    res.send(500, "badlogin");
-                }
-            }
-            else {
-                Log.trace("validateServerToken| Error: Bad servertoken. Returning..");
-                res.send(500, "badlogin");
-            } 
-        });
+export default class RouteHandler { 
+    static getGradesAdmin(req:restify.Request, res: restify.Response, next: restify.Next) {
+        res.send(200, "suh, dude");
+        return;
     }
-    
+
     /*
         This function is called from the "post-login" page, after a successful Github login.
         Parameters: Github authcode 
@@ -445,7 +414,7 @@ export default class RouteHandler {
 
     static returnFile(file: string, callback: any) {
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/"+file;
-        Log.trace("returnFile| Accessing file "+file);
+        Log.trace("returnFile| Accessing: "+file);
 
         fs.readFile(filename, function read(err: any, data: any) {
             if (err) {
