@@ -1,5 +1,4 @@
 import React from 'react'
-import NavLink from './NavLink'
 import LoginPage from './login_page/LoginPage'
 import Logout from './student_portal/Logout'
 import StudentPortal from './student_portal/StudentPortal'
@@ -37,16 +36,3 @@ export default React.createClass({
       </div>
     )}
 })
-
-/*
-<div id="NavLinks">
-          <Row>
-            <Col sm="1/2">
-              <NavLink to="/" onlyActiveOnIndex={true}>Portal</NavLink>
-            </Col>
-            <Col sm="1/2">
-              <NavLink to="/link">Update Info</NavLink>
-            </Col>
-          </Row>
-        </div>
-        */

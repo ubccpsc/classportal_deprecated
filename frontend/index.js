@@ -6,11 +6,13 @@ import PostLogin from './modules/PostLogin'
 import Register from './modules/Register'
 import StudentPortal from './modules/student_portal/StudentPortal'
 import AdminPortal from './modules/admin_portal/AdminPortal'
+import AdminTeams from './modules/admin_portal/AdminTeams'
+import AdminStudents from './modules/admin_portal/AdminStudents'
+import AdminDeliverables from './modules/admin_portal/AdminDeliverables'
 import Auth from './modules/Auth'
 import LoginPage from './modules/login_page/LoginPage'
 
-//using require instead of <link rel="stylesheet" href="/index.css"/>
-//so we can hot reload styles in development
+//require here instead of <link> in index.html, so we can hot reload css in dev.
 require("./public/index.css");
 
 function requireAuth(nextState, replace) {
@@ -50,12 +52,20 @@ render((
       <Route path="login" component={LoginPage} onEnter={requireNotAuth} />
       <Route path="postlogin" component={PostLogin} />
       <Route path="register" component={Register} onEnter={requireAuth} />
-      <Route path="admin" component={AdminPortal} onEnter={requireAdminAuth} />
+      <Route path="admin" component={AdminPortal} >
+        <IndexRedirect to="teams" />
+        <Route path="teams" component={AdminTeams} />
+        <Route path="students" component={AdminStudents} />
+        <Route path="deliverables" component={AdminDeliverables} />
+      </Route>
     </Route>
   </Router>
 ), document.getElementById('app'))
 
-/* onEnter={requireAuth}
+/*
+onEnter={requireAuth}
+onEnter={requireAdminAuth}
+
 react events
 limit login requests
 work on memoryStore

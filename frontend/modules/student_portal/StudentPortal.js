@@ -45,8 +45,7 @@ export default React.createClass({
       url: 'http://localhost:4321/api/getDeliverables',
       data: {
         "servertoken": localStorage.servertoken,
-        "username": localStorage.username,
-        "course": this.state.course
+        "username": localStorage.username
       },
       dataType: "json",
       success: function (response) {

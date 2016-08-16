@@ -64,9 +64,11 @@ h5{
 }
 
 #NavLinks{
-  padding: 30px;
-  background:rgb(255,255,255);
+  padding: 20px;
+  background:#e8edff;
   text-align: center;
+  border-width:5px;
+  border-color:#ff0000;
 }
 
 .module{
@@ -112,7 +114,7 @@ h5{
   font-size:14px;
   padding:5px 20px;
   border-style:solid;
-  border-width:0px;
+  border-width:1px;
   overflow:hidden;
   word-break:normal;
   border-color:#aabcfe;
@@ -124,7 +126,7 @@ h5{
   font-weight:normal;
   padding:5px 20px;
   border-style:solid;
-  border-width:0px;
+  border-width:1px;
   overflow:hidden;
   word-break:normal;
   border-color:#aabcfe;
@@ -173,4 +175,26 @@ h5{
 }
 #short-forms{
   height:10px;
+}
+#admin-grades-form {
+  height:20px;
+}
+
+.tg .tg-7wrc2{
+  background-color:#e8edff;
+  color:#003399;
+  vertical-align:top
+}
+.tg .tg-edam2 {
+  background-color:#b9c9fe;
+  color:#003399;
+  vertical-align:top;
+  text-align:left;
+}
+.tg .tg-value2 {
+  background-color:#b9c9fe;
+  color:#003399;
+  vertical-align:top;
+  text-align:left;
+  width:100%;
 }
