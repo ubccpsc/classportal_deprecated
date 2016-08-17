@@ -156,19 +156,25 @@ function checkToken(req: restify.Request, res: restify.Response, next: restify.N
         //evaluate token and continue to next middleware if match
         RouteHandler.returnFile("tokens.json", function (response: any) {
             var file = JSON.parse(response);
-
-            if (req.params.user.admin == true)
-                var servertoken = file.admins[username];
-            else
-                var servertoken = file.students[username];
-
+            var servertoken: string;
+            
+            //get saved token
+            if (req.params.user.admin) {
+                Log.trace("checkToken| Admin token retrieved..");
+                servertoken = file.admins[username];
+            }
+            else {
+                Log.trace("checkToken| Student token retrieved..");
+                servertoken = file.students[username];  
+            } 
+            
             //the next middleware called can be accessed by both students and admins alike.
             if (!!servertoken && (usertoken == servertoken)) {
-                Log.trace("checkToken| Valid request. Continuing to next middleware..\n");
+                Log.trace("checkToken| Tokens match! Continuing to next middleware..\n");
                 return next();
             }
             else {
-                Log.trace("checkToken| Error: Tokens do not match. Returning..");
+                Log.trace("checkToken| Error: Tokens do not match..("+usertoken + servertoken+") Returning..");
                 res.send(500, "bad request");
                 return;
             }

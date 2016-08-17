@@ -56,15 +56,16 @@ export default class RouteHandler {
                         var obj = JSON.parse(body2);
                         var username = obj.login;
                         Log.trace("authenticateGithub| Successfully acquired username: "+username+". Checking registration status..");
-                        
-                        //first, create servertoken
-                        RouteHandler.createServerToken(username, function (servertoken: string) {
-                            Log.trace("authenticateGithub| Updated student's servertoken.");
                                     
-                            //next, check if username matches list of admin usernames.
-                            RouteHandler.isAdmin(username, function (response: boolean) {
-                                //check if admin
-                                if (response) {
+                        //check if username matches list of admin usernames.
+                        RouteHandler.isAdmin(username, function (isAdmin: boolean) {
+                                
+                            //create servertoken with admin flag
+                            RouteHandler.createServerToken(username, isAdmin, function (servertoken: string) {
+                                Log.trace("authenticateGithub| Updated student's servertoken.");
+                        
+                                //next action also depends on isAdmin flag
+                                if (isAdmin) {
                                     res.send(200, "/admin~" + username + "~"+servertoken);
                                     return next();
                                 }
@@ -438,7 +439,7 @@ export default class RouteHandler {
         });
     }
     
-    static createServerToken(username: string, callback: any) {
+    static createServerToken(username: string, admin: boolean, callback: any) {
         Log.trace("createServerToken| Generating new servertoken for user "+username);
         
         //generate unique string
@@ -449,7 +450,10 @@ export default class RouteHandler {
         var file = require(filename);
         
         //overwrite or create
-        file[username] = servertoken;
+        if (admin)
+            file.admins[username] = servertoken;
+        else
+            file.students[username] = servertoken;
         
         //step 3: write to file
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
