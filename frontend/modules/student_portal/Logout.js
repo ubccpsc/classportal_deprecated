@@ -13,7 +13,8 @@ export default React.createClass({
       data: {
         "user": {
           "name": localStorage.user,
-          "token": localStorage.token
+          "token": localStorage.token,
+          "admin": localStorage.admin
         }
       },
       dataType: 'json',
