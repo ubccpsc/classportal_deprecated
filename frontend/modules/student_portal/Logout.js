@@ -11,8 +11,10 @@ export default React.createClass({
       url: 'http://localhost:4321/api/logout',
       type: "POST",
       data: {
-        "servertoken": localStorage.servertoken,
-        "username": localStorage.username
+        "user": {
+          "name": localStorage.user,
+          "token": localStorage.token
+        }
       },
       dataType: 'json',
       cache: false,

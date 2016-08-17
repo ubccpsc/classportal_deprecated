@@ -25,8 +25,10 @@ export default React.createClass({
       url: 'http://localhost:4321/api/register',
       type: "POST",
       data: {
-        "servertoken": localStorage.servertoken,
-        "username": localStorage.username,
+        "user": {
+          "name": localStorage.user,
+          "token": localStorage.token
+        },
         "sid": sid,
         "csid": csid
       },

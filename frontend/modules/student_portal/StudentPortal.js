@@ -22,8 +22,10 @@ export default React.createClass({
       type: 'POST',
       url: 'http://localhost:4321/api/getStudent',
       data: {
-        "servertoken": localStorage.servertoken,
-        "username": localStorage.username
+        "user": {
+          "name": localStorage.user,
+          "token": localStorage.token
+        }
       },
       dataType: "json",
       cache: false,
@@ -44,8 +46,10 @@ export default React.createClass({
       type: 'POST',
       url: 'http://localhost:4321/api/getDeliverables',
       data: {
-        "servertoken": localStorage.servertoken,
-        "username": localStorage.username
+        "user": {
+          "name": localStorage.user,
+          "token": localStorage.token
+        }
       },
       dataType: "json",
       success: function (response) {
@@ -65,8 +69,10 @@ export default React.createClass({
       type: 'POST',
       url: 'http://localhost:4321/api/getGrades',
       data: {
-        "servertoken": localStorage.servertoken,
-        "username": localStorage.username,
+        "user": {
+          "name": localStorage.user,
+          "token": localStorage.token
+        },
         "sid": this.state.studentObject.sid
       },
       dataType: "json",

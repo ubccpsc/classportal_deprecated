@@ -10,18 +10,19 @@ export default React.createClass({
     function onSuccess (response) {
       console.log("PostLogin.js| Authentication success! Response: " + response);
       var fields = response.split('~');
-      var redirect = fields[0], username = fields[1], servertoken = fields[2];
+      var redirect = fields[0], user = fields[1], token = fields[2];
 
       if (redirect == ("/register" || "/")) {
         console.log("PostLogin.js| Student login! Redirecting..");
-        localStorage.setItem('username', username);
-        localStorage.setItem('servertoken', servertoken);
+        localStorage.setItem('user', user);
+        localStorage.setItem('token', token);
         browserHistory.push(redirect); 
       }
       else if (redirect == "/admin") {
         console.log("PostLogin.js| Admin login! Redirecting..");
-        localStorage.setItem('admin', username);
-        localStorage.setItem('servertoken', servertoken);
+        localStorage.setItem('user', user);
+        localStorage.setItem('token', token);
+        localStorage.setItem('admin', true);
         browserHistory.push("/admin");
       }
       else {
@@ -57,8 +58,10 @@ export default React.createClass({
         type: 'POST',
         url: 'http://localhost:4321/api/authenticate',
         data: {
-          "username": "temp",
-          "servertoken": "temp",
+          "user": {
+            "name": "temp",
+            "token": "temp"
+          },
           "authCode": authCode
         },
         dataType: "json",

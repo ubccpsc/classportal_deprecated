@@ -21,8 +21,11 @@ export default React.createClass({
       type: 'POST',
       url: 'http://localhost:4321/api/getDeliverables',
       data: {
-        "servertoken": localStorage.servertoken,
-        "admin": localStorage.admin,
+        "user": {
+          "name": localStorage.user,
+          "token": localStorage.token,
+          "admin": localStorage.admin
+        }
       },
       dataType: "json",
       success: function (response) {
