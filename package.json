@@ -24,14 +24,15 @@
     "typings": "^1.3.0"
   },
   "scripts": {
- 	"clean": "rm -rf ./typings/; rm -rf ./node_modules/;",
-	"configure": "npm install; typings install --global;",
+    "clean": "rm -rf ./typings/; rm -rf ./node_modules/;",
+    "configure": "npm install; typings install --global;",
     "build": "tsc",
     "test": "mocha -c",
     "cover": "istanbul cover _mocha",
     "start": "node src/App.js"
   },
   "dependencies": {
+    "request-promise-native": "^1.0.3",
     "restify": "^4.0.3"
   }
 }

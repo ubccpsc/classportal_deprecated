@@ -5,17 +5,15 @@
 import Log from './Util';
 import Server from './rest/Server';
 
-namespace portal {
-    export class App {
+export class App {
 
-        initServer(port:number) {
-            Log.info('App::initServer( ' + port + ' ) - start');
-            let s = new Server(port);
-            s.start();
-        }
+    initServer(port: number) {
+        Log.info('App::initServer( ' + port + ' ) - start');
+        let s = new Server(port);
+        s.start();
     }
 }
 
 Log.info('App - starting');
-let app = new portal.App();
+let app = new App();
 app.initServer(4321);
