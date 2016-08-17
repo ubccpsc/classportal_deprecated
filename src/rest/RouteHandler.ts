@@ -16,7 +16,7 @@ import Log from '../Util';
 var config = require('./config.json');
 
 export default class RouteHandler { 
-    static getGradesAdmin(req:restify.Request, res: restify.Response, next: restify.Next) {
+    static getAllGrades(req:restify.Request, res: restify.Response, next: restify.Next) {
         res.send(200, "suh, dude");
         return;
     }
@@ -32,6 +32,9 @@ export default class RouteHandler {
         4b) if no, create blank student and redirect app to registration page.
     */
     static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("authenticateGithub| test");
+        Log.trace("authenticateGithub| "+req.params);
+        
         var options = {
             method: 'post',
             body: { client_id: config.client_id,
@@ -120,9 +123,16 @@ export default class RouteHandler {
         }
 
         //request githubtoken from Github using authcode and client id+secret
-        Log.trace("authenticateGithub| Requesting access token from Github..");
-        request(options, requestGithubTokenCallback);
-        return next();
+        if (!!req.params.authCode) {
+            Log.trace("authenticateGithub| Requesting access token from Github..");
+            request(options, requestGithubTokenCallback);
+            return next();
+        }
+        else {
+            Log.trace("authenticateGithub| Error: Missing authcode.");
+            res.send(500, "missing authcode");
+            return;
+        }
     }
 
     /*
@@ -228,10 +238,9 @@ export default class RouteHandler {
 
     static getGrades(req: restify.Request, res: restify.Response, next: restify.Next) {
         var sid = req.params.sid;
-        var csid = req.params.csid;
-
-        //check sid with regex
         Log.trace("getGrades| Testing SID regex..");
+        
+        //check sid with regex
         if (sid.match(/^\d{8}$/)) {
             Log.trace("getGrades| Valid regex.");
 

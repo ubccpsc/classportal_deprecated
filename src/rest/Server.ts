@@ -68,10 +68,15 @@ export default class Server {
                 //parses the body of the request, so we can access req.params
                 that.rest.use(restify.bodyParser());                
 
-                /* USER DEFINED API ROUTES START HERE */
+                /* API start */
+                
+                //Requires Temp Token only
                 //called upon login
-                that.rest.post('/api/authenticate', checkToken);
+                that.rest.post('/api/authenticate', allowTempToken, RouteHandler.authenticateGithub);
+                
+                //Requires Student or Admin Token
                 //called after submitting registration
+                //TODO: what's stopping an admin from calling this?
                 that.rest.post('/api/register', checkToken, RouteHandler.registerAccount);
                 //called upon arriving at student portal
                 that.rest.post('/api/getStudent', checkToken, RouteHandler.getStudent);
@@ -80,10 +85,10 @@ export default class Server {
                 //called by logout button
                 that.rest.post('/api/logout', checkToken, RouteHandler.deleteServerToken);
                 
-                /* ADMIN API */ 
-                that.rest.post('/api/getGradesAdmin', checkAdminToken, RouteHandler.getGradesAdmin);
+                //Requires Admin Token only
+                that.rest.post('/api/getGradesAdmin', requireAdmin, checkToken, RouteHandler.getAllGrades);
 
-                /* API END */
+                /* API end */
                 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({
@@ -108,38 +113,32 @@ export default class Server {
     }
 }
 
-//only calls next middleware if valid admin + user + token fields are supplied 
-function checkAdminToken(req: restify.Request, res: restify.Response, next: restify.Next) {
+function allowTempToken(req: restify.Request, res: restify.Response, next: restify.Next) {
     console.log("Params: " + JSON.stringify(req.params));
-    Log.trace("checkAdminToken| Checking admin token..");
+    Log.trace("checkTempToken| Checking token..");
 
-    var admin: boolean = req.params.admin;
-    var user: string = req.params.user;
-    var token:string = req.params.token;
-
-    //check that admin field is true, and that user & token fields are non-empty
-    if ((admin == true) && !!user && !!token) {
-        RouteHandler.returnFile("tokens.json", function (response: any) {
-            var file = JSON.parse(response);
-            var servertoken = file.admins[user];
-
-            //check if admin token exists in database and matches the supplied token
-            if (!!servertoken && (token == servertoken)) {
-                Log.trace("checkAdminToken| Valid request. Continuing to next middleware..");
-                Log.trace("");
-                return next();
-            }
-            else {
-                Log.trace("checkAdminToken| Error: Tokens do not match. Returning..");
-                res.send(500, "bad admin request");
-                return;
-            }
-        });
+    //check that user & token fields are both set to "temp"
+    if (req.params.user.name == "temp" && req.params.user.token == "temp") {
+        Log.trace("checkTempToken| Valid temp request! Continuing to authentication..");
+        Log.trace("");
+        return next();
     }
     else {
-        Log.trace("checkAdminToken| Error: Bad request. Returning..");
-        res.send(500, "bad admin request");
+        Log.trace("checkTempToken| Error: Bad request. Returning..");
+        res.send(500, "bad request");
         return;
+    }
+}
+
+//only calls next middleware if valid admin field is true
+function requireAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
+    if (!!req.params.user && (req.params.user.admin == true)) {
+        Log.trace("requireAdmin| Valid admin field. Continue to next middleware..\n");
+        next();    
+    }
+    else {
+        Log.trace("requireAdmin| Missing admin field. Returning..");
+        next(new Error("Error: Permission denied."));
     }
 }
 
@@ -147,50 +146,33 @@ function checkAdminToken(req: restify.Request, res: restify.Response, next: rest
 //can be called by both regular users (students) and admins.
 function checkToken(req: restify.Request, res: restify.Response, next: restify.Next) {
     console.log("Params: " + JSON.stringify(req.params));
-    Log.trace("checkAdminToken| Checking admin token..");
-
-    var admin: boolean = req.params.admin;
-    var user: string = req.params.user;
-    var token: string = req.params.token;
+    Log.trace("checkToken| Checking token..");
+    
+    var username: string = req.params.user.name;
+    var usertoken: string = req.params.user.token;
     
     //check that user & token fields are non-empty
-    if (!!user && !!token) {
-        //special case: if token is "temp", continue to login
-        if (token == "temp") {
-            //TODO: this conditional check should exist in authenticateGithub!
-            if (!!req.params.authCode) {
-                Log.trace("checkToken| Valid temp request. Continuing to authentication..");
-                Log.trace("");
-                RouteHandler.authenticateGithub(req, res, next);
-                return;
+    if (!!username && !!usertoken) {
+        //evaluate token and continue to next middleware if match
+        RouteHandler.returnFile("tokens.json", function (response: any) {
+            var file = JSON.parse(response);
+
+            if (req.params.user.admin == true)
+                var servertoken = file.admins[username];
+            else
+                var servertoken = file.students[username];
+
+            //the next middleware called can be accessed by both students and admins alike.
+            if (!!servertoken && (usertoken == servertoken)) {
+                Log.trace("checkToken| Valid request. Continuing to next middleware..\n");
+                return next();
             }
             else {
-                Log.trace("checkToken| Error: Request missing authcode.");
-                res.send(500, "badtoken");
+                Log.trace("checkToken| Error: Tokens do not match. Returning..");
+                res.send(500, "bad request");
                 return;
             }
-        //normal case: evaluate token and continue to next middleware if match
-        } else {
-            RouteHandler.returnFile("tokens.json", function (response: any) {
-                var file = JSON.parse(response);
-                var servertoken:string;
-                
-                if (admin) servertoken = file.admins[user];
-                else servertoken = file.students[user];
-
-                //the next middleware called can be accessed by both students and admins alike.
-                if (!!servertoken && (token == servertoken)) {
-                    Log.trace("checkToken| Valid request. Continuing to next middleware..");
-                    Log.trace("");
-                    return next();
-                }
-                else {
-                    Log.trace("checkAdminToken| Error: Tokens do not match. Returning..");
-                    res.send(500, "bad request");
-                    return;
-                }
-            });
-        }
+        });
     }
     else {
         Log.trace("checkToken| Error: Bad request. Returning..");
@@ -198,22 +180,17 @@ function checkToken(req: restify.Request, res: restify.Response, next: restify.N
         return;
     }
 }
-    
-    
+
 /*  Unused
 
-
-                //restify.CORS.ALLOW_HEADERS.push('authorization');
-                //that.rest.use(restify.CORS());
-                //rest.pre(restify.pre.sanitizePath());
-                //rest.use(restify.acceptParser(rest.acceptable));
-                that.rest.use(restify.bodyParser());
-                // rest.use(restify.queryParser());
-                //rest.use(restify.authorizationParser());
-                //rest.use(restify.fullResponse());                
-                
-
-
+//restify.CORS.ALLOW_HEADERS.push('authorization');
+//that.rest.use(restify.CORS());
+//rest.pre(restify.pre.sanitizePath());
+//rest.use(restify.acceptParser(rest.acceptable));
+that.rest.use(restify.bodyParser());
+// rest.use(restify.queryParser());
+//rest.use(restify.authorizationParser());
+//rest.use(restify.fullResponse());                
 
 
 // clear; curl -is  http://localhost:4321/echo/foo
@@ -230,9 +207,5 @@ that.rest.get('/api/students/:id', RouteHandler.getStudentById);
 that.rest.post('/api/students', RouteHandler.createStudent);
 //that.rest.put('/api/students/:id', RouteHandler.updateStudent);
 that.rest.del('/api/students/:id', RouteHandler.deleteStudent);
-
-
-
-
 
 */
