@@ -3,7 +3,8 @@ import Deliverables from './Deliverables'
 import Grades from './Grades'
 import Info from './Info'
 import Logout from './Logout'
-import Team from './Team'
+import CreateTeam from './CreateTeam'
+import DisplayTeam from './DisplayTeam'
 import NavLink from '../NavLink'
 import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
 
@@ -97,7 +98,8 @@ export default React.createClass({
           <Logout sid={this.state.studentObject.sid} user={localStorage.user}/><br/>
         </div>
         
-        <Team isTeamTrue={this.state.studentObject.isTeamTrue} teamNumber={this.state.studentObject.teamNumber} />
+        { !!this.state.studentObject.team ?
+          (<DisplayTeam teamNumber={this.state.studentObject.team}/>) : (<CreateTeam/>) }
 
         <Deliverables deliverables={this.state.deliverablesObject}/>
         

@@ -56,8 +56,8 @@ export default React.createClass({
     });
   },
   componentDidMount: function () {
-    if (!!localStorage.username) {
-      this.setState({ github: localStorage.username });
+    if (!!localStorage.user) {
+      this.setState({ github: localStorage.user });
     }
   },
   render: function () {

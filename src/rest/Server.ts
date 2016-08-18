@@ -64,12 +64,13 @@ export default class Server {
                     //Set permissive CORS header - this allows this server to be used only as
                     //an API server in conjunction with something like webpack-dev-server.
                     //TODO: delete??
-                    res.setHeader('Access-Control-Allow-Origin', '*');    
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+
                     //Disable caching so we'll always get the latest data
                     res.setHeader('Cache-Control', 'no-cache');
+                    
+                    //log request method and url
                     console.log('\n' + req.method + ' ' + req.url);
-                    console.log("user :" + req.header('user')+ "token :" + req.header('token')+"admin :" + req.header('admin'));
-                    console.log("Params: " + JSON.stringify(req.params));
                     return next();
                 });
 
@@ -77,21 +78,21 @@ export default class Server {
                 
                 /* Requires TEMP token */
                 //called upon login
-                that.rest.post('/api/authenticate', allowTempToken, RouteHandler.authenticateGithub);
+                that.rest.post('/api/authenticate', logRequest, requireTempToken, RouteHandler.authenticateGithub);
                 
                 /* Requires STUDENT OR ADMIN token */
                 //called after submitting registration
                 //TODO: what's stopping an admin from calling this?
-                that.rest.post('/api/register', checkToken, RouteHandler.registerAccount);
+                that.rest.post('/api/register', logRequest, requireToken, RouteHandler.registerAccount);
                 //called upon arriving at student portal
-                that.rest.post('/api/getStudent', checkToken, RouteHandler.getStudent);
-                that.rest.post('/api/getDeliverables', checkToken, RouteHandler.getDeliverables);
-                that.rest.post('/api/getGrades', checkToken, RouteHandler.getGrades);
+                that.rest.post('/api/getStudent', logRequest, requireToken, RouteHandler.getStudent);
+                that.rest.post('/api/getDeliverables', logRequest, requireToken, RouteHandler.getDeliverables);
+                that.rest.post('/api/getGrades', logRequest, requireToken, RouteHandler.getGrades);
                 //called by logout button
-                that.rest.post('/api/logout', checkToken, RouteHandler.deleteServerToken);
+                that.rest.post('/api/logout', logRequest, requireToken, RouteHandler.deleteServerToken);
                 
                 /* Requires ADMIN token */
-                that.rest.post('/api/getGradesAdmin', requireAdmin, checkToken, RouteHandler.getAllGrades);
+                that.rest.post('/api/getGradesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllGrades);
                 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({
@@ -116,7 +117,15 @@ export default class Server {
     }
 }
 
-function allowTempToken(req: restify.Request, res: restify.Response, next: restify.Next) {
+function logRequest(req: restify.Request, res: restify.Response, next: restify.Next) {
+    //for user-defined apis, log request auth headers and request params
+    console.log("User: " + req.header('user') + " | Token: " + req.header('token') + " | Admin: " + req.header('admin'));
+    console.log("Params: " + JSON.stringify(req.params));
+    console.log(" --> next handler");
+    return next();
+}
+
+function requireTempToken(req: restify.Request, res: restify.Response, next: restify.Next) {
     Log.trace("checkTempToken| Checking token..");
 
     var user: string = req.header('user');
@@ -125,7 +134,7 @@ function allowTempToken(req: restify.Request, res: restify.Response, next: resti
     //check that user & token fields are both set to "temp"
     if (user == "temp" && token == "temp") {
         Log.trace("checkTempToken| Valid temp request! Continuing to authentication..");
-        Log.trace("");
+        console.log(" --> next handler");
         return next();
     }
     else {
@@ -135,27 +144,9 @@ function allowTempToken(req: restify.Request, res: restify.Response, next: resti
     }
 }
 
-//only calls next middleware if valid admin field is true
-function requireAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
-    Log.trace("requireAdmin| Checking admin status..");
-
-    var user: string = req.header('user');
-    var token: string = req.header('token');
-    var admin: string = req.header('admin')
-    
-    if (!!user && (admin == "true")) {
-        Log.trace("requireAdmin| Valid admin field. Continue to next middleware..\n");
-        next();    
-    }
-    else {
-        Log.trace("requireAdmin| Missing admin field. Returning..");
-        next(new Error("Error: Permission denied."));
-    }
-}
-
 //calls next middleware if valid user + token fields are supplied.
 //can be called by both regular users (students) and admins.
-function checkToken(req: restify.Request, res: restify.Response, next: restify.Next) {
+function requireToken(req: restify.Request, res: restify.Response, next: restify.Next) {
     Log.trace("checkToken| Checking token..");
     
     var user: string = req.header('user');
@@ -168,7 +159,6 @@ function checkToken(req: restify.Request, res: restify.Response, next: restify.N
     if (!!user && !!token) {
         //evaluate token and continue to next middleware if match
         RouteHandler.returnFile("tokens.json", function (response: any) {
-            console.log("file:");
             var file = JSON.parse(response);
             var servertoken: string;
             
@@ -180,7 +170,8 @@ function checkToken(req: restify.Request, res: restify.Response, next: restify.N
             
             //the next middleware called can be accessed by both students and admins alike.
             if (!!servertoken && (token == servertoken)) {
-                Log.trace("checkToken| Tokens match! Continuing to next middleware..\n");
+                Log.trace("checkToken| Tokens match! Continuing to next middleware..");
+                console.log(" --> next handler");
                 return next();
             }
             else {
@@ -194,6 +185,23 @@ function checkToken(req: restify.Request, res: restify.Response, next: restify.N
         Log.trace("checkToken| Error: Bad request. Returning..");
         res.send(500, "bad request");
         return;
+    }
+}
+
+
+//only calls next middleware if valid admin field is true
+function requireAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
+    Log.trace("requireAdmin| Checking admin status..");
+    var admin: string = req.header('admin')
+    
+    if (admin == "true") {
+        Log.trace("requireAdmin| Valid admin field. Continue to next middleware..\n");
+        console.log(" --> next handler");
+        return next();
+    }
+    else {
+        Log.trace("requireAdmin| Missing admin field. Returning..");
+        return next(new Error("Error: Permission denied."));
     }
 }
 

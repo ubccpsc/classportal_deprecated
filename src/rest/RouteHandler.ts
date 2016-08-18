@@ -68,29 +68,29 @@ export default class RouteHandler {
                     if (!err2 && res2.statusCode == 200) {
                         var obj = JSON.parse(body2);
                         var username = obj.login;
-                        Log.trace("authenticateGithub| Successfully acquired username: "+username+". Checking registration status..");
+                        Log.trace("authenticateGithub| Successfully acquired username: "+username);
                                     
                         //check if username matches list of admin usernames.
                         RouteHandler.isAdmin(username, function (isAdmin: boolean) {
-                                
+
                             //create servertoken with admin flag
                             RouteHandler.createServerToken(username, isAdmin, function (servertoken: string) {
-                                Log.trace("authenticateGithub| Updated student's servertoken.");
                         
-                                //next action also depends on isAdmin flag
+                                //do if admin
                                 if (isAdmin) {
-                                    res.send(200, "/admin~" + username + "~"+servertoken);
+                                    //TODO: any createAdmin() function needed?
+                                    Log.trace("Authentication complete! Redirecting to admin portal..");
+                                    res.send(200, "/admin~" + username + "~" + servertoken);
                                     return next();
                                 }
-                                //student
+                                //do if student
                                 else {
-                                    //next, request student info from database by providing github username.
+                                    //request student info from database by providing github username.
                                     RouteHandler.returnStudent(username, function (studentObject: any) {
-                                        Log.trace("test");
+                                        
                                         //if student does not exist in database, create new user.
                                         //TODO: but what if it was becuase of file read error?
                                         if (studentObject == null) {
-                                            Log.trace("test1");
                                             //create new student with gitub username and githubtoken.
                                             RouteHandler.createBlankStudent(username, githubtoken, function () {
                                                 //finally, send app to registration page.
@@ -101,7 +101,6 @@ export default class RouteHandler {
                                         }
                                         //student exists in database
                                         else {
-                                            Log.trace("test2");
                                             //update githubtoken
                                             RouteHandler.writeStudent(username, { "githubtoken": githubtoken }, function () {
                                                 Log.trace("authenticateGithub| Updated student's githubtoken.");
@@ -150,7 +149,7 @@ export default class RouteHandler {
             3b) no matching csid's, so send error to app.
     */
     static registerAccount(req: restify.Request, res: restify.Response, next: restify.Next) {
-        var username = req.params.username; 
+        var username = req.header('user');
         var csid = req.params.csid;
         var sid = req.params.sid;
         var validCSID = /^[a-z][0-9][a-z][0-9]$/;
@@ -298,17 +297,17 @@ export default class RouteHandler {
     }
 
     static deleteServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
-        var username:string = req.params.user.name;
-        var admin:boolean = req.params.user.admin;
+        var user: string = req.header('user');
+        var admin: string = req.header('admin');
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/tokens.json";
         var file = require(filename);
         
         //overwrite or create
-        Log.trace("deleteServerToken| Deleting servertoken for user: "+username);
-        if (admin)
-            file.admins[username] = "";
+        Log.trace("deleteServerToken| Deleting servertoken for user: "+user);
+        if (admin == "true")
+            file.admins[user] = "";
         else
-            file.students[username] = "";
+            file.students[user] = "";
         
         //step 3: write to file
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
@@ -478,7 +477,7 @@ export default class RouteHandler {
     }
 
     static isAdmin(username: string, callback:any) {
-        Log.trace("isAdmin| Accessing admins.json");
+        Log.trace("isAdmin| Checking admin status..");
         
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/admins.json";
         fs.readFile(filename, function read(err: any, data: any) {
@@ -489,15 +488,13 @@ export default class RouteHandler {
             }
             else {
                 var file = JSON.parse(data);
-                Log.trace("isAdmin| Checking for admin: "+username);
-                
                 if (!!file[username]) {
-                    Log.trace("isAdmin| Successfully accessed "+username+".");
+                    Log.trace("isAdmin| " + username + " is an admin! Executing callback..");                    
                     callback(true);
                     return;
                 }
                 else {
-                    Log.trace("isAdmin| Username not found.");
+                    Log.trace("isAdmin| " + username + " is an student! Executing callback..");
                     callback(false);
                     return;
                 }
