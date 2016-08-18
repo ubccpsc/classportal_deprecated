@@ -69,7 +69,14 @@ export default React.createClass({
           </Form>
           {this.renderTeams() }
         </div>
+        
         <FormTeam/>
+        
+        <div className="module">
+          <h3>Create Projects</h3><br/>
+          <Button>Create Projects</Button>
+        </div>
+        
       </div>
     )}
 })
