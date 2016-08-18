@@ -12,7 +12,7 @@ export default React.createClass({
       var fields = response.split('~');
       var redirect = fields[0], user = fields[1], token = fields[2];
 
-      if (redirect == ("/register" || "/")) {
+      if (redirect == "/register" || redirect == "/") {
         console.log("PostLogin.js| Student login! Redirecting..");
         localStorage.setItem('user', user);
         localStorage.setItem('token', token);
@@ -26,6 +26,7 @@ export default React.createClass({
         browserHistory.push("/admin");
       }
       else {
+        //bad login, so send back to login page
         browserHistory.push("/");
       }
     }
@@ -52,17 +53,17 @@ export default React.createClass({
     }
     
     var that = this;
-    getAuthCode(window.location.href, function (authCode) {
+    getAuthCode(window.location.href, function (authcode) {
       console.log("PostLogin.js| Authenticating..");
       $.ajax({
         type: 'POST',
         url: 'http://localhost:4321/api/authenticate',
-        data: {
-          "user": {
-            "name": "temp",
-            "token": "temp"
-          },
-          "authCode": authCode
+        headers: {
+          "user": "temp",
+          "token": "temp"
+        },
+        data: { 
+          "authcode": authcode
         },
         dataType: "json",
         success: onSuccess.bind(this),

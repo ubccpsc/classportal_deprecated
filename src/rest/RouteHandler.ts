@@ -31,20 +31,33 @@ export default class RouteHandler {
         4a) if yes, update the user's githubtoken and redirect app to the homepage.
         4b) if no, create blank student and redirect app to registration page.
     */
-    static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("authenticateGithub| test");
-        Log.trace("authenticateGithub| "+req.params);
+    static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {    
+        Log.trace("authenticateGithub| Checking authcode..");
         
-        var options = {
-            method: 'post',
-            body: { client_id: config.client_id,
-                    client_secret: config.client_secret,
-                    code: req.params.authCode },
-            json: true,
-            url: 'https://github.com/login/oauth/access_token',
-            headers: {}
-        };
-    
+        //only continue if authcode is present.
+        if (!!req.params.authcode) {
+            //build the request options object
+            var options = {
+                method: 'post',
+                body: { client_id: config.client_id,
+                        client_secret: config.client_secret,
+                        code: req.params.authcode },
+                json: true,
+                url: 'https://github.com/login/oauth/access_token',
+                headers: {}
+            };
+            
+            Log.trace("authenticateGithub| Requesting access token from Github..");
+            request(options, requestGithubTokenCallback);
+            return next();
+        }
+        else {
+            Log.trace("authenticateGithub| Error: Missing authcode.");
+            res.send(500, "missing authcode");
+            return;
+        }
+
+        //callback executed after successful request to Github for access token.
         function requestGithubTokenCallback(err1: any, res1: any, body1: any) {
             if (!err1 && res1.statusCode == 200) {
                 var githubtoken = body1.access_token;
@@ -72,12 +85,12 @@ export default class RouteHandler {
                                 //student
                                 else {
                                     //next, request student info from database by providing github username.
-                                    RouteHandler.returnStudent("students", username, function (studentObject: any) {
-                                        
+                                    RouteHandler.returnStudent(username, function (studentObject: any) {
+                                        Log.trace("test");
                                         //if student does not exist in database, create new user.
                                         //TODO: but what if it was becuase of file read error?
                                         if (studentObject == null) {
-                                            
+                                            Log.trace("test1");
                                             //create new student with gitub username and githubtoken.
                                             RouteHandler.createBlankStudent(username, githubtoken, function () {
                                                 //finally, send app to registration page.
@@ -88,7 +101,7 @@ export default class RouteHandler {
                                         }
                                         //student exists in database
                                         else {
-                                        
+                                            Log.trace("test2");
                                             //update githubtoken
                                             RouteHandler.writeStudent(username, { "githubtoken": githubtoken }, function () {
                                                 Log.trace("authenticateGithub| Updated student's githubtoken.");
@@ -123,17 +136,6 @@ export default class RouteHandler {
             }
         }
 
-        //request githubtoken from Github using authcode and client id+secret
-        if (!!req.params.authCode) {
-            Log.trace("authenticateGithub| Requesting access token from Github..");
-            request(options, requestGithubTokenCallback);
-            return next();
-        }
-        else {
-            Log.trace("authenticateGithub| Error: Missing authcode.");
-            res.send(500, "missing authcode");
-            return;
-        }
     }
 
     /*
@@ -278,8 +280,10 @@ export default class RouteHandler {
     }
 
     static getStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var user = req.header('user');
+        
         Log.trace("getStudent| Retrieving student file..");
-        RouteHandler.returnStudent("students", req.params.username, function (response:any) {
+        RouteHandler.returnStudent(user, function (response:any) {
             //return current student
             if (response == null) {
                 Log.trace("getStudent| Error! Student object: "+response);
@@ -294,13 +298,17 @@ export default class RouteHandler {
     }
 
     static deleteServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var username:string = req.params.user.name;
+        var admin:boolean = req.params.user.admin;
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/tokens.json";
         var file = require(filename);
-        var username = req.params.username;
-        Log.trace("deleteServerToken| Deleting servertoken for user: "+username);
         
         //overwrite or create
-        file[username] = "";
+        Log.trace("deleteServerToken| Deleting servertoken for user: "+username);
+        if (admin)
+            file.admins[username] = "";
+        else
+            file.students[username] = "";
         
         //step 3: write to file
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
@@ -337,7 +345,7 @@ export default class RouteHandler {
         //RouteHandler.createServerToken(githubUser, function (response: string) { });
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/students.json";
         var file = require(filename);        
-        file.students[username] = {
+        file[username] = {
             "sid": "",
             "csid": "",
             "firstname": "",
@@ -363,14 +371,14 @@ export default class RouteHandler {
         Log.trace("writeStudent| Writing to user: "+username+" in students.json..");
 
         //step 1: check if username exists
-        if (!!file.students[username]) {
+        if (!!file[username]) {
             //step 2: update student object
             //TODO: do i need to worry about mapping to a new object instead of modifying the original object?
             var i = 0;
             for (var key in paramsObject) {
-                if (file.students[username].hasOwnProperty(key)) {
+                if (file[username].hasOwnProperty(key)) {
                     Log.trace('writeStudent| Writing to '+key+': '+paramsObject[key]);
-                    file.students[username][key] = paramsObject[key];
+                    file[username][key] = paramsObject[key];
                     i++;
                 }
             }
@@ -395,7 +403,7 @@ export default class RouteHandler {
         }
     }
 
-    static returnStudent(accessType: string, username: string, callback: any) {
+    static returnStudent(username: string, callback: any) {
         Log.trace("returnStudent| Accessing students.json");
         
         var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/students.json";
@@ -408,9 +416,9 @@ export default class RouteHandler {
                 var file = JSON.parse(data);
                 Log.trace("returnStudent| Checking for user "+username);
                 
-                if (!!file[accessType][username]) {
+                if (!!file[username]) {
                     Log.trace("returnStudent| Successfully accessed "+username+".");
-                    callback(file[accessType][username]);
+                    callback(file[username]);
                     return;
                 }
                 else {

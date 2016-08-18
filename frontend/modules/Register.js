@@ -24,11 +24,11 @@ export default React.createClass({
     $.ajax({
       url: 'http://localhost:4321/api/register',
       type: "POST",
+      headers: {
+        "user": localStorage.user,
+        "token": localStorage.token,
+      },
       data: {
-        "user": {
-          "name": localStorage.user,
-          "token": localStorage.token
-        },
         "sid": sid,
         "csid": csid
       },

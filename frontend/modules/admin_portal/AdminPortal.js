@@ -20,13 +20,12 @@ export default React.createClass({
     $.ajax({
       type: 'POST',
       url: 'http://localhost:4321/api/getDeliverables',
-      data: {
-        "user": {
-          "name": localStorage.user,
-          "token": localStorage.token,
-          "admin": localStorage.admin
-        }
+      headers: {
+        "user": localStorage.user,
+        "token": localStorage.token,
+        "admin": localStorage.admin
       },
+      data: {},
       dataType: "json",
       success: function (response) {
         console.log("AdminDeliverables.js| Retrieved "+response.length+" deliverables");

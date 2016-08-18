@@ -21,12 +21,12 @@ export default React.createClass({
     $.ajax({
       type: 'POST',
       url: 'http://localhost:4321/api/getStudent',
-      data: {
-        "user": {
-          "name": localStorage.user,
-          "token": localStorage.token
-        }
+      headers: {
+        "user": localStorage.user,
+        "token": localStorage.token,
+        "admin": localStorage.admin
       },
+      data: {},
       dataType: "json",
       cache: false,
       success: function (response) {
@@ -45,12 +45,12 @@ export default React.createClass({
     $.ajax({
       type: 'POST',
       url: 'http://localhost:4321/api/getDeliverables',
-      data: {
-        "user": {
-          "name": localStorage.user,
-          "token": localStorage.token
-        }
+      headers: {
+        "user": localStorage.user,
+        "token": localStorage.token,
+        "admin": localStorage.admin
       },
+      data: {},
       dataType: "json",
       success: function (response) {
         console.log("StudentPortal.js| Retrieved "+response.length+" deliverables");
@@ -68,11 +68,12 @@ export default React.createClass({
     $.ajax({
       type: 'POST',
       url: 'http://localhost:4321/api/getGrades',
+      headers: {
+        "user": localStorage.user,
+        "token": localStorage.token,
+        "admin": localStorage.admin
+      },
       data: {
-        "user": {
-          "name": localStorage.user,
-          "token": localStorage.token
-        },
         "sid": this.state.studentObject.sid
       },
       dataType: "json",
@@ -93,7 +94,7 @@ export default React.createClass({
       <div>
         <div className="module">
           <h3>Welcome, {this.state.studentObject.firstname}!</h3><br/>
-          <Logout sid={this.state.studentObject.sid} username={localStorage.username}/><br/>
+          <Logout sid={this.state.studentObject.sid} user={localStorage.user}/><br/>
         </div>
         
         <Team isTeamTrue={this.state.studentObject.isTeamTrue} teamNumber={this.state.studentObject.teamNumber} />

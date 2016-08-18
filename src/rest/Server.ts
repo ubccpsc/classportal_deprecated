@@ -55,26 +55,31 @@ export default class Server {
                     name: 'classPortal'
                 });
                 
+                /*  Bundled middleware start */
+
+                //parses the body of the request into req.params
+                that.rest.use(restify.bodyParser());
+                
                 that.rest.use(function(req, res, next){
                     //Set permissive CORS header - this allows this server to be used only as
                     //an API server in conjunction with something like webpack-dev-server.
+                    //TODO: delete??
                     res.setHeader('Access-Control-Allow-Origin', '*');    
                     //Disable caching so we'll always get the latest data
                     res.setHeader('Cache-Control', 'no-cache');
                     console.log('\n' + req.method + ' ' + req.url);
+                    console.log("user :" + req.header('user')+ "token :" + req.header('token')+"admin :" + req.header('admin'));
+                    console.log("Params: " + JSON.stringify(req.params));
                     return next();
                 });
 
-                //parses the body of the request, so we can access req.params
-                that.rest.use(restify.bodyParser());                
-
-                /* API start */
+                /* User-defined middleware start */
                 
-                //Requires Temp Token only
+                /* Requires TEMP token */
                 //called upon login
                 that.rest.post('/api/authenticate', allowTempToken, RouteHandler.authenticateGithub);
                 
-                //Requires Student or Admin Token
+                /* Requires STUDENT OR ADMIN token */
                 //called after submitting registration
                 //TODO: what's stopping an admin from calling this?
                 that.rest.post('/api/register', checkToken, RouteHandler.registerAccount);
@@ -85,10 +90,8 @@ export default class Server {
                 //called by logout button
                 that.rest.post('/api/logout', checkToken, RouteHandler.deleteServerToken);
                 
-                //Requires Admin Token only
+                /* Requires ADMIN token */
                 that.rest.post('/api/getGradesAdmin', requireAdmin, checkToken, RouteHandler.getAllGrades);
-
-                /* API end */
                 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({
@@ -114,11 +117,13 @@ export default class Server {
 }
 
 function allowTempToken(req: restify.Request, res: restify.Response, next: restify.Next) {
-    console.log("Params: " + JSON.stringify(req.params));
     Log.trace("checkTempToken| Checking token..");
 
+    var user: string = req.header('user');
+    var token: string = req.header('token');
+    
     //check that user & token fields are both set to "temp"
-    if (req.params.user.name == "temp" && req.params.user.token == "temp") {
+    if (user == "temp" && token == "temp") {
         Log.trace("checkTempToken| Valid temp request! Continuing to authentication..");
         Log.trace("");
         return next();
@@ -132,7 +137,13 @@ function allowTempToken(req: restify.Request, res: restify.Response, next: resti
 
 //only calls next middleware if valid admin field is true
 function requireAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
-    if (!!req.params.user && (req.params.user.admin == true)) {
+    Log.trace("requireAdmin| Checking admin status..");
+
+    var user: string = req.header('user');
+    var token: string = req.header('token');
+    var admin: string = req.header('admin')
+    
+    if (!!user && (admin == "true")) {
         Log.trace("requireAdmin| Valid admin field. Continue to next middleware..\n");
         next();    
     }
@@ -145,36 +156,35 @@ function requireAdmin(req: restify.Request, res: restify.Response, next: restify
 //calls next middleware if valid user + token fields are supplied.
 //can be called by both regular users (students) and admins.
 function checkToken(req: restify.Request, res: restify.Response, next: restify.Next) {
-    console.log("Params: " + JSON.stringify(req.params));
     Log.trace("checkToken| Checking token..");
     
-    var username: string = req.params.user.name;
-    var usertoken: string = req.params.user.token;
+    var user: string = req.header('user');
+    var token: string = req.header('token');
+    var admin: string = req.header('admin');
     
+    Log.trace("checkToken| auths: " + user + ":" + token + ":" + admin);
+
     //check that user & token fields are non-empty
-    if (!!username && !!usertoken) {
+    if (!!user && !!token) {
         //evaluate token and continue to next middleware if match
         RouteHandler.returnFile("tokens.json", function (response: any) {
+            console.log("file:");
             var file = JSON.parse(response);
             var servertoken: string;
             
             //get saved token
-            if (req.params.user.admin) {
-                Log.trace("checkToken| Admin token retrieved..");
-                servertoken = file.admins[username];
-            }
-            else {
-                Log.trace("checkToken| Student token retrieved..");
-                servertoken = file.students[username];  
-            } 
+            if (admin == "true")
+                servertoken = file.admins[user];
+            else
+                servertoken = file.students[user];
             
             //the next middleware called can be accessed by both students and admins alike.
-            if (!!servertoken && (usertoken == servertoken)) {
+            if (!!servertoken && (token == servertoken)) {
                 Log.trace("checkToken| Tokens match! Continuing to next middleware..\n");
                 return next();
             }
             else {
-                Log.trace("checkToken| Error: Tokens do not match..("+usertoken + servertoken+") Returning..");
+                Log.trace("checkToken| Error: Tokens do not match (" + token + ":" + servertoken + ") Returning..");
                 res.send(500, "bad request");
                 return;
             }
