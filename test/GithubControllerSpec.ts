@@ -78,6 +78,16 @@ describe("GithubProjectController", function () {
         });
     });
 
+    it("Should be able to list the teams", function () {
+        return controller.listTeams().then(function (res) {
+            Log.test('Team list: ' + res);
+            expect(res).not.to.be.null;
+        }).catch(function (err) {
+            Log.test('Did not list team: ' + err);
+            expect(true).to.be.false; // should not happen
+        });
+    });
+
     it("Should be able to add a team to a repo", function () {
         let teamId = 2100162;
         return controller.addTeamToRepo(teamId, REPO_NAME1).then(function (res) {

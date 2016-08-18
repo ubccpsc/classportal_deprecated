@@ -123,17 +123,91 @@ export default class GithubProjectController {
     }
 
     /**
-     * Creates a team for a groupName (e.g., cpsc310_team1)
+     * Lists teams. Doesn't work (dealing with pagination is irritating)
      *
-     * @param groupName
+     * @param teamName
      * @returns {Promise<T>}
      */
-    public createTeam(groupName: string): Promise<number> {
+    public listTeams(): Promise<[]> {
+        let ctx = this;
+
+        Log.info("GithubProjectController::listTeams(..) - start");
+        return new Promise(function (fulfill, reject) {
+
+            var options = {
+                method: 'GET',
+                uri: 'https://api.github.com/orgs/' + ctx.org + '/teams?per_page=200',
+                headers: {
+                    'Authorization': ctx.GITHUB_AUTH_TOKEN,
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/json'
+                },
+                resolveWithFullResponse: true,
+                json: true
+            };
+
+            rp(options).then(function (fullResponse: any) {
+
+                // let linkString = fullResponse.headers.link;
+                // let links = ctx.parseLinkHeader(linkString);
+
+                if (typeof fullResponse.headers.link !== 'undefined') {
+                    let eMessage = "GithubProjectController::creatlistTeams(..) - ERROR; pagination encountered (and not handled)";
+                    Log.error(eMessage);
+                    reject(eMessage);
+                }
+                // ignore whatever
+                Log.info("GithubProjectController::creatlistTeams(..) - success: " + JSON.stringify(fullResponse.body));
+                for (var team of fullResponse.body) {
+                    let id = team.id;
+                    let name = team.name;
+
+                    Log.info("GithubProjectController::creatlistTeams(..) - team: " + JSON.stringify(team));
+                }
+
+                fulfill(JSON.stringify(fullResponse.body));
+            }).catch(function (err: any) {
+                Log.error("GithubProjectController::listTeams(..) - ERROR: " + err);
+                reject(err);
+            });
+        });
+    }
+
+    /**
+     * From: https://gist.github.com/niallo/3109252#gistcomment-1474669
+     */
+    private parseLinkHeader(header: string) {
+        if (header.length === 0) {
+            throw new Error("input must not be of zero length");
+        }
+
+        // Split parts by comma
+        var parts = header.split(',');
+        var links = {};
+        // Parse each part into a named link
+        for (var i = 0; i < parts.length; i++) {
+            var section = parts[i].split(';');
+            if (section.length !== 2) {
+                throw new Error("section could not be split on ';'");
+            }
+            var url = section[0].replace(/<(.*)>/, '$1').trim();
+            var name = section[1].replace(/rel="(.*)"/, '$1').trim();
+            links[name] = url;
+        }
+        return links;
+    }
+
+    /**
+     * Creates a team for a groupName (e.g., cpsc310_team1)
+     *
+     * @param teamName
+     * @returns {Promise<T>}
+     */
+    public createTeam(teamName: string): Promise<number> {
         let ctx = this;
 
         Log.info("GithubProjectController::createTeam(..) - start");
         return new Promise(function (fulfill, reject) {
-
 
             var options = {
                 method: 'POST',
@@ -144,7 +218,7 @@ export default class GithubProjectController {
                     'Accept': 'application/json'
                 },
                 body: {
-                    name: groupName
+                    name: teamName
                 },
                 json: true
             };
@@ -157,74 +231,11 @@ export default class GithubProjectController {
                 Log.error("GithubProjectController::createTeam(..) - ERROR: " + err);
                 reject(err);
             });
-            /*
-             request.post(
-             {
-             url: 'https://api.github.com/orgs/' + ctx.org + '/teams',
-             headers: {
-             'Authorization': ctx.GITHUB_AUTH_TOKEN,
-             'User-Agent': ctx.GITHUB_USER_NAME,
-             'Accept': 'application/json'
-             },
-             json: {
-             name: groupName
-             }
-             },
-
-             function (error: any, response: any, body: any) {
-             if (!error && response.statusCode < 400) {
-             let id = body.id;
-             Log.info("GithubProjectController::createTeam(..) - success: " + id);
-             fulfill(id);
-             // onSuccess(body.id);
-             } else {
-             Log.error("GithubProjectController::createTeam(..) - ERROR: " + response);
-             reject(error);
-             }
-
-             }
-             );
-             */
         });
     }
 
     /**
-     * Deletes a repo from the organization.
-     *
-     * @param repoName
-     * @returns {Promise<T>}
-     */
-    /*
-     public deleteTeam(teamName: string): Promise<string> {
-     let ctx = this;
-
-     Log.info("GithubProjectController::deleteTeam(..) - start");
-     return new Promise(function (fulfill, reject) {
-
-     var options = {
-     method: 'DELETE',
-     uri: 'https://api.github.com/teams/' + teamName,// TODO: needs to be a team id
-     headers: {
-     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-     'User-Agent': ctx.GITHUB_USER_NAME,
-     'Accept': 'application/json'
-     }
-     };
-
-     rp(options).then(function (body: any) {
-     Log.info("GithubProjectController::deleteTeam(..) - success; body: " + body);
-     fulfill(body);
-     }).catch(function (err: any) {
-     Log.error("GithubProjectController::deleteTeam(..) - ERROR: " + JSON.stringify(err));
-     reject(err);
-     });
-
-     });
-     }
-     */
-
-    /**
-     * NOTE: needs the team Id, not the team name!
+     * NOTE: needs the team Id (number), not the team name (string)!
      *
      * @param teamId
      * @param repoName
