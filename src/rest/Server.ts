@@ -121,7 +121,7 @@ function logRequest(req: restify.Request, res: restify.Response, next: restify.N
     //for user-defined apis, log request auth headers and request params
     console.log("User: " + req.header('user') + " | Token: " + req.header('token') + " | Admin: " + req.header('admin'));
     console.log("Params: " + JSON.stringify(req.params));
-    console.log(" --> next handler");
+    console.log(">> next handler");
     return next();
 }
 
@@ -134,7 +134,7 @@ function requireTempToken(req: restify.Request, res: restify.Response, next: res
     //check that user & token fields are both set to "temp"
     if (user == "temp" && token == "temp") {
         Log.trace("checkTempToken| Valid temp request! Continuing to authentication..");
-        console.log(" --> next handler");
+        console.log(">> next handler");
         return next();
     }
     else {
@@ -153,8 +153,6 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
     var token: string = req.header('token');
     var admin: string = req.header('admin');
     
-    Log.trace("checkToken| auths: " + user + ":" + token + ":" + admin);
-
     //check that user & token fields are non-empty
     if (!!user && !!token) {
         //evaluate token and continue to next middleware if match
@@ -171,7 +169,7 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
             //the next middleware called can be accessed by both students and admins alike.
             if (!!servertoken && (token == servertoken)) {
                 Log.trace("checkToken| Tokens match! Continuing to next middleware..");
-                console.log(" --> next handler");
+                console.log(">> next handler");
                 return next();
             }
             else {
@@ -192,11 +190,12 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
 //only calls next middleware if valid admin field is true
 function requireAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
     Log.trace("requireAdmin| Checking admin status..");
+    
     var admin: string = req.header('admin')
     
     if (admin == "true") {
         Log.trace("requireAdmin| Valid admin field. Continue to next middleware..\n");
-        console.log(" --> next handler");
+        console.log(">> next handler");
         return next();
     }
     else {

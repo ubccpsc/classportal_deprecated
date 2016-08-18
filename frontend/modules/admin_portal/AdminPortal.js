@@ -70,8 +70,8 @@ export default React.createClass({
         </div>
 
         <div className="module">
-          <h3>Welcome, {localStorage.admin}!</h3><br/>
-          <Logout sid="Admin-TA" username={localStorage.admin}/><br/>
+          <h3>Welcome, {localStorage.user}!</h3><br/>
+          <Logout sid="admin: TA" user={localStorage.user}/><br/>
         </div>
 
         {!!this.state.deliverablesObject && childrenWithProps}
