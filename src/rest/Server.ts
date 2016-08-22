@@ -132,7 +132,7 @@ function requireTempToken(req: restify.Request, res: restify.Response, next: res
     var token: string = req.header('token');
     
     //check that user & token fields are both set to "temp"
-    if (user == "temp" && token == "temp") {
+    if (user === "temp" && token === "temp") {
         Log.trace("checkTempToken| Valid temp request! Continuing to authentication..");
         console.log(">> next handler");
         return next();
@@ -161,13 +161,15 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
             var servertoken: string;
             
             //get saved token
-            if (admin == "true")
+            if (admin === "true") {
                 servertoken = file.admins[user];
-            else
+            }
+            else {
                 servertoken = file.students[user];
+            }
             
             //the next middleware called can be accessed by both students and admins alike.
-            if (!!servertoken && (token == servertoken)) {
+            if (!!servertoken && (token === servertoken)) {
                 Log.trace("checkToken| Tokens match! Continuing to next middleware..");
                 console.log(">> next handler");
                 return next();
@@ -193,7 +195,7 @@ function requireAdmin(req: restify.Request, res: restify.Response, next: restify
     
     var admin: string = req.header('admin')
     
-    if (admin == "true") {
+    if (admin === "true") {
         Log.trace("requireAdmin| Valid admin field. Continue to next middleware..\n");
         console.log(">> next handler");
         return next();
@@ -214,21 +216,5 @@ that.rest.use(restify.bodyParser());
 // rest.use(restify.queryParser());
 //rest.use(restify.authorizationParser());
 //rest.use(restify.fullResponse());                
-
-
-// clear; curl -is  http://localhost:4321/echo/foo
-that.rest.get('/echo/:message', RouteHandler.getEcho);
-
-// clear; curl -is -X PUT -d '{"key":"val","key2":"val2"}' http://localhost:3031/say/randomKey67
-// rest.put('/say/:val', portal.rest.RouteHandler.putSay);
-
-// clear; curl -is  http://localhost:4321/students
-that.rest.get('/api/students', RouteHandler.getStudents);
-
-//get, add, update, delete students
-that.rest.get('/api/students/:id', RouteHandler.getStudentById);
-that.rest.post('/api/students', RouteHandler.createStudent);
-//that.rest.put('/api/students/:id', RouteHandler.updateStudent);
-that.rest.del('/api/students/:id', RouteHandler.deleteStudent);
 
 */

@@ -78,7 +78,9 @@ export default class RouteHandler {
                         
                                 //do if admin
                                 if (isAdmin) {
-                                    //TODO: any createAdmin() function needed?
+
+                                    //TODO: write github token to admin file!
+
                                     Log.trace("Authentication complete! Redirecting to admin portal..");
                                     res.send(200, "/admin~" + username + "~" + servertoken);
                                     return next();
@@ -304,7 +306,7 @@ export default class RouteHandler {
         
         //overwrite or create
         Log.trace("deleteServerToken| Deleting servertoken for user: "+user);
-        if (admin == "true")
+        if (admin === "true")
             file.admins[user] = "";
         else
             file.students[user] = "";
