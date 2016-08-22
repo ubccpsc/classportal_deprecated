@@ -1,0 +1,13 @@
+{
+    "client_id":        "97ae59518a9d5cae2550",
+    "client_secret":    "c81185c31a66f6439ee6a2e6fa33cedd057a49d9",
+    "hostname":         "localhost",
+    "port":             "4321",
+    "systemname":       "310 portal",
+    "private_folder":   "priv/",
+    "path_to_classlist":"priv/classlist.csv",
+    "path_to_admins":    "priv/admins.json",
+    "path_to_tokens":   "priv/tokens.json",
+    "path_to_students":   "priv/students.json",
+    "path to etc...":   "/"
+    }

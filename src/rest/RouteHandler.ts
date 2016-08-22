@@ -13,7 +13,9 @@ import Store from '../store/Store';
 import EchoController from '../controller/EchoController';
 import Student from '../model/Student';
 import Log from '../Util';
-var config = require('./config.json');
+
+const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
+var config = require(pathToRoot + 'config.json');
 
 export default class RouteHandler { 
     static getAllGrades(req:restify.Request, res: restify.Response, next: restify.Next) {
@@ -301,7 +303,7 @@ export default class RouteHandler {
     static deleteServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
         var user: string = req.header('user');
         var admin: string = req.header('admin');
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest")) + "sampleData/tokens.json";
+        var filename = pathToRoot.concat(config.path_to_tokens); 
         var file = require(filename);
         
         //overwrite or create
@@ -342,9 +344,7 @@ export default class RouteHandler {
 
     static createBlankStudent(username: string, githubtoken: string, callback: any) {
         Log.trace("createBlankStudent| Creating new student: "+username);
-        
-        //RouteHandler.createServerToken(githubUser, function (response: string) { });
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/students.json";
+        var filename = pathToRoot.concat(config.path_to_students);
         var file = require(filename);        
         file[username] = {
             "sid": "",
@@ -367,9 +367,10 @@ export default class RouteHandler {
     
     //update keys in object in username file
     static writeStudent(username: string, paramsObject: any, callback: any) {
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/students.json";
+        Log.trace("writeStudent| Writing to user: " + username + " in students.json..");
+        
+        var filename = pathToRoot.concat(config.path_to_students); 
         var file = require(filename);
-        Log.trace("writeStudent| Writing to user: "+username+" in students.json..");
 
         //step 1: check if username exists
         if (!!file[username]) {
@@ -406,8 +407,8 @@ export default class RouteHandler {
 
     static returnStudent(username: string, callback: any) {
         Log.trace("returnStudent| Accessing students.json");
+        var filename = pathToRoot.concat(config.path_to_students);
         
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/students.json";
         fs.readFile(filename, function read(err: any, data: any) {
             if (err) {
                 Log.trace("returnStudent| Error reading file: "+err.toString());
@@ -432,8 +433,8 @@ export default class RouteHandler {
     }
 
     static returnFile(file: string, callback: any) {
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/"+file;
-        Log.trace("returnFile| Accessing: "+file);
+        Log.trace("returnFile| Accessing: " + file);
+        var filename = pathToRoot.concat(config.private_folder, file);
 
         fs.readFile(filename, function read(err: any, data: any) {
             if (err) {
@@ -455,7 +456,7 @@ export default class RouteHandler {
         var servertoken: string = Math.random().toString(36).slice(2);
 
         //access file
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/tokens.json";
+        var filename = pathToRoot.concat(config.path_to_tokens); 
         var file = require(filename);
         
         //overwrite or create
@@ -480,8 +481,8 @@ export default class RouteHandler {
 
     static isAdmin(username: string, callback:any) {
         Log.trace("isAdmin| Checking admin status..");
-        
-        var filename = __dirname.substring(0, __dirname.lastIndexOf("src/rest"))+"sampleData/admins.json";
+        var filename = pathToRoot.concat(config.path_to_admins);
+
         fs.readFile(filename, function read(err: any, data: any) {
             if (err) {
                 Log.trace("isAdmin| Error reading file: "+err.toString());
