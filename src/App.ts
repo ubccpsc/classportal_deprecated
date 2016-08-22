@@ -4,6 +4,7 @@
 
 import Log from './Util';
 import Server from './rest/Server';
+var config = require('../config.json');
 
 namespace portal {
     export class App {
@@ -18,4 +19,4 @@ namespace portal {
 
 Log.info('App - starting');
 let app = new portal.App();
-app.initServer(4321);
+app.initServer(config.port);
