@@ -53,19 +53,15 @@ export default React.createClass({
       alert("Error: Bad selection");
     }
   },
+  //TODO: variable team size based on config file.
   render: function () {
-    var options1 = [{ "label": "1" }, { "label": "2" }];
-    var options2 = [{ "label": "1" }, { "label": "2" }];
-    var options3 = this.props.classList;
-
     return (
       <div className="module">
         <h3>Create Team</h3><br/>
       
         <Form onSubmit={this.handleSubmit}>
           <FormField id="form1" onChange={this.handleSelect}>
-            <FormSelect id="select1" options={options3} firstOption="Select" onChange={ function doNothing(){} } />
-            <FormSelect id="select2" options={options2} firstOption="Select" onChange={ function doNothing(){} } />
+            <FormSelect id="select1" options={this.props.classList} firstOption="Select" onChange={ function doNothing(){} } />
             <Button size="sm" submit>Form Team</Button>
           </FormField>
         </Form>

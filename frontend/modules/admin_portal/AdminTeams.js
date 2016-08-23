@@ -71,7 +71,7 @@ export default React.createClass({
           {this.renderTeams() }
         </div>
         
-        <CreateTeam/>
+        <CreateTeam classList={this.props.classList} />
         
         <div className="module">
           <h3>Create Projects</h3><br/>
@@ -81,65 +81,3 @@ export default React.createClass({
       </div>
     )}
 })
-
-const ECreateTeam = React.createClass({
-  handleSelect: function () {
-    
-  },
-  formTeam: function () {
-    var asdf = "circle-slash";
-    var valid = false;
-    var options1 = [{ "label": "1" }, { "label": "2" }];
-    var options2 = [{ "label": "1" }, { "label": "2" }];
-    var set1 = false;
-    var set2 = false;
-
-    return (
-      <Form onSubmit={this.teamSubmit}>
-        <FormField>
-          <FormSelect options={options1} firstOption="Select" onChange={this.handleSelect} />
-        </FormField>
-        
-        <FormField>
-          <FormSelect options={options2} firstOption="Select" onChange={this.handleSelect} />
-        </FormField>
-
-        <FormField>
-          <Button size="sm" type="default-danger" submit><Glyph icon={asdf} />&nbsp; Form Team</Button>
-        </FormField>
-      </Form>
-    );
-  },
-  render() {
-    return (
-      <div className="module">
-        <h3>Form Team</h3><br/>
-        {this.formTeam()}
-      </div>
-    )}
-})
-
-
-/*
-
-            <tr>
-              <td className="tg-edam">Assignment 1 (Group)</td>
-              <td className="tg-value">
-                <Form onSubmit={this.gradeSubmit}>
-                  <FormField label="Type">
-                    <FormSelect options={options1} onChange={this.updateSelect} />
-                  </FormField>
-                  <FormField label="Grade (out of 100)">
-                    <FormInput placeholder="Eg. 90"/>
-                  </FormField>
-                  <FormField label="Comments">
-                    <FormInput placeholder="Eg." multiline />
-                  </FormField>
-                  <FormField >
-                    <Button size="sm" submit>Submit</Button>
-                  </FormField>
-                </Form>
-              </td>
-            </tr>
-
-*/

@@ -5,6 +5,7 @@ import Logout from '../shared_components/Logout'
 import AdminTeams from './AdminTeams'
 import AdminDeliverables from './AdminDeliverables'
 var util = require('util');
+import Ajax from '../shared_components/Ajax'
 
 export default React.createClass({
   getInitialState: function() {
@@ -13,31 +14,24 @@ export default React.createClass({
       studentObject: '',
       gradesObject: '',
       deliverablesObject: '',
-      
+      classList: [{ "label": "asdf" }, { "label": "qwerty" }]
     };
   },
   getDeliverables: function () {
-    console.log("AdminDeliverables.js| Requesting deliverables");
-    $.ajax({
-      type: 'POST',
-      url: 'http://localhost:4321/api/getDeliverables',
-      headers: {
-        "user": localStorage.user,
-        "token": localStorage.token,
-        "admin": localStorage.admin
-      },
-      data: {},
-      dataType: "json",
-      success: function (response) {
+    Ajax.getDeliverables(
+      function success (response) {
         console.log("AdminDeliverables.js| Retrieved "+response.length+" deliverables");
         this.setState({ deliverablesObject: response }, function () {
           console.log("AdminDeliverables.js| deliverablesObject set: "+JSON.stringify(this.state.deliverablesObject[1]));
         });
       }.bind(this),
-      error: function (xhr, status, err) {
+      function error (xhr, status, err) {
         console.log("AdminDeliverables.js| Error retrieving deliverables!");
       }.bind(this)
-    });  
+    )
+  },
+  getClassList: function () {
+    
   },
   componentDidMount: function () {
     this.getDeliverables();
@@ -50,7 +44,8 @@ export default React.createClass({
       return React.cloneElement(child, {
         "students": that.state.studentsObject,
         "grades": that.state.gradesObject,
-        "deliverables": that.state.deliverablesObject
+        "deliverables": that.state.deliverablesObject,
+        "classList": that.state.classList
       });
     });
     
@@ -78,5 +73,3 @@ export default React.createClass({
       </div>
     )}
 })
-
-//this.props.children
