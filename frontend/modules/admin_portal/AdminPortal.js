@@ -31,7 +31,15 @@ export default React.createClass({
     )
   },
   getClassList: function () {
-    
+    Ajax.getClassList(
+      function success(response) {
+        console.log("AdminPortal.js| Retreived class list:" + response);
+        this.setState({ classList: response});
+      },
+      function error(xhr, status, error) {
+        console.log("AdminPortal.js| Error getting classlist!");
+      }
+    )
   },
   componentDidMount: function () {
     this.getDeliverables();
