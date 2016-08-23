@@ -3,7 +3,7 @@ import Deliverables from './Deliverables'
 import Grades from './Grades'
 import Info from './Info'
 import Logout from './Logout'
-import CreateTeam from './CreateTeam'
+import CreateTeam from '../shared_components/CreateTeam'
 import DisplayTeam from './DisplayTeam'
 import NavLink from '../NavLink'
 import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
@@ -87,6 +87,9 @@ export default React.createClass({
       }.bind(this)
     });
   },
+  getClasslist: function () {
+    return [{ "label": "asdf" }, { "label": "qwerty" }];
+  },
   componentDidMount: function () {
     this.getStudent();
   },
@@ -99,7 +102,7 @@ export default React.createClass({
         </div>
         
         { !!this.state.studentObject.team ?
-          (<DisplayTeam teamNumber={this.state.studentObject.team}/>) : (<CreateTeam/>) }
+          (<DisplayTeam teamNumber={this.state.studentObject.team}/>) : (<CreateTeam classList={this.getClasslist()} />) }
 
         <Deliverables deliverables={this.state.deliverablesObject}/>
         

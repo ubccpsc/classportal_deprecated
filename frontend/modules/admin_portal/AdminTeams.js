@@ -1,5 +1,6 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
+import CreateTeam from '../shared_components/CreateTeam'
 
 export default React.createClass({
   getInitialState: function () {
@@ -70,7 +71,7 @@ export default React.createClass({
           {this.renderTeams() }
         </div>
         
-        <FormTeam/>
+        <CreateTeam/>
         
         <div className="module">
           <h3>Create Projects</h3><br/>
@@ -81,7 +82,7 @@ export default React.createClass({
     )}
 })
 
-const FormTeam = React.createClass({
+const ECreateTeam = React.createClass({
   handleSelect: function () {
     
   },
