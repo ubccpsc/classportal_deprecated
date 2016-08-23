@@ -2,7 +2,7 @@ import React from 'react'
 import Deliverables from './Deliverables'
 import Grades from './Grades'
 import Info from './Info'
-import Logout from './Logout'
+import Logout from '../shared_components/Logout'
 import CreateTeam from '../shared_components/CreateTeam'
 import DisplayTeam from './DisplayTeam'
 import NavLink from '../NavLink'
@@ -32,7 +32,7 @@ export default React.createClass({
     )
   },
   getDeliverables: function () {
-    Ajax.getDeliverables(  
+    Ajax.getDeliverables(
       function success (response) {
         console.log("StudentPortal.js| Retrieved "+response.length+" deliverables");
         this.setState({ deliverablesObject: response }, function () {
@@ -45,7 +45,8 @@ export default React.createClass({
     )
   },
   getGrades: function () {
-    Ajax.getDeliverables(  
+    Ajax.getGrades(
+      { "sid": this.state.studentObject.sid },
       function success (response) {
         console.log("StudentPortal.js| Retrieved grades: " + response);
         this.setState({ gradesObject: response });
@@ -64,12 +65,9 @@ export default React.createClass({
   render: function () {
     return (
       <div>
-        <div className="module">
-          <h3>Welcome, {this.state.studentObject.firstname}!</h3><br/>
-          <Logout sid={this.state.studentObject.sid} user={localStorage.user}/><br/>
-        </div>
-        
-        { !!this.state.studentObject.team ?
+        <Logout firstname={this.state.studentObject.firstname} sid={this.state.studentObject.sid} user={localStorage.user}/><br/>
+
+        {!!this.state.studentObject.team ?
           (<DisplayTeam teamNumber={this.state.studentObject.team}/>) : (<CreateTeam classList={this.getClasslist()} />) }
 
         <Deliverables deliverables={this.state.deliverablesObject}/>

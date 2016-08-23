@@ -1,6 +1,5 @@
 import React from 'react'
 import LoginPage from './login_page/LoginPage'
-import Logout from './student_portal/Logout'
 import StudentPortal from './student_portal/StudentPortal'
 import AdminPortal from './admin_portal/AdminPortal'
 

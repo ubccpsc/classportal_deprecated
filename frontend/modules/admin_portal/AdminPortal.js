@@ -1,7 +1,7 @@
 import React from 'react'
 import NavLink from '../NavLink'
 import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
-import Logout from '../student_portal/Logout'
+import Logout from '../shared_components/Logout'
 import AdminTeams from './AdminTeams'
 import AdminDeliverables from './AdminDeliverables'
 var util = require('util');
@@ -9,6 +9,7 @@ var util = require('util');
 export default React.createClass({
   getInitialState: function() {
     return {
+      adminObject: '',
       studentObject: '',
       gradesObject: '',
       deliverablesObject: '',
@@ -69,10 +70,7 @@ export default React.createClass({
           </Row>
         </div>
 
-        <div className="module">
-          <h3>Welcome, {localStorage.user}!</h3><br/>
-          <Logout sid="admin: TA" user={localStorage.user}/><br/>
-        </div>
+        <Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.role} user={localStorage.user}/><br/>
 
         {!!this.state.deliverablesObject && childrenWithProps}
 

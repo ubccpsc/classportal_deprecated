@@ -1,3 +1,4 @@
+import React from 'react'
 import Config from 'Config';
 
 module.exports = {
@@ -20,7 +21,7 @@ module.exports = {
     },
 
     getDeliverables: function (successCallback, errorCallback) {
-        console.log("Ajax.js| Getting deliverables");
+        console.log("Ajax.js| Getting deliverables..");
         $.ajax({
             type: 'POST',
             url: 'http://' + Config.host + ':' + Config.port + '/api/getDeliverables',
@@ -37,7 +38,9 @@ module.exports = {
         });
     },
 
-    getGrades: function (successCallback, errorCallback) {
+    //Input: data = sid
+    getGrades: function (data, successCallback, errorCallback) {
+        console.log("Ajax.js| Getting grades..");
         $.ajax({
             type: 'POST',
             url: 'http://' + Config.host + ':' + Config.port + '/api/getGrades',
@@ -46,13 +49,30 @@ module.exports = {
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
-            data: {
-                "sid": this.state.studentObject.sid
-            },
+            data: data,
             dataType: "json",
             cache: false,
             success: successCallback,
             error: errorCallback
         });
-    }    
+    },
+
+    //Tells server to delete the server token of the current user.     
+    logout: function (successCallback, errorCallback) {
+        console.log("Ajax.js| Logging out..");
+        $.ajax({
+            type: "POST",
+            url: 'http://' + Config.host + ':' + Config.port + '/api/logout',
+            headers: {
+                "user": localStorage.user,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: {},
+            dataType: 'json',
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    }
 }
