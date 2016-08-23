@@ -7,6 +7,7 @@ import CreateTeam from '../shared_components/CreateTeam'
 import DisplayTeam from './DisplayTeam'
 import NavLink from '../NavLink'
 import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
+import Ajax from '../shared_components/Ajax'
 
 export default React.createClass({
   getInitialState: function() {
@@ -17,75 +18,42 @@ export default React.createClass({
     };
   },
   //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json  
-  getStudent: function () {  
-    console.log("StudentPortal.js| Requesting student");
-    $.ajax({
-      type: 'POST',
-      url: 'http://localhost:4321/api/getStudent',
-      headers: {
-        "user": localStorage.user,
-        "token": localStorage.token,
-        "admin": localStorage.admin
-      },
-      data: {},
-      dataType: "json",
-      cache: false,
-      success: function (response) {
+  getStudent: function () {
+    Ajax.getStudent(
+      function success(response) {
         console.log("StudentPortal.js| Retrieved student: \n" + JSON.stringify(response));
         this.setState({ studentObject: response }, function () {
           this.getDeliverables();
         });
       }.bind(this),
-      error: function(xhr, status, err) {
+      function error(xhr, status, err) {
         console.error("StudentPortal.js| Error retrieving student file!", status, err.toString());
       }.bind(this)
-    });
+    )
   },
   getDeliverables: function () {
-    console.log("StudentPortal.js| Requesting deliverables");
-    $.ajax({
-      type: 'POST',
-      url: 'http://localhost:4321/api/getDeliverables',
-      headers: {
-        "user": localStorage.user,
-        "token": localStorage.token,
-        "admin": localStorage.admin
-      },
-      data: {},
-      dataType: "json",
-      success: function (response) {
+    Ajax.getDeliverables(  
+      function success (response) {
         console.log("StudentPortal.js| Retrieved "+response.length+" deliverables");
         this.setState({ deliverablesObject: response }, function () {
           this.getGrades();
         });
       }.bind(this),
-      error: function (xhr, status, err) {
+      function error (xhr, status, err) {
         console.log("StudentPortal.js| Error retrieving deliverables!");
       }.bind(this)
-    });
+    )
   },
   getGrades: function () {
-    console.log("StudentPortal.js| Requesting grades");
-    $.ajax({
-      type: 'POST',
-      url: 'http://localhost:4321/api/getGrades',
-      headers: {
-        "user": localStorage.user,
-        "token": localStorage.token,
-        "admin": localStorage.admin
-      },
-      data: {
-        "sid": this.state.studentObject.sid
-      },
-      dataType: "json",
-      success: function (response) {
+    Ajax.getDeliverables(  
+      function success (response) {
         console.log("StudentPortal.js| Retrieved grades: " + response);
         this.setState({ gradesObject: response });
       }.bind(this),
-      error: function (xhr, status, err) {
+      function error (xhr, status, err) {
         console.log("StudentPortal.js| Error getting grades!");
       }.bind(this)
-    });
+    )
   },
   getClasslist: function () {
     return [{ "label": "asdf" }, { "label": "qwerty" }];

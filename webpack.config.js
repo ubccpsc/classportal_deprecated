@@ -9,6 +9,10 @@ module.exports = {
     publicPath: ''
   },
 
+  externals: {
+    'Config': JSON.stringify(require('./config.json'))
+  },
+
  plugins: process.env.NODE_ENV === 'production' ? [
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
@@ -20,5 +24,5 @@ module.exports = {
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader?presets[]=es2015&presets[]=react' },
       { test: /\.css$/, loader: "style-loader!css-loader" }
     ]
-  }
+ }
 }
