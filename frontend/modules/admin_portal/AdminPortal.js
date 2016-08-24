@@ -10,7 +10,10 @@ import Ajax from '../shared_components/Ajax'
 export default React.createClass({
   getInitialState: function() {
     return {
-      adminObject: '',
+      adminObject: {
+          role: "Prof",
+          firstname: "Michael"
+        },
       studentObject: '',
       gradesObject: '',
       deliverablesObject: '',
@@ -40,7 +43,7 @@ export default React.createClass({
         for (var index = 0; index < response.length; index++){
           classlistWithLabels[index] = { "label": response[index] };
         }
-        
+
         this.setState({ classList: classlistWithLabels });
       }.bind(this),
       function error(xhr, status, error) {
@@ -58,6 +61,7 @@ export default React.createClass({
     //http://stackoverflow.com/questions/32370994/how-to-pass-props-to-this-props-children
     var childrenWithProps = React.Children.map(this.props.children, function (child) {
       return React.cloneElement(child, {
+        "admin": that.state.adminObject,
         "students": that.state.studentsObject,
         "grades": that.state.gradesObject,
         "deliverables": that.state.deliverablesObject,
@@ -81,11 +85,10 @@ export default React.createClass({
           </Row>
         </div>
 
-        <Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.role} user={localStorage.user}/><br/>
+        <Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.role} user={localStorage.user}/>
 
         {!!this.state.deliverablesObject && !!this.state.classList && childrenWithProps}
 
-        <br/>  
       </div>
     )}
 })

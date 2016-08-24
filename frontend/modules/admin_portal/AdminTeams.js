@@ -54,7 +54,7 @@ export default React.createClass({
               </td>
             </tr>
           </tbody>
-        </table><br/>
+        </table>
       </div>
     );
   },
@@ -62,7 +62,7 @@ export default React.createClass({
     return (
       <div>
         <div className="module">
-          <h3>{this.state.viewAll ? "All" : "My"} Teams</h3><br/>
+          <h3>{this.state.viewAll ? "All" : "My"} Teams</h3>
           <Form id="text-center" onSubmit={this.toggleView} >
             <FormField>    
               <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle View</Button>&nbsp;
@@ -73,11 +73,26 @@ export default React.createClass({
         
         <CreateTeam classList={this.props.classList} />
         
-        <div className="module">
-          <h3>Create Projects</h3><br/>
-          <Button>Create Projects</Button>
-        </div>
+        {this.props.admin.role==="prof" && (<CreateProjects/>)}
         
+      </div>
+    )}
+})
+
+const CreateProjects = React.createClass({
+  createProjects: function () {
+    console.log("Created the projects!");
+  },
+  render: function () {
+    return (
+      <div className="module">
+        <h3>Create Projects</h3>
+        
+        <Form onSubmit={this.createProjects}>
+          <FormField id="text-center">
+            <Button type="danger" size="sm" submit>Create Projects</Button>
+          </FormField>
+        </Form>
       </div>
     )}
 })

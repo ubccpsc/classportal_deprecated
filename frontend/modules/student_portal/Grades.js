@@ -22,7 +22,7 @@ export default React.createClass({
   render: function () {
     return (
       <div className="module">
-        <h3>Grades</h3><br/>
+        <h3>Grades</h3>
    
         <div className="tg-wrap">
           <table className="tg">

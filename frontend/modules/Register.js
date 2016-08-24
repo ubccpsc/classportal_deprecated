@@ -63,7 +63,7 @@ export default React.createClass({
   render: function () {
     return (
       <div className="module">
-        <h3>Register Account</h3><br/><br/>
+        <h3>Register Account</h3>
         <p>Please confirm your student info below to continue.</p><br/><br/>
         <Form onSubmit={this.handleSubmit} className="form" type="horizontal">
           <FormIconField label="Github Username" iconPosition="left" iconKey="mark-github">

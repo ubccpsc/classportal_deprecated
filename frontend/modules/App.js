@@ -13,6 +13,7 @@ export default React.createClass({
           <h1>Course Portal</h1>
         </div>
         {this.props.children}
+        <br/><br/>
       </div>
     )}
 })

@@ -33,7 +33,7 @@ export default React.createClass({
                 <td className="tg-value">0 / 50</td>
               </tr>
             </tbody>
-          </table><br/>
+          </table>
         </div>);
     }
     return deliverables;
@@ -41,7 +41,7 @@ export default React.createClass({
   render: function () {
     return (
       <div className="module">
-        <h3>Deliverables</h3><br/>
+        <h3>Deliverables</h3>
         {!!this.props.deliverables && this.renderDeliverables()}
       </div>
     )}

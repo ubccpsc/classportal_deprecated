@@ -85,7 +85,7 @@ export default React.createClass({
   render() {
     return (
       <div className="module">
-        <h3>{this.state.error ? "Error! Redirecting to Login" : "Connecting to Github" }</h3><br/><br/>
+        <h3>{this.state.error ? "Error! Redirecting to Login" : "Connecting to Github" }</h3>
         <Spinner size="lg" type="primary"/><br/><br/>        
       </div>
     )}

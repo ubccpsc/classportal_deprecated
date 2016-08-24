@@ -32,16 +32,30 @@ h2 {
 }
 
 h3 {
+  margin: 20px;
   font-size: 1.5em;
 }
 
 h4 {
   font-size: 1.1em;
 }
+
 h5{
   font-size: 0.9em;
+}
+
+#privacy-text{
   line-height: 1.1;
-  padding-bottom:5px
+  padding: 20px;
+  padding-top: 0px;
+  text-align: left;
+}
+
+#about-text{
+  line-height: 1.1;
+  padding: 20px;
+  padding-top: 0px;
+  text-align: center;
 }
 
 .active {
@@ -80,7 +94,10 @@ h5{
   border: 1px solid mediumblue;
   border-radius: 5px;
   text-align: center;
-  padding: 20px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 20px;
+  padding-right: 20px;
 }.module p, h3, h4 {
   padding: 0;
 }.module .Form{
@@ -109,6 +126,7 @@ h5{
   border-spacing:0;
   border-color:#aabcfe;
   margin:0px auto;
+  margin-bottom: 15px;
 } .tg td{
   font-family:Arial, sans-serif;
   font-size:14px;
@@ -168,16 +186,9 @@ h5{
 
 #logout-form {
   text-align:center;
-  height:20px;
 }
 #logout-formfield {
   max-width:20%;
-}
-#short-forms{
-  height:10px;
-}
-#admin-grades-form {
-  height:20px;
 }
 
 .tg .tg-7wrc2{

@@ -15,7 +15,7 @@ export default React.createClass({
       studentObject: '',
       deliverablesObject: '',
       gradesObject: '',
-      classList: [{ "label": "asdf" }, { "label": "qwerty" }]
+      classList: ''
     };
   },
   //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json  
@@ -61,7 +61,14 @@ export default React.createClass({
     Ajax.getClassList(
       function success(response) {
         console.log("StudentPortal.js| Retrieved class list:" + response);
-        this.setState({ classList: response});
+        
+        //convert classlist into format useable by Elemental Form-Select
+        var classlistWithLabels = []
+        for (var index = 0; index < response.length; index++){
+          classlistWithLabels[index] = { "label": response[index] };
+        }
+        
+        this.setState({ classList: classlistWithLabels });
       }.bind(this),
       function error(xhr, status, error) {
         console.log("StudentPortal.js| Error getting classlist!");
@@ -70,19 +77,20 @@ export default React.createClass({
   },
   componentDidMount: function () {
     this.getStudent();
+    this.getClasslist();
   },
   render: function () {
     return (
       <div>
-        <Logout firstname={this.state.studentObject.firstname} sid={this.state.studentObject.sid} user={localStorage.user}/><br/>
+        <Logout firstname={this.state.studentObject.firstname} sid={this.state.studentObject.sid} user={localStorage.user}/>
 
         {!!this.state.studentObject.team ?
-          (<DisplayTeam teamNumber={this.state.studentObject.team}/>) : (<CreateTeam classList={this.state.getClasslist()} />) }
-
+          (<DisplayTeam teamNumber={this.state.studentObject.team}/>) :
+            !!this.state.classList && (<CreateTeam classList={this.state.classList} />) }
+        
         <Deliverables deliverables={this.state.deliverablesObject}/>
         
-        <Grades grades={this.state.gradesObject} deliverables={this.state.deliverablesObject}/><br/>
-
+        <Grades grades={this.state.gradesObject} deliverables={this.state.deliverablesObject}/>
       </div>
     )}
 })

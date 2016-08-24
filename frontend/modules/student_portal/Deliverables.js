@@ -36,7 +36,7 @@ export default React.createClass({
                 <td className="tg-value"><a href="http://www.github.com" target="blank">http://www.github.com</a></td>
               </tr>
             </tbody>
-          </table><br/>
+          </table>
         </div>);
     };
     
@@ -45,7 +45,7 @@ export default React.createClass({
   render: function () {
     return (
       <div className="module">
-        <h3>Deliverables</h3><br/>
+        <h3>Deliverables</h3>
         {!!this.props.deliverables && this.renderDeliverables()}
       </div>
     )}

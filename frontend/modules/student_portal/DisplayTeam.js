@@ -20,7 +20,7 @@ export default React.createClass({
   render: function () {
     return (
       <div className="module">
-        <h3>Team { this.props.teamNumber }</h3><br/>
+        <h3>Team { this.props.teamNumber }</h3>
         {this.renderMembers()}
       </div>
     )}
