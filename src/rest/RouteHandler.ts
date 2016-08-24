@@ -225,6 +225,24 @@ export default class RouteHandler {
         }
     }
 
+    static getStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var user = req.header('user');
+        
+        Log.trace("getStudent| Retrieving student file..");
+        RouteHandler.returnStudent(user, function (response:any) {
+            //return current student
+            if (response == null) {
+                Log.trace("getStudent| Error! Student object: "+response);
+                res.json(500, "error");
+            }
+            else {
+                Log.trace("getStudent| Success! Returning..");
+                res.json(200, response);
+                return next();
+            }
+        });
+    }
+
     static getDeliverables(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("getDeliverables| Requesting file..");
         RouteHandler.returnFile("deliverables.json", function (response: any) {
@@ -282,23 +300,35 @@ export default class RouteHandler {
         }
     }
 
-    static getStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-        var user = req.header('user');
+    static getClassList(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("getClassList| Getting class list..");
         
-        Log.trace("getStudent| Retrieving student file..");
-        RouteHandler.returnStudent(user, function (response:any) {
-            //return current student
-            if (response == null) {
-                Log.trace("getStudent| Error! Student object: "+response);
-                res.json(500, "error");
+        RouteHandler.returnFile("classList.csv", function (data: any) {
+            if (data == null) {
+                res.json(500, "Bad class list. Returning..");
             }
             else {
-                Log.trace("getStudent| Success! Returning..");
-                res.json(200, response);
-                return next();
+                var lines = data.toString().split(/\n/);
+                Log.trace("getClassList| Classlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
+                        
+                // Splice up the first row to get the headings
+                var headings = lines[0].split(',');
+                
+                //data arrays are set up specifically for our classList.csv format
+                //TODO: last names are unused in this function.
+                var classList: any[] = [];
+                
+                // Split up the comma seperated values and sort into arrays
+                for (var index = 1; index < lines.length; index++) {
+                    var values = lines[index].split(',');
+                    classList.push(values[3] + " " + values[2])
+                }
+                
+                Log.trace("getClassList| Sending class list..");
+                res.json(200, classList);
             }
         });
-    }
+    }    
 
     static deleteServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
         var user: string = req.header('user');

@@ -33,7 +33,7 @@ export default React.createClass({
   getClassList: function () {
     Ajax.getClassList(
       function success(response) {
-        console.log("AdminPortal.js| Retreived class list:" + response);
+        console.log("AdminPortal.js| Retreived class list:" + JSON.stringify(response));
         this.setState({ classList: response});
       },
       function error(xhr, status, error) {
@@ -43,6 +43,7 @@ export default React.createClass({
   },
   componentDidMount: function () {
     this.getDeliverables();
+    this.getClassList();
   },
   render: function () {
     var that = this;
