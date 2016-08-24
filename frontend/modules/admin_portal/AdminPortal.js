@@ -14,7 +14,7 @@ export default React.createClass({
       studentObject: '',
       gradesObject: '',
       deliverablesObject: '',
-      classList: [{ "label": "asdf" }, { "label": "qwerty" }]
+      classList: ''
     };
   },
   getDeliverables: function () {
@@ -33,12 +33,19 @@ export default React.createClass({
   getClassList: function () {
     Ajax.getClassList(
       function success(response) {
-        console.log("AdminPortal.js| Retreived class list:" + JSON.stringify(response));
-        this.setState({ classList: response});
-      },
+        console.log("AdminPortal.js| Retreived class list: " + JSON.stringify(response));
+        
+        //convert classlist into format useable by Elemental Form-Select
+        var classlistWithLabels = []
+        for (var index = 0; index < response.length; index++){
+          classlistWithLabels[index] = { "label": response[index] };
+        }
+        
+        this.setState({ classList: classlistWithLabels });
+      }.bind(this),
       function error(xhr, status, error) {
         console.log("AdminPortal.js| Error getting classlist!");
-      }
+      }.bind(this)
     )
   },
   componentDidMount: function () {
@@ -76,7 +83,7 @@ export default React.createClass({
 
         <Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.role} user={localStorage.user}/><br/>
 
-        {!!this.state.deliverablesObject && childrenWithProps}
+        {!!this.state.deliverablesObject && !!this.state.classList && childrenWithProps}
 
         <br/>  
       </div>
