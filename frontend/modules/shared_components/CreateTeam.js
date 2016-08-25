@@ -1,6 +1,7 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
 import ContentModule from '../shared_components/ContentModule'
+import Ajax from './Ajax'
 
 export default React.createClass({
   getInitialState: function () {
@@ -10,38 +11,29 @@ export default React.createClass({
     };
   },
   handleSubmit: function (e) {
-    e.preventDefault;
-    /*
-    if (!!this.state.student1 & !!this.state.student2) {
-      //alert("Send invite to: " + this.state.student1 + " and " + this.state.student2 + "?");
-      $.ajax({
-        url: 'http://localhost:4321/api/formTeam',
-        type: "POST",
-        headers: {
-          "user": localStorage.user,
-          "token": localStorage.token,
-          "admin": localStorage.admin
+    e.preventDefault();
+    var std1 = this.state.student1;
+    var std2 = this.state.student2;
+
+    if (!!std1 && !!std2 && (std1 != std2)) {
+      alert("Send invite to: " + std1 + " and " + std2 + "?");
+      Ajax.createTeam(
+        {
+          "students": [ std1, std2 ]
         },
-        data: {
-          "student1": this.state.student1,
-          "student2": this.state.student2
-        },
-        dataType: 'json',
-        cache: false,
-        success: function (response) {
+        function success (response) {
           console.log("CreateTeam.js| Success: " + response);
-          //alert("Submitted team!")
+            alert("Success: Team " + response + " created!")
         }.bind(this),
-        error: function (xhr, status, err) {
+        function error (xhr, status, err) {
           console.log("CreateTeam.js| Error: " + status + err);
-          //alert("Error: Could not reach server.")
+          alert("Error: Could not create team.")
         }.bind(this)
-      });
+      )
     }
     else {
-      //alert("Error: Invalid team.")
+      alert("Error: Invalid team.")
     }
-    */
   },
   handleSelect: function (e) {
     if (e.target.id === "select1") {

@@ -92,5 +92,24 @@ module.exports = {
             success: successCallback,
             error: errorCallback
         });
+    },
+
+    //submit 2 students, expects server to form team and update their student objects.
+    createTeam: function (data, successCallback, errorCallback) {
+        console.log("Ajax.js| Creating team..");
+        $.ajax({
+            type: "POST",
+            url: 'http://' + Config.host + ':' + Config.port + '/api/createTeam',
+            headers: {
+                "user": localStorage.user,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: data,
+            dataType: 'json',
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
     }
 }

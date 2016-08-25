@@ -358,6 +358,58 @@ export default class RouteHandler {
         });
     }
     
+    /*
+        add new entry to teams.json
+        assign team in admins.json
+        set "hasTeam":true in students.json
+    */
+    static createTeam(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("createTeam| Creating new team..");
+        var user: string = req.header('user');
+        var admin: string = req.header('admin');
+
+        //todo: permissions: if not admin, can only set team with std1=user
+        if (1) {
+            var filename = pathToRoot.concat(config.path_to_teams);
+            var file = require(filename);        
+            var newEntry = {
+                "team": file.length + 1,
+                "url": "",
+                "members": req.params.students
+            };
+
+            Log.trace("createTeam| New team: " + JSON.stringify(newEntry));
+            
+            file.push(newEntry);
+            
+            fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
+                if (err) {
+                    Log.trace("createTeam| Write error: " + err.toString());
+                    res.send(500, "error")
+                    return;
+                }
+                else {
+                    Log.trace("createTeam| Team added to teams.json");
+
+                    for (var i = 0; i < req.params.students.length; i++) {
+                        RouteHandler.writeStudent(req.params.students[i], { "hasTeam": true }, function () {
+                            Log.trace("createTeam| Updated " + req.params.students[i] + "'s team status.");
+                        });
+                    }
+                    
+                    Log.trace("createTeam| Team " + newEntry.team + " created! Returning..");
+                    res.send(200, newEntry.team)
+                    return next();
+                }
+            });
+        }
+        else {
+            Log.trace("createTeam| Error: Bad permission");
+            res.send(500, "bad permissions")
+            return;
+        }
+    }
+
     //***HELPER FUNCTIONS***//
     static requestGithubInfo(githubtoken: string, callback: any) {
         var options = {

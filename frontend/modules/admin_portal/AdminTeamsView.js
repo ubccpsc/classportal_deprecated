@@ -16,7 +16,8 @@ export default React.createClass({
 })
 
 const CreateProjects = React.createClass({
-  createProjects: function () {
+  createProjects: function (e) {
+    e.preventDefault();
     console.log("Created the projects!");
   },
   render: function () {

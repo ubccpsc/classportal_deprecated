@@ -89,6 +89,7 @@ export default class Server {
                 that.rest.post('/api/getDeliverables', logRequest, requireToken, RouteHandler.getDeliverables);
                 that.rest.post('/api/getGrades', logRequest, requireToken, RouteHandler.getGrades);
                 that.rest.post('/api/getClassList', logRequest, requireToken, RouteHandler.getClassList);
+                that.rest.post('/api/createTeam', logRequest, requireToken, RouteHandler.createTeam);
                 
                 //called by logout button
                 that.rest.post('/api/logout', logRequest, requireToken, RouteHandler.deleteServerToken);
