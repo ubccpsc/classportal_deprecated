@@ -6,7 +6,7 @@ import PostLogin from './modules/PostLogin'
 import Register from './modules/Register'
 import StudentPortal from './modules/student_portal/StudentPortal'
 import AdminPortal from './modules/admin_portal/AdminPortal'
-import AdminTeams from './modules/admin_portal/AdminTeams'
+import AdminTeamsView from './modules/admin_portal/AdminTeamsView'
 import AdminStudents from './modules/admin_portal/AdminStudents'
 import AdminDeliverables from './modules/admin_portal/AdminDeliverables'
 import Auth from './modules/Auth'
@@ -54,7 +54,7 @@ render((
       <Route path="register" component={Register} onEnter={requireAuth} />
       <Route path="admin" component={AdminPortal} >
         <IndexRedirect to="teams" />
-        <Route path="teams" component={AdminTeams} />
+        <Route path="teams" component={AdminTeamsView} />
         <Route path="students" component={AdminStudents} />
         <Route path="deliverables" component={AdminDeliverables} />
       </Route>

@@ -2,10 +2,10 @@ import React from 'react'
 import NavLink from '../NavLink'
 import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
 import Logout from '../shared_components/Logout'
-import AdminTeams from './AdminTeams'
+import AdminTeamsView from './AdminTeamsView'
 import AdminDeliverables from './AdminDeliverables'
-var util = require('util');
 import Ajax from '../shared_components/Ajax'
+var util = require('util');
 
 export default React.createClass({
   getInitialState: function() {

@@ -1,6 +1,5 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
-import CreateTeam from '../shared_components/CreateTeam'
 import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
@@ -61,37 +60,15 @@ export default React.createClass({
   },
   render: function () {
     return (
-      <div>
-        <div className="module">
-          <h3>{this.state.viewAll ? "All" : "My"} Teams</h3>
+       <ContentModule id="create-projects-module" title={this.state.viewAll ? "All Teams" : "My Teams"} initialHideContent={false}>
           <Form id="text-center" onSubmit={this.toggleView} >
-            <FormField>    
-              <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle View</Button>&nbsp;
+            <FormField>
+              <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle</Button>&nbsp;
             </FormField>
           </Form>
           {this.renderTeams() }
-        </div>
-        
-        <CreateTeam classList={this.props.classList} />
-        
-        {this.props.admin.role==="prof" && (<CreateProjects/>)}
-        
-      </div>
-    )}
-})
-
-const CreateProjects = React.createClass({
-  createProjects: function () {
-    console.log("Created the projects!");
-  },
-  render: function () {
-    return (
-       <ContentModule id="create-projects-module" title="Create Projects" initialHideContent={false}>
-        <Form onSubmit={this.createProjects}>
-          <FormField id="text-center">
-            <Button type="danger" size="sm" submit>Create Projects</Button>
-          </FormField>
-        </Form>
       </ContentModule>
-    )}
+    )}        
 })
+        
+  
