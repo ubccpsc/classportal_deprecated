@@ -60,7 +60,14 @@ export default React.createClass({
       <ContentModule id="createTeamModule" title="Create Team" initialHideContent={false}>
         <Form onSubmit={this.handleSubmit}>
           <FormField id="text-center" onChange={this.handleSelect}>
-            <FormSelect id="select1" options={this.props.classList} firstOption="Select" onChange={ function doNothing(){} } />
+            <FormSelect id="select1"
+                        options={!!this.props.studentName ? [] : this.props.classList}
+                        firstOption={!!this.props.studentName ? this.props.studentName : "Select"}
+                        onChange={ function doNothing(){} } />
+            <FormSelect id="select2"
+                        options={this.props.classList}
+                        firstOption="Select"
+                        onChange={ function doNothing(){} } />
             <Button size="sm" submit>Form Team</Button>
           </FormField>
         </Form>

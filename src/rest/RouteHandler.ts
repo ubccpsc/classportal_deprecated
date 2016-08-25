@@ -196,7 +196,7 @@ export default class RouteHandler {
                         Log.trace("registerAccount| CSID Match! Checking SID..");
                         if (sid == sidArray[index]) {
                             Log.trace("registerAccount| SID Match! Updating student information..");
-                            RouteHandler.writeStudent(username, { "sid": sid, "csid": csid, "firstname": firstArray[index] }, function () {
+                            RouteHandler.writeStudent(username, { "sid": sid, "csid": csid, "firstname": firstArray[index], "lastname": lastArray[index] }, function () {
                                 Log.trace("registerAccount| Account updated successfully. Sending user to homepage.");
                                 res.json(200, "success");
                                 return next();
@@ -380,6 +380,7 @@ export default class RouteHandler {
             "sid": "",
             "csid": "",
             "firstname": "",
+            "lastname": "",
             "githubtoken": githubtoken
         };
         

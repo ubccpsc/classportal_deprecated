@@ -86,8 +86,8 @@ export default React.createClass({
 
         {!!this.state.studentObject.team ?
           (<DisplayTeam teamNumber={this.state.studentObject.team}/>) :
-            !!this.state.classList && (<CreateTeam classList={this.state.classList} />) }
-        
+            !!this.state.classList && (<CreateTeam classList={this.state.classList} studentName={this.state.studentObject.firstname + " " + this.state.studentObject.lastname} />) }
+            
         <Deliverables deliverables={this.state.deliverablesObject}/>
         
         <Grades grades={this.state.gradesObject} deliverables={this.state.deliverablesObject}/>
