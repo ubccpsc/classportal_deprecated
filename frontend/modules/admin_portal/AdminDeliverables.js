@@ -1,5 +1,6 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
+import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
   renderDeliverables: function () {
@@ -40,9 +41,8 @@ export default React.createClass({
   },
   render: function () {
     return (
-      <div className="module">
-        <h3>Deliverables</h3>
+      <ContentModule id="admin-deliverables-module" title="Deliverables" initialHideContent={false}>
         {!!this.props.deliverables && this.renderDeliverables()}
-      </div>
+      </ContentModule>
     )}
 })

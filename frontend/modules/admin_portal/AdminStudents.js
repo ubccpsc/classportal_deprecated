@@ -1,5 +1,6 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
+import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
   getInitialState: function () {
@@ -65,16 +66,14 @@ export default React.createClass({
   },
   render: function () {
     return (
-      <div className="module">
-        <h3>{this.state.viewAll ? "All" : "My"} Students</h3>
+      <ContentModule id="admin-students-module" title={this.state.viewAll ? "All Students" : "My Students"} initialHideContent={false}>
         <Form id="text-center" onSubmit={this.toggleView} >
           <FormField>    
             <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle View</Button>&nbsp;
           </FormField>
         </Form>
-
         {!!this.props.students && this.renderStudents()}
-      </div>
+      </ContentModule>
     )}
 })
 
