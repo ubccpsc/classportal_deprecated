@@ -1,5 +1,5 @@
 body {
-  background: #ffffff;
+  background: #E8EDFF;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 15px;
   line-height: 1;
@@ -72,7 +72,7 @@ h5{
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-  background: darkblue;
+  background: #002145;
 } #Title h1 {
   color: white;
 }
@@ -83,25 +83,6 @@ h5{
   text-align: center;
   border-width:5px;
   border-color:#ff0000;
-}
-
-.module{
-  margin-top: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  width:600px;
-  background: #ffffff;
-  border: 1px solid mediumblue;
-  border-radius: 5px;
-  text-align: center;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
-}.module p, h3, h4 {
-  padding: 0;
-}.module .Form{
-  text-align: left;
 }
 
 .form{
@@ -208,4 +189,33 @@ h5{
   vertical-align:top;
   text-align:left;
   width:100%;
+}
+
+.module{
+  position: relative;
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  width:600px;
+  background: #ffffff;
+  border: 1px solid #002145;
+  border-radius: 5px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 20px;
+  padding-right: 20px;
+  text-align: center;
+}.module p, h3, h4 {
+  padding: 0;
+}.module .Form{
+  text-align: left;
+}
+
+.absolute-pos{
+  position: absolute;
+  top: 0%;
+  right: 0%;
+}
+.relative-pos{
+  position:relative;
 }

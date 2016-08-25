@@ -1,6 +1,7 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
 import CreateTeam from '../shared_components/CreateTeam'
+import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
   getInitialState: function () {
@@ -85,14 +86,12 @@ const CreateProjects = React.createClass({
   },
   render: function () {
     return (
-      <div className="module">
-        <h3>Create Projects</h3>
-        
+       <ContentModule id="create-projects-module" title="Create Projects" initialHideContent={false}>
         <Form onSubmit={this.createProjects}>
           <FormField id="text-center">
             <Button type="danger" size="sm" submit>Create Projects</Button>
           </FormField>
         </Form>
-      </div>
+      </ContentModule>
     )}
 })

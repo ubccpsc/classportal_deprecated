@@ -1,5 +1,6 @@
 import React from 'react'
 import {Modal, ModalHeader, ModalFooter, ModalBody, Button, Card, Row, Col} from 'elemental'
+import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
   renderDeliverables: function () {
@@ -44,9 +45,8 @@ export default React.createClass({
   },
   render: function () {
     return (
-      <div className="module">
-        <h3>Deliverables</h3>
+      <ContentModule id="deliverablesModule" title="Deliverables" initialHideContent={false}>
         {!!this.props.deliverables && this.renderDeliverables()}
-      </div>
+      </ContentModule>
     )}
 })

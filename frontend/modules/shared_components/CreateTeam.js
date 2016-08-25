@@ -1,5 +1,6 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
+import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
   getInitialState: function () {
@@ -56,15 +57,13 @@ export default React.createClass({
   //TODO: variable team size based on config file.
   render: function () {
     return (
-      <div className="module">
-        <h3>Create Team</h3>
-      
+      <ContentModule id="createTeamModule" title="Create Team" initialHideContent={false}>
         <Form onSubmit={this.handleSubmit}>
           <FormField id="text-center" onChange={this.handleSelect}>
             <FormSelect id="select1" options={this.props.classList} firstOption="Select" onChange={ function doNothing(){} } />
             <Button size="sm" submit>Form Team</Button>
           </FormField>
         </Form>
-      </div>
+      </ContentModule>
     )}
 })

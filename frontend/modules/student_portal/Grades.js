@@ -1,5 +1,6 @@
 import React from 'react'
-import { Row, Col, Button, Alert, Spinner } from 'elemental'
+import { Row, Col, Button, Alert, Glyph, Spinner } from 'elemental'
+import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
   renderGrades: function () {
@@ -21,11 +22,10 @@ export default React.createClass({
   },
   render: function () {
     return (
-      <div className="module">
-        <h3>Grades</h3>
-   
+      <ContentModule id="gradesModule" title="Grades" initialHideContent={false}>
+        
         <div className="tg-wrap">
-          <table className="tg">
+          <table className="tg">    
             <tbody>
               <tr>
                 <th className="tg-yw4l">Assignment</th>
@@ -36,6 +36,7 @@ export default React.createClass({
             {!!this.props.grades && !!this.props.deliverables && this.renderGrades()}
           </table>
         </div>
-      </div>
+
+      </ContentModule>
     )}
 })
