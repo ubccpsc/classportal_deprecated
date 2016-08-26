@@ -7,7 +7,7 @@ import Register from './modules/Register'
 import StudentPortal from './modules/student_portal/StudentPortal'
 import AdminPortal from './modules/admin_portal/AdminPortal'
 import AdminTeamsView from './modules/admin_portal/AdminTeamsView'
-import AdminStudents from './modules/admin_portal/AdminStudents'
+import AdminStudentsView from './modules/admin_portal/AdminStudentsView'
 import AdminDeliverables from './modules/admin_portal/AdminDeliverables'
 import Auth from './modules/Auth'
 import LoginPage from './modules/login_page/LoginPage'
@@ -55,7 +55,7 @@ render((
       <Route path="admin" component={AdminPortal} >
         <IndexRedirect to="teams" />
         <Route path="teams" component={AdminTeamsView} />
-        <Route path="students" component={AdminStudents} />
+        <Route path="students" component={AdminStudentsView} />
         <Route path="deliverables" component={AdminDeliverables} />
       </Route>
     </Route>

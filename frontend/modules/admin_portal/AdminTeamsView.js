@@ -22,12 +22,12 @@ const CreateProjects = React.createClass({
   },
   render: function () {
     return (
-       <ContentModule id="create-projects-module" title="Create Projects" initialHideContent={false}>
+      <ContentModule id="create-projects-module" title="Create Projects" initialHideContent={false}>
         <Form onSubmit={this.createProjects}>
           <FormField id="text-center">
             <Button type="danger" size="sm" submit>Create Projects</Button>
           </FormField>
         </Form>
-    </ContentModule>
-    )}        
+      </ContentModule>
+    )}
 })

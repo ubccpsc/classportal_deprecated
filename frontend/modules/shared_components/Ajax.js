@@ -111,5 +111,24 @@ module.exports = {
             success: successCallback,
             error: errorCallback
         });
+    },
+
+    //send csv
+    submitClassList: function (data, successCallback, errorCallback) {
+        console.log("Ajax.js| Submitting new class list..");
+        $.ajax({
+            type: "POST",
+            url: 'http://' + Config.host + ':' + Config.port + '/api/submitClassList',
+            headers: {
+                "user": localStorage.user,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: data,
+            dataType: 'json',
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
     }
 }
