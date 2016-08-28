@@ -96,7 +96,8 @@ export default class Server {
                 
                 /* Requires ADMIN token */
                 that.rest.post('/api/getGradesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllGrades);
-                
+                that.rest.post('/api/submitClassList', logRequest, requireAdmin, requireToken, RouteHandler.submitClassList);
+
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({
                     directory: __dirname.substring(0, __dirname.lastIndexOf("/src")) + '/frontend/public',

@@ -15,20 +15,31 @@ export default React.createClass({
 })
 
 const UploadClassList = React.createClass({
+  getInitialState: function () {
+    return ({file: ''})
+  },
   createProjects: function (e) {
     e.preventDefault();
+  },
+  handleChange: function (e) {
+    this.setState({ file: e });
   },
   submitCSV: function (e) {
     e.preventDefault();
     console.log("Submitting..");
+    
+    //grab all form data  
+    var formData = new FormData(this.state.file);
+    console.log(formData);
+    
     Ajax.submitClassList(
-      "file",
+      formData,
       function success() {
         console.log("success");
       },
       function error() {
         console.log("error");
-      },
+      }
     )
   },
   uploadFile: function () {
@@ -39,7 +50,7 @@ const UploadClassList = React.createClass({
       <ContentModule id="upload-classlist-module" title="Upload New Classlist" initialHideContent={false}>
         <Form onSubmit={this.submitCSV}>
           <FormField id="text-center">
-            <input type="file" id="input" onchange="handleFiles(this.files)" />
+            <input type="file" accept=".csv" id="inputCSV" onChange={this.handleChange} />
             <Button type="danger" size="sm" submit>Submit</Button>
           </FormField>
         </Form>

@@ -114,7 +114,7 @@ module.exports = {
     },
 
     //send csv
-    submitClassList: function (data, successCallback, errorCallback) {
+    submitClassList: function (formData, successCallback, errorCallback) {
         console.log("Ajax.js| Submitting new class list..");
         $.ajax({
             type: "POST",
@@ -124,9 +124,11 @@ module.exports = {
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
-            data: data,
-            dataType: 'json',
+            data: formData,
+            async: false,
             cache: false,
+            contentType: false,
+            processData: false,
             success: successCallback,
             error: errorCallback
         });

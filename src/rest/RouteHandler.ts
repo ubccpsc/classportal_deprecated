@@ -330,6 +330,43 @@ export default class RouteHandler {
         });
     }    
 
+    static parseClassList(file:any, callback:any) {
+        Log.trace("parseCSV| Reading file..");
+        
+        fs.readFile(file, function read(err: any, data: any) {
+            if (err) {
+                Log.trace("parseCSV| Error reading file: "+err.toString());
+                return;
+            }
+            else {
+                Log.trace("parseCSV| File read successfully.");
+                
+                var lines = data.toString().split(/\n/);
+                Log.trace("parseCSV| Classlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
+                        
+                // Splice up the first row to get the headings
+                Log.trace("parseCSV| Headings: " + lines[0]);
+                var headings = lines[0].split(',');
+                
+                //data arrays are set up specifically for our classList.csv format
+                var studentObject: any;
+
+                // Split up the comma seperated values and sort into arrays
+                for (var index = 1; index < lines.length; index++) {
+                    var values = lines[index].split(',');
+                    studentObject[index].csid = values[0];
+                    studentObject[index].sid = values[1];
+                    studentObject[index].lastname = values[2];
+                    studentObject[index].firstname = values[3];
+                }
+                
+                Log.trace("parseCSV| Sending class list..");
+                callback(studentObject);
+                return;
+            }
+        });
+    }    
+    
     static deleteServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
         var user: string = req.header('user');
         var admin: string = req.header('admin');
@@ -408,6 +445,41 @@ export default class RouteHandler {
             res.send(500, "bad permissions")
             return;
         }
+    }
+
+    /*
+        expects ubc-formatted classlist
+        populates:
+            students.json
+            grades.json (should grades be in students.json?)
+    */
+    static submitClassList(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var file = req.files;
+
+        RouteHandler.parseClassList(file, function (studentObject: any) {
+            var classList:any[] = [];
+            var student = {
+                "sid": "",
+                "csid": "",
+                "username": "",
+                "firstname": "",
+                "lastname": "",
+                "githubtoken": "",
+                "hasTeam": false
+            };
+
+            for (var index = 0; index < studentObject.length; index++){
+                student.csid = studentObject.sid;
+                student.sid = studentObject.sid;
+                student.lastname = studentObject.lastname;
+                student.firstname = studentObject.firstname;
+                
+                classList.push(student);
+            }
+            
+            console.log(classList);
+            return;
+        });
     }
 
     //***HELPER FUNCTIONS***//
