@@ -88,7 +88,7 @@ export default class Server {
                 that.rest.post('/api/getStudent', logRequest, requireToken, RouteHandler.getStudent);
                 that.rest.post('/api/getDeliverables', logRequest, requireToken, RouteHandler.getDeliverables);
                 that.rest.post('/api/getGrades', logRequest, requireToken, RouteHandler.getGrades);
-                that.rest.post('/api/getClassList', logRequest, requireToken, RouteHandler.getClassList);
+                that.rest.post('/api/getClassList', logRequest, requireToken, RouteHandler.getClasslist);
                 that.rest.post('/api/createTeam', logRequest, requireToken, RouteHandler.createTeam);
                 
                 //called by logout button
@@ -96,7 +96,7 @@ export default class Server {
                 
                 /* Requires ADMIN token */
                 that.rest.post('/api/getGradesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllGrades);
-                that.rest.post('/api/submitClassList', logRequest, requireAdmin, requireToken, RouteHandler.submitClassList);
+                that.rest.post('/api/submitClassList', logRequest, requireAdmin, requireToken, RouteHandler.updateClasslist);
 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({
@@ -125,7 +125,7 @@ function logRequest(req: restify.Request, res: restify.Response, next: restify.N
     //for user-defined apis, log request auth headers and request params
     console.log("User: " + req.header('user') + " | Token: " + req.header('token') + " | Admin: " + req.header('admin'));
     console.log("Params: " + JSON.stringify(req.params));
-    console.log(">> next handler");
+    console.log("----------------------------------------------------");
     return next();
 }
 
@@ -137,8 +137,7 @@ function requireTempToken(req: restify.Request, res: restify.Response, next: res
     
     //check that user & token fields are both set to "temp"
     if (user === "temp" && token === "temp") {
-        Log.trace("checkTempToken| Valid temp request! Continuing to authentication..");
-        console.log(">> next handler");
+        Log.trace("checkTempToken| Valid temp request! Continuing to authentication..\n----------------------------------------------------");
         return next();
     }
     else {
@@ -174,8 +173,7 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
             
             //the next middleware called can be accessed by both students and admins alike.
             if (!!servertoken && (token === servertoken)) {
-                Log.trace("checkToken| Tokens match! Continuing to next middleware..");
-                console.log(">> next handler");
+                Log.trace("checkToken| Tokens match! Continuing to next middleware..\n----------------------------------------------------");
                 return next();
             }
             else {
@@ -200,8 +198,7 @@ function requireAdmin(req: restify.Request, res: restify.Response, next: restify
     var admin: string = req.header('admin')
     
     if (admin === "true") {
-        Log.trace("requireAdmin| Valid admin field. Continue to next middleware..\n");
-        console.log(">> next handler");
+        Log.trace("requireAdmin| Valid admin field. Continuing to next middleware..\n----------------------------------------------------");
         return next();
     }
     else {

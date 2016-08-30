@@ -125,7 +125,6 @@ module.exports = {
                 "admin": localStorage.admin
             },
             data: formData,
-            async: false,
             cache: false,
             contentType: false,
             processData: false,

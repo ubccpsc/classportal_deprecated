@@ -16,24 +16,31 @@ export default React.createClass({
 
 const UploadClassList = React.createClass({
   getInitialState: function () {
-    return ({file: ''})
+    return ({files: []})
   },
-  createProjects: function (e) {
-    e.preventDefault();
+  createProjects: function (event) {
+    event.preventDefault();
   },
-  handleChange: function (e) {
-    this.setState({ file: e });
+  handleChange: function (event) {
+    this.setState({ files: event.target.files }, function () {
+      console.log("this.state.files = " + JSON.stringify(this.state.files));
+    });
   },
-  submitCSV: function (e) {
-    e.preventDefault();
+  submitCSV: function (event) {
+    event.preventDefault();
     console.log("Submitting..");
     
     //grab all form data  
-    var formData = new FormData(this.state.file);
-    console.log(formData);
+    var files = new FormData();
+    $.each(this.state.files, function(key, value)
+    {
+        files.append(key, value);
+    });
+
+    console.log("files: " + JSON.stringify(files));
     
     Ajax.submitClassList(
-      formData,
+      files,
       function success() {
         console.log("success");
       },
@@ -41,9 +48,6 @@ const UploadClassList = React.createClass({
         console.log("error");
       }
     )
-  },
-  uploadFile: function () {
-    console.log("upload");
   },
   render: function () {
     return (

@@ -165,14 +165,14 @@ export default class RouteHandler {
             Log.trace("registerAccount| Valid regex.");
             
             //get class list then check if csid and sid exist and are a valid combination
-            RouteHandler.returnFile("classList.csv", function (data: any) {
+            RouteHandler.returnFile("class.csv", function (data: any) {
                 var lines = data.toString().split(/\n/);
-                Log.trace("registerAccount| Classlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
+                Log.trace("registerAccount| Classlistlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
                         
                 // Splice up the first row to get the headings
                 var headings = lines[0].split(',');
                 
-                //data arrays are set up specifically for our classList.csv format
+                //data arrays are set up specifically for our class.csv format
                 //TODO: last names are unused in this function.
                 var csidArray: any[] = [];
                 var sidArray: any[] = [];
@@ -300,73 +300,6 @@ export default class RouteHandler {
         }
     }
 
-    static getClassList(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("getClassList| Getting class list..");
-        
-        RouteHandler.returnFile("classList.csv", function (data: any) {
-            if (data == null) {
-                res.json(500, "Bad class list. Returning..");
-            }
-            else {
-                var lines = data.toString().split(/\n/);
-                Log.trace("getClassList| Classlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
-                        
-                // Splice up the first row to get the headings
-                var headings = lines[0].split(',');
-                
-                //data arrays are set up specifically for our classList.csv format
-                //TODO: last names are unused in this function.
-                var classList: any[] = [];
-                
-                // Split up the comma seperated values and sort into arrays
-                for (var index = 1; index < lines.length; index++) {
-                    var values = lines[index].split(',');
-                    classList.push(values[3] + " " + values[2])
-                }
-                
-                Log.trace("getClassList| Sending class list..");
-                res.json(200, classList);
-            }
-        });
-    }    
-
-    static parseClassList(file:any, callback:any) {
-        Log.trace("parseCSV| Reading file..");
-        
-        fs.readFile(file, function read(err: any, data: any) {
-            if (err) {
-                Log.trace("parseCSV| Error reading file: "+err.toString());
-                return;
-            }
-            else {
-                Log.trace("parseCSV| File read successfully.");
-                
-                var lines = data.toString().split(/\n/);
-                Log.trace("parseCSV| Classlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
-                        
-                // Splice up the first row to get the headings
-                Log.trace("parseCSV| Headings: " + lines[0]);
-                var headings = lines[0].split(',');
-                
-                //data arrays are set up specifically for our classList.csv format
-                var studentObject: any;
-
-                // Split up the comma seperated values and sort into arrays
-                for (var index = 1; index < lines.length; index++) {
-                    var values = lines[index].split(',');
-                    studentObject[index].csid = values[0];
-                    studentObject[index].sid = values[1];
-                    studentObject[index].lastname = values[2];
-                    studentObject[index].firstname = values[3];
-                }
-                
-                Log.trace("parseCSV| Sending class list..");
-                callback(studentObject);
-                return;
-            }
-        });
-    }    
-    
     static deleteServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
         var user: string = req.header('user');
         var admin: string = req.header('admin');
@@ -449,45 +382,230 @@ export default class RouteHandler {
 
     /*
         expects ubc-formatted classlist
-        populates:
-            students.json
-            grades.json (should grades be in students.json?)
+        save to classlist.csv
+        populate students.json
+        do something to grades.json (should grades be in students.json?)
     */
-    static submitClassList(req: restify.Request, res: restify.Response, next: restify.Next) {
-        var file = req.files;
+    static updateClasslist(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("updateClasslist| Reading new file..");
 
-        RouteHandler.parseClassList(file, function (studentObject: any) {
-            var classList:any[] = [];
-            var student = {
-                "sid": "",
-                "csid": "",
-                "username": "",
-                "firstname": "",
-                "lastname": "",
-                "githubtoken": "",
-                "hasTeam": false
-            };
-
-            for (var index = 0; index < studentObject.length; index++){
-                student.csid = studentObject.sid;
-                student.sid = studentObject.sid;
-                student.lastname = studentObject.lastname;
-                student.firstname = studentObject.firstname;
-                
-                classList.push(student);
+        fs.readFile(req.files[0].path, function read(err: any, data: any) {
+            if (err) {
+                Log.trace("updateClasslist| Error reading file: " + err.toString());
+                res.send(500, "error");
+                return;
             }
-            
-            console.log(classList);
-            return;
+            else {
+                Log.trace("updateClasslist| Accessing old file..");
+                var filename = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/priv/classlist.csv'; 
+                    Log.trace("updateClasslist| " + filename);
+                //var file = require(filename);
+                    //Log.trace("updateClasslist| " + file);
+
+                Log.trace("updateClasslist| Overwriting old file..");
+                fs.writeFile(filename, data, function (err: any) {
+                    if (err) {
+                        Log.trace("updateClasslist| Write unsuccessful: " + err.toString());
+                        res.send(500, "error");
+                        return;
+                    }
+                    else {
+                        Log.trace("updateClasslist| Write successful!");
+                        
+                        //read new classlist
+                        RouteHandler.returnFile("classlist.csv", function (response: any) {
+                            var classArray = response.toString().split(/\n/);
+                            if (!!classArray) {
+                                //update students.json
+                                Log.trace("updateClasslist| Updating students.json..");
+                                RouteHandler.updateStudents(classArray, function (success: boolean) {
+                                    if (success) {
+                                        Log.trace("updateClasslist| Successfully updated students.json. Returning..");
+                                        res.send(200, "success updating classlist")
+                                        return next();
+                                    }
+                                    else {
+                                        Log.trace("updateClasslist| Error updating students.json. Returning..");
+                                        res.send(500, "error: could not update students")
+                                        return;
+                                    }
+                                });    
+                            }
+                            else {
+                                Log.trace("updateClasslist| Error reading classlist! Returning..");
+                                res.send(500, "error: could not read classlist")
+                                return;
+                            }            
+                        });
+                    }
+                });
+            }
         });
     }
 
+    static getClasslist(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("getClasslist| Getting class list..");
+        
+        RouteHandler.returnFile("classlist.csv", function (data: any) {
+            if (data == null) {
+                res.json(500, "Bad class list. Returning..");
+            }
+            else {
+                var lines = data.toString().split(/\n/);
+                Log.trace("getClasslist| Classlistlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
+                        
+                // Splice up the first row to get the headings
+                var headings = lines[0].split(',');
+                
+                //data arrays are set up specifically for our class.csv format
+                //TODO: last names are unused in this function.
+                var classlist: any[] = [];
+                
+                // Split up the comma seperated values and sort into arrays
+                for (var index = 1; index < lines.length; index++) {
+                    var values = lines[index].split(',');
+                    classlist.push(values[3] + " " + values[2])
+                }
+                
+                Log.trace("getClasslist| Sending class list..");
+                res.json(200, classlist);
+            }
+        });
+    }
+    
     //***HELPER FUNCTIONS***//
+
+    //todo: on login, let students only log in if student exists
+    //in classlist, not in students.json. if not, redirect to error page (Please email prof holmes @ ..)
+    //todo: make sure we don't overwrite existing info by accident!
+    static updateStudents(classlist:any, callback:any) {
+        Log.trace("updateStudents| classlist: " + classlist);
+        Log.trace("updateStudents| classlist.length: " + classlist.length);
+        RouteHandler.returnFile("students.json", function (response: any) {
+            if (response == null) {
+                //???
+            }
+            else {
+                //???
+            }
+            var studentsFile = JSON.parse(response);
+            Log.trace("updateStudents| Response: " + studentsFile);
+            Log.trace("studentsFile.length: " + studentsFile.length);
+            //loop: for each students in classlist
+            for (var index = 1; index < classlist.length; index++) {
+                Log.trace("updateStudents| Index: " + index);
+                //csid, sid, lastname, firstname
+                var values = classlist[index].split(',');
+                Log.trace("updateStudents| values: " + values);
+
+                Log.trace("updateStudents| TEST");
+                //check if student exists in students.json
+                //if yes: do nothing(?)
+
+
+                function findSID(student: any) {
+                    Log.trace("updateStudents| values[1]:" + values[1] + ", student.sid:" + student.sid);
+                    return student.sid === values[1];
+                };
+
+                var asdf: boolean = !!studentsFile.find(findSID);
+                Log.trace("updateStudents| asdf: " + asdf);
+
+                if (asdf) {
+                    Log.trace("updateStudents| doNothing");
+                }
+                else {
+                    //add blank student to students.json
+                    Log.trace("updateStudents| Adding new student..");
+                    var newStudent = {
+                        "csid": values[0],
+                        "sid": values[1],
+                        "firstname": values[3],
+                        "lastname": values[2],
+                        "github_name": "",
+                        "github_token": "",
+                        "hasTeam": false
+                    };
+                    Log.trace("updateStudents| Pushing student: " + JSON.stringify(newStudent, null, 2));
+                    studentsFile[studentsFile.length] = newStudent;
+                    
+                    Log.trace("updateStudents| test1");
+                }
+                Log.trace("updateStudents| test2");
+                //for students who were already in students.json but not in new classlist:
+                //do not let them log in?
+                //do nothing for now.
+            }
+            //done
+            Log.trace("updateStudents| Writing new student file: " + JSON.stringify(studentsFile));
+            var filename = pathToRoot.concat(config.path_to_students);      
+            fs.writeFile(filename, JSON.stringify(studentsFile, null, 2), function (err: any) {
+                if (err) {
+                    Log.trace("updateStudents| Write error: "+err.toString());
+                    return;
+                }
+                else {
+                    Log.trace("updateStudents| New file created.");
+                    callback(true);
+                    return;
+                }
+            });
+        });
+    }
+
+    static parseClasslist(file:any, callback:any) {
+        Log.trace("parseCSV| Reading file..");
+        
+        fs.readFile(file, function read(err: any, data: any) {
+            if (err) {
+                Log.trace("parseCSV| Error reading file: "+err.toString());
+                return;
+            }
+            else {
+                Log.trace("parseCSV| File read successfully.");
+                
+                var lines = data.toString().split(/\n/);
+                Log.trace("parseCSV| Classlistlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
+
+                // Splice up the first row to get the headings
+                Log.trace("parseCSV| Headings: " + lines[0]);
+                var headings = lines[0].split(',');
+
+                //data arrays are set up specifically for our class.csv format
+                var studentObject: any[] = [];
+
+                // Split up the comma seperated values and sort into arrays
+                for (var index = 1; index < lines.length; index++) {
+                    Log.trace("index: "+index);
+                    var values = lines[index].split(',');
+                    var newStudent = {
+                        "sid": "",
+                        "csid": "",
+                        "firstname": "",
+                        "lastname": "",
+                        "github_name": "",
+                        "github_token": "",
+                        "hasTeam": false
+                    };
+                    newStudent.csid = values[0];
+                    newStudent.sid = values[1];
+                    newStudent.lastname = values[2];
+                    newStudent.firstname = values[3];
+                    studentObject.push(newStudent);
+                }
+                
+                Log.trace("parseCSV| Sending class list.." + JSON.stringify(studentObject));
+                callback(studentObject);
+                return;
+            }
+        });
+    }
+
     static requestGithubInfo(githubtoken: string, callback: any) {
         var options = {
             url: 'https://api.github.com/user',
             headers: {
-                "User-Agent": "ClassPortal-Student",
+                "User-Agent": "ClasslistPortal-Student",
                 "Authorization": "token "+githubtoken
             }
         };
@@ -521,6 +639,7 @@ export default class RouteHandler {
     }
     
     //update keys in object in username file
+    //todo: rename writeStudent to updateStudent
     static writeStudent(username: string, paramsObject: any, callback: any) {
         Log.trace("writeStudent| Writing to user: " + username + " in students.json..");
         
