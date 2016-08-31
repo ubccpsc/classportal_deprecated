@@ -13,37 +13,47 @@ export default React.createClass({
     });
   },
   renderStudents: function () {
-    var allStudents = this.props.students;
+    var studentsObject = this.props.students;
+    var myTeams = this.props.teams;
+    var numStudents = studentsObject.length;
     var students = [];
-    if (this.state.viewAll) {
-      for (var index = 1; index < 6; index++) {
-        students[index] = this.renderStudent(index);
+
+    function include(arr, obj) {
+      console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr));
+      var result = (arr.indexOf(obj) != -1);
+      console.log(result.toString());
+      return (result);
+    }
+    
+    for (var index = 0; index < numStudents; index++) {
+      if (this.state.viewAll ? include(myTeams, index.toString()) : true) { 
+        students[index] = this.renderStudent(index, studentsObject[index]);
       }
     }
-    else {
-      for (var index = 1; index < 6; index++) {
-        if (index % 2){
-          students[index] = this.renderStudent(index);
-        }
-      }
-    }
+
     return students;
   },
-  renderStudent: function (index) {
+  renderStudent: function (index, studentFile) {
     return (
       <div className="tg-wrap-deliverables" key={index}>
         <table className="tg">
           <tbody>
             <tr>
-              <th className="tg-7wrc" colSpan="2">Michael Sargent</th>
+              <th className="tg-7wrc" colSpan="2">
+                {studentFile.firstname + " " + studentFile.lastname}
+              </th>
             </tr>
             <tr>
               <td className="tg-edam">SID</td>
-              <td className="tg-value">54813118</td>
+              <td className="tg-value">
+                {studentFile.sid}
+              </td>
             </tr>
             <tr>
               <td className="tg-edam">CSID</td>
-              <td className="tg-value">a6j8</td>
+              <td className="tg-value">
+                {studentFile.csid}
+              </td>
             </tr>
             <tr>
               <td className="tg-edam">Team</td>
@@ -51,7 +61,9 @@ export default React.createClass({
             </tr>
             <tr>
               <td className="tg-edam">Github</td>
-              <td className="tg-value">http://github.com/mksarge</td>
+              <td className="tg-value">
+                {"http://github.com/" + studentFile.github_name}
+              </td>
             </tr>
             <tr>
               <td className="tg-edam">Marks</td>

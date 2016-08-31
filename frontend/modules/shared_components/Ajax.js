@@ -74,7 +74,25 @@ module.exports = {
             error: errorCallback
         });
     },
-
+    
+    getStudents: function (successCallback, errorCallback) {
+        console.log("Ajax.js| Getting classlist..");
+        $.ajax({
+            type: "POST",
+            url: 'http://' + Config.host + ':' + Config.port + '/api/getStudentsAdmin',
+            headers: {
+                "user": localStorage.user,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: {},
+            dataType: 'json',
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
+    
     //Tells server to delete the server token of the current user.     
     logout: function (successCallback, errorCallback) {
         console.log("Ajax.js| Logging out..");

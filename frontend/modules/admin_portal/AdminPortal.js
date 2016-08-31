@@ -16,9 +16,10 @@ export default React.createClass({
     return {
       adminObject: {
           role: "Prof",
-          firstname: "Michael"
+          firstname: "Michael",
+          teams: ["1", "2", "3"]
         },
-      studentObject: '',
+      studentsObject: '',
       gradesObject: '',
       deliverablesObject: '',
       classList: ''
@@ -55,9 +56,21 @@ export default React.createClass({
       }.bind(this)
     )
   },
+  getStudents: function () {
+    Ajax.getStudents(
+      function success(response) {
+        console.log("AdminPortal.js| Retreived students file: " + JSON.stringify(response));
+        this.setState({ studentsObject: response });
+      }.bind(this),
+      function error(xhr, status, error) {
+        console.log("AdminPortal.js| Error getting classlist!");
+      }.bind(this)
+    )
+  },
   componentDidMount: function () {
     this.getDeliverables();
     this.getClassList();
+    this.getStudents();
   },
   render: function () {
     var that = this;

@@ -459,7 +459,22 @@ export default class RouteHandler {
             }
         })
     }
-    
+
+    static getAllStudents(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("getAllStudents| Getting students..");
+        RouteHandler.returnFile("students.json", function (response: any) {
+            if (!!response && response.length !== 0) {
+                var studentsObject = JSON.parse(response);
+                Log.trace("getAllStudents| Sending students object..");
+                res.json(200, studentsObject);
+            }
+            else {
+                Log.trace("getClasslist| Error reading classlist..");
+                res.json(500, "error");
+            }
+        })
+    }
+
     //***HELPER FUNCTIONS***//
 
     //todo: on login, let students only log in if student exists
