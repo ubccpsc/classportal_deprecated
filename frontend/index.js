@@ -1,14 +1,18 @@
 import React from 'react'
 import { Router, Route, browserHistory, IndexRoute, IndexRedirect } from 'react-router'
 import { render } from 'react-dom'
+
 import App from './modules/App'
 import PostLogin from './modules/PostLogin'
 import Register from './modules/Register'
+
 import StudentPortal from './modules/student_portal/StudentPortal'
+
 import AdminPortal from './modules/admin_portal/AdminPortal'
-import AdminTeamsView from './modules/admin_portal/AdminTeamsView'
-import AdminStudentsView from './modules/admin_portal/AdminStudentsView'
-import AdminDeliverables from './modules/admin_portal/AdminDeliverables'
+import AdminTeamsView from './modules/admin_portal/teams_view/AdminTeamsView'
+import AdminStudentsView from './modules/admin_portal/students_view/AdminStudentsView'
+import AdminDeliverables from './modules/admin_portal/delivs_view/AdminDeliverables'
+
 import Auth from './modules/Auth'
 import LoginPage from './modules/login_page/LoginPage'
 

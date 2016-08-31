@@ -1,10 +1,14 @@
 import React from 'react'
-import NavLink from '../NavLink'
 import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
+
+import NavLink from '../NavLink'
 import Logout from '../shared_components/Logout'
-import AdminTeamsView from './AdminTeamsView'
-import AdminDeliverables from './AdminDeliverables'
 import Ajax from '../shared_components/Ajax'
+
+import AdminTeamsView from './teams_view/AdminTeamsView'
+import AdminStudentsView from './students_view/AdminStudentsView'
+import AdminDeliverables from './delivs_view/AdminDeliverables'
+
 var util = require('util');
 
 export default React.createClass({

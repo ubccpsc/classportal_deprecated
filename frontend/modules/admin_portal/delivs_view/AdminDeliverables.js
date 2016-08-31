@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
-import ContentModule from '../shared_components/ContentModule'
+import ContentModule from '../../shared_components/ContentModule'
 
 export default React.createClass({
   renderDeliverables: function () {

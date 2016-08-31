@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
-import ContentModule from '../shared_components/ContentModule'
+import ContentModule from '../../shared_components/ContentModule'
 
 export default React.createClass({
   getInitialState: function () {
@@ -9,7 +9,7 @@ export default React.createClass({
   toggleView: function (e) {
     e.preventDefault();
     this.setState({ "viewAll": !this.state.viewAll }, function () {
-      console.log("AdminTeams.js| viewAll: " + this.state.viewAll);
+      console.log("AdminStudents.js| viewAll: " + this.state.viewAll);
     });
   },
   renderStudents: function () {
