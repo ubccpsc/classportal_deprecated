@@ -40,10 +40,12 @@ export default React.createClass({
       <table className="tg">
         <tbody>
           <tr>
-            <th className="tg-yw4l">CSID</th>
-            <th className="tg-yw4l">SNUM</th>
-            <th className="tg-yw4l">LAST</th>
-            <th className="tg-yw4l">FIRST</th>
+            <th className="tg-yw4l">Student #</th>
+            <th className="tg-yw4l">Last</th>
+            <th className="tg-yw4l">First</th>
+            <th className="tg-yw4l">Team</th>
+            <th className="tg-yw4l">GitHub</th>
+            <th className="tg-yw4l">Grades</th>
           </tr>
           {renderStudents(studentsObject)}
         </tbody>
@@ -55,10 +57,20 @@ export default React.createClass({
   renderStudent: function (studentObject) {
     return (
       <tr>
-        <td className="tg-yw4l">{studentObject.csid}</td>
         <td className="tg-yw4l">{studentObject.sid}</td>
         <td className="tg-yw4l">{studentObject.lastname}</td>
         <td className="tg-yw4l">{studentObject.firstname}</td>
+        <td className="tg-yw4l">#</td>
+        <td className="tg-yw4l">
+          {!!studentObject.github_name ?
+            <a href={"http://github.com/" + studentObject.github_name} target="blank" >
+              {studentObject.github_name}
+            </a>
+            : "Not registered" }
+        </td>
+        <td className="tg-yw4l">
+          <a>View/Edit</a>
+        </td>
       </tr>
     )
   },
