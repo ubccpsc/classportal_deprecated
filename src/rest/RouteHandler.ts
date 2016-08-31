@@ -440,31 +440,24 @@ export default class RouteHandler {
     static getClasslist(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("getClasslist| Getting class list..");
         
-        RouteHandler.returnFile("classlist.csv", function (data: any) {
-            if (data == null) {
-                res.json(500, "Bad class list. Returning..");
+        RouteHandler.returnFile("students.json", function (response: any) {
+            if (!!response && response.length !== 0) {
+                var studentsObject = JSON.parse(response);
+                var namesArray: any[] = [];
+                
+                for (var index = 0; index < studentsObject.length; index++) {
+                    var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
+                    namesArray.push(name);
+                }
+
+                Log.trace("getClasslist| Sending array of names..");
+                res.json(200, namesArray);
             }
             else {
-                var lines = data.toString().split(/\n/);
-                Log.trace("getClasslist| Classlistlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
-                        
-                // Splice up the first row to get the headings
-                var headings = lines[0].split(',');
-                
-                //data arrays are set up specifically for our class.csv format
-                //TODO: last names are unused in this function.
-                var classlist: any[] = [];
-                
-                // Split up the comma seperated values and sort into arrays
-                for (var index = 1; index < lines.length; index++) {
-                    var values = lines[index].split(',');
-                    classlist.push(values[3] + " " + values[2])
-                }
-                
-                Log.trace("getClasslist| Sending class list..");
-                res.json(200, classlist);
+                Log.trace("getClasslist| Error reading classlist..");
+                res.json(500, "error");
             }
-        });
+        })
     }
     
     //***HELPER FUNCTIONS***//
