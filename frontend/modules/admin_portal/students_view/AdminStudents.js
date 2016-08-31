@@ -4,7 +4,7 @@ import ContentModule from '../../shared_components/ContentModule'
 
 export default React.createClass({
   getInitialState: function () {
-    return { viewAll: false };
+    return { viewAll: true };
   },
   toggleView: function (e) {
     e.preventDefault();
@@ -12,69 +12,55 @@ export default React.createClass({
       console.log("AdminStudents.js| viewAll: " + this.state.viewAll);
     });
   },
-  renderStudents: function () {
+  renderTable: function () {
     var studentsObject = this.props.students;
     var myTeams = this.props.teams;
     var numStudents = studentsObject.length;
-    var students = [];
+    var table;
+    var that = this;
 
     function include(arr, obj) {
-      console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr));
       var result = (arr.indexOf(obj) != -1);
-      console.log(result.toString());
+      console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
       return (result);
     }
     
-    for (var index = 0; index < numStudents; index++) {
-      if (this.state.viewAll ? include(myTeams, index.toString()) : true) { 
-        students[index] = this.renderStudent(index, studentsObject[index]);
+    function renderStudents(studentsObject) {
+      var students = [];
+      for (var index = 0; index < numStudents; index++) {
+        //if viewAll is true, render all students; otherwise, only render students from myTeams.
+        if (that.state.viewAll ? true : include(myTeams, index.toString())) {
+          students.push(that.renderStudent(studentsObject[index]));
+        }
       }
-    }
+      return students;
+    }  
 
-    return students;
-  },
-  renderStudent: function (index, studentFile) {
-    return (
-      <div className="tg-wrap-deliverables" key={index}>
-        <table className="tg">
-          <tbody>
-            <tr>
-              <th className="tg-7wrc" colSpan="2">
-                {studentFile.firstname + " " + studentFile.lastname}
-              </th>
-            </tr>
-            <tr>
-              <td className="tg-edam">SID</td>
-              <td className="tg-value">
-                {studentFile.sid}
-              </td>
-            </tr>
-            <tr>
-              <td className="tg-edam">CSID</td>
-              <td className="tg-value">
-                {studentFile.csid}
-              </td>
-            </tr>
-            <tr>
-              <td className="tg-edam">Team</td>
-              <td className="tg-value">5</td>
-            </tr>
-            <tr>
-              <td className="tg-edam">Github</td>
-              <td className="tg-value">
-                {"http://github.com/" + studentFile.github_name}
-              </td>
-            </tr>
-            <tr>
-              <td className="tg-edam">Marks</td>
-              <td className="tg-value">
-                <a href="student2" target="blank">View / Submit </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    table = (
+      <table className="tg">
+        <tbody>
+          <tr>
+            <th className="tg-yw4l">CSID</th>
+            <th className="tg-yw4l">SNUM</th>
+            <th className="tg-yw4l">LAST</th>
+            <th className="tg-yw4l">FIRST</th>
+          </tr>
+          {renderStudents(studentsObject)}
+        </tbody>
+      </table>
     );
+
+    return table;
+  },
+  renderStudent: function (studentObject) {
+    return (
+      <tr>
+        <td className="tg-yw4l">{studentObject.csid}</td>
+        <td className="tg-yw4l">{studentObject.sid}</td>
+        <td className="tg-yw4l">{studentObject.lastname}</td>
+        <td className="tg-yw4l">{studentObject.firstname}</td>
+      </tr>
+    )
   },
   render: function () {
     return (
@@ -84,49 +70,7 @@ export default React.createClass({
             <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle View</Button>&nbsp;
           </FormField>
         </Form>
-        {!!this.props.students && this.renderStudents()}
+        {!!this.props.students && this.renderTable()}
       </ContentModule>
     )}
 })
-
-
-
-
-/*
-
-        <div className="module">
-          <h3>Students View</h3><br/>
-          {this.renderAllTeams()}
-        </div>
-        
-          
-  updateSelect: function() {
-    
-  },
-
-
-gradeSubmit: function (e) {
-    e.preventDefault();
-    alert("Grade Submission: Team 1 - Assignment 2");
-  },
-
-<tr>
-              <td className="tg-edam">Assignment 1 (Group)</td>
-              <td className="tg-value">
-                <Form onSubmit={this.gradeSubmit}>
-                  <FormField label="Type">
-                    <FormSelect options={options1} onChange={this.updateSelect} />
-                  </FormField>
-                  <FormField label="Grade (out of 100)">
-                    <FormInput placeholder="Eg. 90"/>
-                  </FormField>
-                  <FormField label="Comments">
-                    <FormInput placeholder="Eg." multiline />
-                  </FormField>
-                  <FormField >
-                    <Button size="sm" submit>Submit</Button>
-                  </FormField>
-                </Form>
-              </td>
-            </tr>
-            */
