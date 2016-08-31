@@ -387,7 +387,7 @@ export default class RouteHandler {
         do something to grades.json (should grades be in students.json?)
     */
     static updateClasslist(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("updateClasslist| Reading new file..");
+        Log.trace("updateClasslist| Received new classlist..");
 
         fs.readFile(req.files[0].path, function read(err: any, data: any) {
             if (err) {
@@ -396,13 +396,8 @@ export default class RouteHandler {
                 return;
             }
             else {
-                Log.trace("updateClasslist| Accessing old file..");
+                Log.trace("updateClasslist| Overwriting old classlist.csv..");
                 var filename = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/priv/classlist.csv'; 
-                    Log.trace("updateClasslist| " + filename);
-                //var file = require(filename);
-                    //Log.trace("updateClasslist| " + file);
-
-                Log.trace("updateClasslist| Overwriting old file..");
                 fs.writeFile(filename, data, function (err: any) {
                     if (err) {
                         Log.trace("updateClasslist| Write unsuccessful: " + err.toString());
@@ -411,16 +406,15 @@ export default class RouteHandler {
                     }
                     else {
                         Log.trace("updateClasslist| Write successful!");
-                        
                         //read new classlist
                         RouteHandler.returnFile("classlist.csv", function (response: any) {
                             var classArray = response.toString().split(/\n/);
                             if (!!classArray) {
                                 //update students.json
-                                Log.trace("updateClasslist| Updating students.json..");
+                                Log.trace("updateClasslist| Updating student file..");
                                 RouteHandler.updateStudents(classArray, function (success: boolean) {
                                     if (success) {
-                                        Log.trace("updateClasslist| Successfully updated students.json. Returning..");
+                                        Log.trace("updateClasslist| Success! Returning..");
                                         res.send(200, "success updating classlist")
                                         return next();
                                     }
@@ -479,65 +473,50 @@ export default class RouteHandler {
     //in classlist, not in students.json. if not, redirect to error page (Please email prof holmes @ ..)
     //todo: make sure we don't overwrite existing info by accident!
     static updateStudents(classlist:any, callback:any) {
-        Log.trace("updateStudents| classlist: " + classlist);
-        Log.trace("updateStudents| classlist.length: " + classlist.length);
         RouteHandler.returnFile("students.json", function (response: any) {
-            if (response == null) {
-                //???
+            var studentsFile: any[];
+
+            //check if response exists and is not 0-length file
+            //todo: look into streams instead of fs.readFile
+            if (!!response && response.length !== 0) {    
+                studentsFile = JSON.parse(response);
             }
             else {
-                //???
+                studentsFile = [];
             }
-            var studentsFile = JSON.parse(response);
-            Log.trace("updateStudents| Response: " + studentsFile);
-            Log.trace("studentsFile.length: " + studentsFile.length);
-            //loop: for each students in classlist
+
+            var studentsAdded: number = 0;
             for (var index = 1; index < classlist.length; index++) {
-                Log.trace("updateStudents| Index: " + index);
-                //csid, sid, lastname, firstname
-                var values = classlist[index].split(',');
-                Log.trace("updateStudents| values: " + values);
-
-                Log.trace("updateStudents| TEST");
-                //check if student exists in students.json
-                //if yes: do nothing(?)
-
-
-                function findSID(student: any) {
-                    Log.trace("updateStudents| values[1]:" + values[1] + ", student.sid:" + student.sid);
-                    return student.sid === values[1];
-                };
-
-                var asdf: boolean = !!studentsFile.find(findSID);
-                Log.trace("updateStudents| asdf: " + asdf);
-
-                if (asdf) {
-                    Log.trace("updateStudents| doNothing");
+                var studentInfo = classlist[index].split(','); //csid, sid, lastname, firstname
+                if (!!studentInfo[0] && !!studentInfo[1] && !!studentInfo[2] && !!studentInfo[3]) {
+                    //check if student exists in students.json
+                    if (!!studentsFile.find((student: any) => student.sid === studentInfo[1])) {
+                        //Log.trace("updateStudents| Student file exists already!");
+                    }
+                    //else, add blank student to students.json
+                    else {
+                        var newStudent = {
+                            "csid": studentInfo[0],
+                            "sid": studentInfo[1],
+                            "lastname": studentInfo[2],
+                            "firstname": studentInfo[3],
+                            "github_name": "",
+                            "github_token": "",
+                            "hasTeam": false
+                        };
+                        //studentsFile[studentsFile.length] = newStudent;
+                        studentsFile.push(newStudent);
+                        studentsAdded++;
+                    }
+                    //for students who were already in students.json but not in new classlist:
+                    //should we not let them log in? do nothing for now.
                 }
                 else {
-                    //add blank student to students.json
-                    Log.trace("updateStudents| Adding new student..");
-                    var newStudent = {
-                        "csid": values[0],
-                        "sid": values[1],
-                        "firstname": values[3],
-                        "lastname": values[2],
-                        "github_name": "",
-                        "github_token": "",
-                        "hasTeam": false
-                    };
-                    Log.trace("updateStudents| Pushing student: " + JSON.stringify(newStudent, null, 2));
-                    studentsFile[studentsFile.length] = newStudent;
-                    
-                    Log.trace("updateStudents| test1");
+                    Log.trace("updateStudents| This line is empty or badly formatted.");
                 }
-                Log.trace("updateStudents| test2");
-                //for students who were already in students.json but not in new classlist:
-                //do not let them log in?
-                //do nothing for now.
             }
-            //done
-            Log.trace("updateStudents| Writing new student file: " + JSON.stringify(studentsFile));
+            //done updating
+            Log.trace("updateStudents| Added " + studentsAdded + " new students to students.json");
             var filename = pathToRoot.concat(config.path_to_students);      
             fs.writeFile(filename, JSON.stringify(studentsFile, null, 2), function (err: any) {
                 if (err) {
@@ -545,7 +524,7 @@ export default class RouteHandler {
                     return;
                 }
                 else {
-                    Log.trace("updateStudents| New file created.");
+                    Log.trace("updateStudents| Write successful.");
                     callback(true);
                     return;
                 }
@@ -706,13 +685,15 @@ export default class RouteHandler {
         });
     }
 
+    //todo: returns bad data when reading empty (0-length) file. look into i/o streams    
     static returnFile(file: string, callback: any) {
         Log.trace("returnFile| Accessing: " + file);
         var filename = pathToRoot.concat(config.private_folder, file);
 
         fs.readFile(filename, function read(err: any, data: any) {
             if (err) {
-                Log.trace("returnFile| Error reading file: "+err.toString());
+                Log.trace("returnFile| Error reading file: " + err.toString());
+                //todo: should we callback(null)?
                 return;
             }
             else {
