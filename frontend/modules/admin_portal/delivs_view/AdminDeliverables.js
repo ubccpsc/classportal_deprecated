@@ -19,9 +19,9 @@ export default React.createClass({
         <td className="tg-yw4l">
           <a href={deliverable.url} target="blank" >View</a>
         </td>
-        <td className="tg-yw4l">{deliverable.open}</td>
-        <td className="tg-yw4l">{deliverable.due}</td>
-        <td className="tg-yw4l">{deliverable.gradeRelease}</td>
+        <td className="tg-edam">{deliverable.open}</td>
+        <td className="tg-edam">{deliverable.due}</td>
+        <td className="tg-edam">{deliverable.gradeRelease}</td>
       </tr>
     );
   },

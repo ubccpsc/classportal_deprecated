@@ -3,50 +3,41 @@ import {Modal, ModalHeader, ModalFooter, ModalBody, Button, Card, Row, Col} from
 import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
-  renderDeliverables: function () {
-    console.log("Deliverables.js| Rendering deliverables");
-    var block = [];
-    var deliverables = this.props.deliverables;
-    
-    for (var index = 0; index < deliverables.length; index++){
-      block[index] = (
-        <div className="tg-wrap-deliverables" key={index}>
-          <table className="tg">
-            <tbody>
-              <tr>
-                <th className="tg-7wrc" colSpan="2">{deliverables[index].name}</th>
-              </tr>
-              <tr>
-                <td className="tg-edam">Description</td>
-                <td className="tg-value">{deliverables[index].description}</td>
-              </tr>
-              <tr>
-                <td className="tg-edam">Criteria</td>
-                <td className="tg-value"><a href={deliverables[index].url} target="blank">{deliverables[index].url}</a></td>
-              </tr>
-              <tr>
-                <td className="tg-edam">Date open</td>
-                <td className="tg-value">{deliverables[index].open}</td>
-              </tr>
-              <tr>
-                <td className="tg-edam">Date due</td>
-                <td className="tg-value">{deliverables[index].due}</td>
-              </tr>
-              <tr>
-                <td className="tg-edam">Submit</td>
-                <td className="tg-value"><a href="http://www.github.com" target="blank">http://www.github.com</a></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>);
-    };
-    
-    return (<div>{block}</div>);
+  renderDeliverables: function() {
+    var that = this;
+    var delivs = [];
+    for (var index = 0; index < this.props.deliverables.length; index++) {
+      delivs.push(that.renderDeliverable(index));
+    }
+    return delivs;
+  },
+  renderDeliverable: function (index) {
+    var deliverable = this.props.deliverables[index];
+    return (
+      <tr key={index}>
+        <td className="tg-edam">
+          <a href={deliverable.url} target="blank" >{deliverable.name}</a>
+        </td>
+        <td className="tg-edam">{deliverable.open}</td>
+        <td className="tg-edam">{deliverable.due}</td>
+        <td className="tg-yw4l">-</td>
+      </tr>
+    );
   },
   render: function () {
     return (
-      <ContentModule id="deliverablesModule" title="Deliverables" initialHideContent={false}>
-        {!!this.props.deliverables && this.renderDeliverables()}
+      <ContentModule id="deliverables-module" title="Deliverables" initialHideContent={false}>
+        <table className="tg">
+          <tbody>
+            <tr>
+              <th className="tg-yw4l">Criteria</th>
+              <th className="tg-yw4l">Open</th>
+              <th className="tg-yw4l">Due</th>
+              <th className="tg-yw4l">Grade</th>
+            </tr>
+            {!!this.props.deliverables && this.renderDeliverables() }
+          </tbody>
+        </table>
       </ContentModule>
-    )}
+  )}
 })
