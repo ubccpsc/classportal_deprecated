@@ -12,10 +12,10 @@ export default React.createClass({
       console.log("AdminTeams.js| viewAll: " + this.state.viewAll);
     });
   },
-  include: function(arr, obj) {
-      var result = (arr.indexOf(obj) != -1);
-      console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
-      return (result);
+  include: function (arr, obj) {
+    var result = (arr.indexOf(obj) != -1);
+    console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
+    return (result);
   },
   renderTeams: function () {
     var that = this;
@@ -30,6 +30,18 @@ export default React.createClass({
   },
   renderOneTeam: function (index) {
     var team = this.props.teams[index];
+    var students = this.props.students;
+    
+    function returnName(studentNum) {
+      //search students file for matching sid
+      for (var index = 0; index < students.length; index++) {
+        if (students[index].sid === studentNum) {
+          return students[index].firstname + " " + students[index].lastname;
+        }
+      }
+      return "null";
+    }
+
     return (
       <tr key={index}>
         <td className="tg-yw4l">{team.id}</td>
@@ -40,8 +52,8 @@ export default React.createClass({
             </a>
             : "Not set" }</td>
         <td className="tg-edam">
-          <a href="" target="blank">{team.members[0]}</a>,&nbsp;
-          <a href="" target="blank">{team.members[1]}</a>
+          <a href="" target="blank">{returnName(team.members[0])}</a>,&nbsp;
+          <a href="" target="blank">{returnName(team.members[1])}</a>
         </td>
         <td className="tg-yw4l">
           <a href="" target="blank">View / Submit</a>
