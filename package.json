@@ -27,7 +27,8 @@
     "react-router": "^2.0.0",
     "request": "^2.73.0",
     "request-promise": "^4.1.1",
-    "restify": "^4.0.3"
+    "restify": "^4.0.3",
+    "request-promise-native": "^1.0.3"
   },
   "devDependencies": {
     "babel-core": "^6.5.1",
