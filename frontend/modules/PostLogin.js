@@ -57,7 +57,7 @@ export default React.createClass({
       console.log("PostLogin.js| Authenticating..");
       $.ajax({
         type: 'POST',
-        url: 'http://localhost:4321/api/authenticate',
+        url: 'http://skaha.cs.ubc.ca:8020/api/authenticate',
         headers: {
           "user": "temp",
           "token": "temp"
