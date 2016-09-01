@@ -3,46 +3,44 @@ import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, 
 import ContentModule from '../../shared_components/ContentModule'
 
 export default React.createClass({
-  renderDeliverables: function () {
-    var deliverables = this.props.deliverables;
-    for (var index = 0; index < deliverables.length; index++) {
-      deliverables[index] = (
-        <div className="tg-wrap-deliverables" key={index}>
-          <table className="tg">
-            <tbody>
-              <tr>
-                <th className="tg-7wrc" colSpan="2">{deliverables[index].name}</th>
-              </tr>
-              <tr>
-                <td className="tg-edam">Description</td>
-                <td className="tg-value">{deliverables[index].description}</td>
-              </tr>
-              <tr>
-                <td className="tg-edam">Criteria</td>
-                <td className="tg-value">{deliverables[index].url}</td>
-              </tr>
-              <tr>
-                <td className="tg-edam">Date open</td>
-                <td className="tg-value">{deliverables[index].open}</td>
-              </tr>
-              <tr>
-                <td className="tg-edam">Date due</td>
-                <td className="tg-value">{deliverables[index].due}</td>
-              </tr>
-              <tr>
-                <td className="tg-edam">Students Marked</td>
-                <td className="tg-value">0 / 50</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>);
+  renderDeliverables: function() {
+    var that = this;
+    var delivs = [];
+    for (var index = 0; index < this.props.deliverables.length; index++) {
+      delivs.push(that.renderDeliverable(index));
     }
-    return deliverables;
+    return delivs;
+  },
+  renderDeliverable: function (index) {
+    var deliverable = this.props.deliverables[index];
+    return (
+      <tr key={index}>
+        <td className="tg-edam">
+          <a href={deliverable.url} target="blank" >{deliverable.name}</a>
+        </td>
+        <td className="tg-edam">{deliverable.open}</td>
+        <td className="tg-edam">{deliverable.due}</td>
+        <td className="tg-edam">{deliverable.gradeRelease}</td>
+      </tr>
+    );
+  },
+  didComponentMount: function () {
+    console.log("ADMINTEST");
   },
   render: function () {
     return (
-      <ContentModule id="admin-deliverables-module" title="Deliverables" initialHideContent={false}>
-        {!!this.props.deliverables && this.renderDeliverables()}
+      <ContentModule id="admin-deliverables2-module" title="Deliverables" initialHideContent={false}>
+        <table className="tg">
+          <tbody>
+            <tr>
+              <th className="tg-yw4l">Name (Link)</th>
+              <th className="tg-yw4l">Open Date</th>
+              <th className="tg-yw4l">Due Date</th>
+              <th className="tg-yw4l">Release Date</th>
+            </tr>
+            {!!this.props.deliverables && this.renderDeliverables() }
+          </tbody>
+        </table>
       </ContentModule>
-    )}
+  )}
 })

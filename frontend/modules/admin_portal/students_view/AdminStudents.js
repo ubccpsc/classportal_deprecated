@@ -23,7 +23,7 @@ export default React.createClass({
     var students = [];
     for (var index = 0; index < this.props.students.length; index++) {
       //if viewAll is true, render all students; otherwise, only render students from myTeams.
-      if (that.state.viewAll ? true : include(myTeams, index.toString())) {
+      if (that.state.viewAll ? true : this.include(myTeams, index.toString())) {
         students.push(that.renderStudent(index));
       }
     }
