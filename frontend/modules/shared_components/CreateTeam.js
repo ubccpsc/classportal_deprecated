@@ -23,7 +23,8 @@ export default React.createClass({
         },
         function success (response) {
           console.log("CreateTeam.js| Success: " + response);
-            alert("Success: Team " + response + " created!")
+          alert("Success: Team " + response + " created!")
+          window.location.reload(true);
         }.bind(this),
         function error (xhr, status, err) {
           console.log("CreateTeam.js| Error: " + status + err);

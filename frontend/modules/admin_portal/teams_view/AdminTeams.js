@@ -12,63 +12,60 @@ export default React.createClass({
       console.log("AdminTeams.js| viewAll: " + this.state.viewAll);
     });
   },
+  include: function(arr, obj) {
+      var result = (arr.indexOf(obj) != -1);
+      console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
+      return (result);
+  },
   renderTeams: function () {
+    var that = this;
     var teams = [];
-    if (this.state.viewAll) {
-      for (var index = 1; index < 6; index++) {
-        teams[index] = this.renderTeam(index);
-      }
-    }
-    else {
-      for (var index = 1; index < 6; index++) {
-        if (index % 2){
-          teams[index] = this.renderTeam(index);
-        }
+    for (var index = 0; index < this.props.teams.length; index++) {
+      //if viewAll is true, render all students; otherwise, only render students from myTeams.
+      if (that.state.viewAll ? true : this.include(this.props.myTeams, index.toString())) {
+        teams.push(that.renderOneTeam(index));
       }
     }
     return teams;
   },
-  renderTeam: function (index) {
+  renderOneTeam: function (index) {
+    var team = this.props.teams[index];
     return (
-      <div className="tg-wrap-deliverables" key={index}>
-        <table className="tg">
-          <tbody>
-            <tr>
-              <th className="tg-7wrc" colSpan="2">Team {index}</th>
-            </tr>
-            <tr>
-              <td className="tg-edam">Repo</td>
-              <td className="tg-value"><a href="http://github.com/user/project" target="blank">http://github.com/user/project</a></td>
-            </tr>
-            <tr>
-              <td className="tg-edam">Members</td>
-              <td className="tg-value">
-                <a href="student1" target="blank">student1</a>,&nbsp;
-                <a href="student2" target="blank">student2</a>
-              </td>
-            </tr>
-            <tr>
-              <td className="tg-edam">Marks</td>
-              <td className="tg-value">
-                <a href="student2" target="blank">View / Submit </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <tr key={index}>
+        <td className="tg-yw4l">{team.number}</td>
+        <td className="tg-yw4l">
+          {!!team.url ?
+            <a href={team.url} target="blank" >
+              View
+            </a>
+            : "Not set" }</td>
+        <td className="tg-yw4l">{team.members}</td>
+        <td className="tg-yw4l">
+          <a href="" target="blank">View / Submit</a>
+        </td>
+      </tr>
     );
   },
   render: function () {
     return (
-       <ContentModule id="create-projects-module" title={this.state.viewAll ? "All Teams" : "My Teams"} initialHideContent={false}>
-          <Form id="text-center" onSubmit={this.toggleView} >
-            <FormField>
-              <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle</Button>&nbsp;
-            </FormField>
-          </Form>
-          {this.renderTeams() }
+      <ContentModule id="admin-teams-module" title={this.state.viewAll ? "All Teams" : "My Teams"} initialHideContent={false}>
+        <Form id="text-center" onSubmit={this.toggleView} >
+          <FormField>
+            <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle</Button>&nbsp;
+          </FormField>
+        </Form>
+
+        <table className="tg">
+          <tbody>
+            <tr>
+              <th className="tg-yw4l">Team</th>
+              <th className="tg-yw4l">Repo</th>
+              <th className="tg-yw4l">Members</th>
+              <th className="tg-yw4l">Marks</th>
+            </tr>
+            {!!this.props.teams && this.renderTeams() }
+          </tbody>
+        </table>
       </ContentModule>
-    )}        
+  )}
 })
-        
-  

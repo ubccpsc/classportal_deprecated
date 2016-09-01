@@ -95,9 +95,11 @@ export default class Server {
                 that.rest.post('/api/logout', logRequest, requireToken, RouteHandler.deleteServerToken);
                 
                 /* Requires ADMIN token */
-                that.rest.post('/api/getGradesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllGrades);
                 that.rest.post('/api/submitClassList', logRequest, requireAdmin, requireToken, RouteHandler.updateClasslist);
+                that.rest.post('/api/getGradesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllGrades);
                 that.rest.post('/api/getStudentsAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllStudents);
+                that.rest.post('/api/getTeamsAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllTeams);
+                
 
                 //serve static css and js files
                 that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({

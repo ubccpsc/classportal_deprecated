@@ -92,6 +92,24 @@ module.exports = {
             error: errorCallback
         });
     },
+
+    getTeams: function (successCallback, errorCallback) {
+        console.log("Ajax.js| Getting teams..");
+        $.ajax({
+            type: "POST",
+            url: 'http://' + Config.host + ':' + Config.port + '/api/getTeamsAdmin',
+            headers: {
+                "user": localStorage.user,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: {},
+            dataType: 'json',
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
     
     //Tells server to delete the server token of the current user.     
     logout: function (successCallback, errorCallback) {

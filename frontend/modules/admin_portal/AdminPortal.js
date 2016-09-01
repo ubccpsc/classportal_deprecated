@@ -19,6 +19,7 @@ export default React.createClass({
           firstname: "Michael",
           teams: ["1", "2", "3"]
         },
+      teamsObject: '',
       studentsObject: '',
       gradesObject: '',
       deliverablesObject: '',
@@ -65,10 +66,22 @@ export default React.createClass({
       }.bind(this)
     )
   },
+  getTeams: function () {
+    Ajax.getTeams(
+      function success(response) {
+        console.log("AdminPortal.js| Retreived teams file.");
+        this.setState({ teamsObject: response });
+      }.bind(this),
+      function error(xhr, status, error) {
+        console.log("AdminPortal.js| Error getting teams!");
+      }.bind(this)
+    )
+  },
   componentDidMount: function () {
     this.getDeliverables();
     this.getClassList();
     this.getStudents();
+    this.getTeams();
   },
   render: function () {
     var that = this;
@@ -77,6 +90,7 @@ export default React.createClass({
     var childrenWithProps = React.Children.map(this.props.children, function (child) {
       return React.cloneElement(child, {
         "admin": that.state.adminObject,
+        "teams": that.state.teamsObject,
         "students": that.state.studentsObject,
         "grades": that.state.gradesObject,
         "deliverables": that.state.deliverablesObject,

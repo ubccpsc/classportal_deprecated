@@ -9,7 +9,7 @@ export default React.createClass({
   render: function () {
     return (
       <div>
-        <AdminStudents teams={this.props.admin.teams} students={this.props.students}/>
+        <AdminStudents students={this.props.students} myTeams={this.props.admin.teams} />
         <UploadClassList />
       </div>
     )}

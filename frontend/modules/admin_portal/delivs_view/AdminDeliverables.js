@@ -18,22 +18,19 @@ export default React.createClass({
         <td className="tg-edam">
           <a href={deliverable.url} target="blank" >{deliverable.name}</a>
         </td>
-        <td className="tg-edam">{deliverable.open}</td>
-        <td className="tg-edam">{deliverable.due}</td>
-        <td className="tg-edam">{deliverable.gradeRelease}</td>
+        <td className="tg-yw4l">{deliverable.open}</td>
+        <td className="tg-yw4l">{deliverable.due}</td>
+        <td className="tg-yw4l">{deliverable.gradeRelease}</td>
       </tr>
     );
   },
-  didComponentMount: function () {
-    console.log("ADMINTEST");
-  },
   render: function () {
     return (
-      <ContentModule id="admin-deliverables2-module" title="Deliverables" initialHideContent={false}>
+      <ContentModule id="admin-deliverables-module" title="Deliverables" initialHideContent={false}>
         <table className="tg">
           <tbody>
             <tr>
-              <th className="tg-yw4l">Name (Link)</th>
+              <th className="tg-yw4l">Link</th>
               <th className="tg-yw4l">Open Date</th>
               <th className="tg-yw4l">Due Date</th>
               <th className="tg-yw4l">Release Date</th>

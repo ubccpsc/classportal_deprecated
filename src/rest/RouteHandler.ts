@@ -338,7 +338,7 @@ export default class RouteHandler {
             var filename = pathToRoot.concat(config.path_to_teams);
             var file = require(filename);        
             var newEntry = {
-                "team": file.length + 1,
+                "number": file.length + 1,
                 "url": "",
                 "members": students
             };
@@ -363,8 +363,8 @@ export default class RouteHandler {
                         });
                     }
                     
-                    Log.trace("createTeam| Team " + newEntry.team + " created! Returning..");
-                    res.send(200, newEntry.team)
+                    Log.trace("createTeam| Team " + newEntry.number + " created! Returning..");
+                    res.send(200, newEntry.number)
                     return next();
                 }
             });
@@ -468,13 +468,30 @@ export default class RouteHandler {
                 return next();
             }
             else {
-                Log.trace("getClasslist| Error reading classlist..");
+                Log.trace("getAllStudents| Error reading file..");
                 res.json(500, "error");
                 return;
             }
         })
     }
 
+    static getAllTeams(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("getAllTeams| Getting students..");
+        RouteHandler.returnFile("teams.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                var teamsObject = JSON.parse(data);
+                Log.trace("getAllStudents| Sending teams object..");
+                res.json(200, teamsObject);
+                return next();
+            }
+            else {
+                Log.trace("getAllTeams| Error reading file..");
+                res.json(500, "error");
+                return;
+            }
+        })
+    }
+    
     //***HELPER FUNCTIONS***//
 
     //todo: on login, let students only log in if student exists

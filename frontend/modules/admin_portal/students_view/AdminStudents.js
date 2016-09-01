@@ -19,17 +19,18 @@ export default React.createClass({
   },
   renderStudents: function() {
     var that = this;
-    var myTeams = this.props.teams;
+    //todo: decide how to display myStudents properly
+    var myStudents = this.props.myTeams;
     var students = [];
     for (var index = 0; index < this.props.students.length; index++) {
       //if viewAll is true, render all students; otherwise, only render students from myTeams.
-      if (that.state.viewAll ? true : this.include(myTeams, index.toString())) {
-        students.push(that.renderStudent(index));
+      if (that.state.viewAll ? true : this.include(myStudents, index.toString())) {
+        students.push(that.renderOneStudent(index));
       }
     }
     return students;
   },
-  renderStudent: function (index) {
+  renderOneStudent: function (index) {
     var student = this.props.students[index];
     return (
       <tr key={index}>
@@ -42,8 +43,7 @@ export default React.createClass({
             <a href={"http://github.com/" + student.github_name} target="blank" >
               {student.github_name}
             </a>
-            : "Not registered" }
-        </td>
+            : "Not registered" }</td>
         <td className="tg-yw4l">
           <a>View/Edit</a>
         </td>
