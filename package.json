@@ -12,7 +12,8 @@
   "keywords": [],
   "version": "0.0.1",
   "dependencies": {
-    "babel-core": "^6.13.2",
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
     "babel-preset-es2015": "^6.13.2",
     "compression": "^1.6.2",
     "elemental": "^0.6.1",
@@ -27,8 +28,10 @@
     "react-router": "^2.0.0",
     "request": "^2.73.0",
     "request-promise": "^4.1.1",
+    "request-promise-native": "^1.0.3",
     "restify": "^4.0.3",
-    "request-promise-native": "^1.0.3"
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.15.1"
   },
   "devDependencies": {
     "babel-core": "^6.5.1",
