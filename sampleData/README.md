@@ -28,11 +28,3 @@ The ```id``` can be assumed to be unique; if it is already known to the Portal t
 # Deliverables Schema
 
 The ```id``` can be assumed to be unique; if it is already known to the Portal, the deliverable record should be updated (any field can change). This schema is not fixed, if you want to change ```isOpen``` to a date (or ```openDate/closeDate```) that would be fine too.
-
-
-
- config.json
-
- register new oauth application on github (https://github.com/settings/applications/). set the callback to be <server>/postlogin Set clientid and client secret in config.json with these
-
-update frontend/modules/login_page/GithubButton.js  with the clientid and postlogin url

@@ -62,7 +62,6 @@
     "build": "tsc",
     "test": "mocha -c",
     "cover": "istanbul cover _mocha",
-    "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:dev": "webpack-dev-server --inline --content-base frontend/public --history-api-fallback",
     "start:prod": "webpack && node src/App.js"
   }
