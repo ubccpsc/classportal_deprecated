@@ -10,6 +10,5 @@
     "path_to_admins":    "priv/admins.json",
     "path_to_tokens":    "priv/tokens.json",
     "path_to_students":  "priv/students.json",
-    "path_to_teams":     "priv/teams.json",
-    "path to etc...":    "/"
+    "path_to_teams":     "priv/teams.json"
 }

@@ -1,0 +1,13 @@
+[
+    {
+        "id":"1",
+        "name":"Assignment 1",
+        "description":"A1 Description",
+        "url":"http://link-to-deliverable-description",
+        "open": "Jan 1",
+        "due": "Jan 2",
+        "gradeRelease": "Jan 3",
+        "isTeam": true,
+        "uploadKind": ""
+    }
+]

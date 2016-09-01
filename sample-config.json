@@ -1,0 +1,14 @@
+{
+    "titlebar":          "course_num",
+    "titlebar_subtext":  "course_name",
+    "client_id":         "",
+    "client_secret":     "",
+    "host":              "",
+    "port":              "",
+    "private_folder":    "priv/",
+    "path_to_classlist": "priv/classlist.csv",
+    "path_to_admins":    "priv/admins.json",
+    "path_to_tokens":    "priv/tokens.json",
+    "path_to_students":  "priv/students.json",
+    "path_to_teams":     "priv/teams.json"
+}

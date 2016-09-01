@@ -1,10 +1,10 @@
 {
   "name": "classportalserver",
-  "description": "Server portion of the class portal",
+  "description": "Class portal for Reid Holmes",
   "homepage": "https://cs.ubc.ca",
-  "author": "N/A",
+  "author": "Reid Holmes",
   "contributors": [
-    "N/A"
+    "Michael Sargent"
   ],
   "license": "private",
   "repository": "",
@@ -36,7 +36,7 @@
     "babel-preset-es2015": "^6.5.0",
     "babel-preset-react": "^6.5.0",
     "chai": "^3.5.0",
-    "css-loader": "^0.23.1",
+    "css-loader": "*",
     "frisby": "^0.8.5",
     "http": "0.0.0",
     "http-server": "^0.9.0",

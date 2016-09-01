@@ -1,31 +1,29 @@
-To install:
+## Install
 
-```npm install``` and  ```typings install```
+`npm install` and  `typings install`
 
-NPM run scripts have been set up for most common tasks:
-
-* Clean: ```npm run clean```
-* Configure: ```npm run configure```
-* Test: ```npm run test``` (or ```npm test```)
-* Test + coverage: ```npm run cover``` (HTML reports in ```./coverage/lcov-report/index.html```)
-
-We are using webpack-dev-server for front-end dev, which allows front-end files to be updated live. It runs on localhost:8080.
-
-* Run web-dev-server: ```npm run start``` (or ```npm start```)
-
-The production server runs on localhost:4321.
-
-* Build: ```npm run build```
-* Run production server: ```NODE_ENV=production npm start```
-
-must be global?
-
+The following NPM modules must be global?
 * mocha
 * jasmine-node
 * typescript
 
+## Scripts
 
-# System overview
+NPM run scripts have been set up for most common tasks:
+
+* Clean: `npm run clean`
+* Configure: `npm run configure`
+* Test: `npm run test`
+* Test + coverage: `npm run cover` (HTML reports in `./coverage/lcov-report/index.html`)
+* Run webpack-dev-server (allows live reloading of front-end code): `npm run start`
+* Run production server: `npm run build` then `NODE_ENV=production npm start`
+
+## Files Needed
+In the project's root directory, a configuration file `config.json` is needed. A sample file `sample-config.json` is provided to expose the structure.
+
+In the project's root directory, a private folder `/priv` with is needed. Refer to the sample folder `/sampleData` to get the list of files needed in `/priv`.
+
+## System overview
 
 Some docs will need to be provided to the system to set it up, these include:
 
