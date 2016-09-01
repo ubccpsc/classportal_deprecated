@@ -102,7 +102,7 @@ export default class Server {
                 that.rest.post('/api/getTeamsAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllTeams);
                 
                 //serve static css and js files
-                that.rest.get(/\w+\.[jc]ss?/, restify.serveStatic({
+                that.rest.get(/\w+\.(?:(js)|(css)|(png))/, restify.serveStatic({
                     directory: __dirname.substring(0, __dirname.lastIndexOf("/src")) + '/frontend/public',
                     default: 'index.html'
                 }));

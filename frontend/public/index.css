@@ -1,5 +1,5 @@
 body {
-  background: #E8EDFF;
+  background: #e7e9f5;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 15px;
   line-height: 1;
@@ -64,17 +64,41 @@ h5{
   background-color: rgba(0,0,0,0.05);
 }
 
-#App {
-  outline: none;
-}
-
-#Title{
+#titlebar{
+  position: static;
+  left: 0;
+  top: 0;
+  width:100%;
+  height: 60px;
   margin-left: auto;
   margin-right: auto;
-  text-align: center;
   background: #002145;
-} #Title h1 {
+} #titlebar-img{
+  position: absolute;
+  top:  10px;
+  left: 10px;
+  max-height: 40px;
+  width: auto;
+} #titlebar-text {
+  position: absolute;
+  padding: 10px;
+  margin: 0;
+  right:50%;
+  top: 0px;
   color: white;
+  text-align: center;
+} #titlebar-subtext {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  padding: 0;
+  margin: 0;
+  color: white;
+  text-align: center;
+}
+#body-css{
+  position:relative;
+  top:0px;
 }
 
 #NavLinks{

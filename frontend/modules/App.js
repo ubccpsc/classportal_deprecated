@@ -1,19 +1,18 @@
 import React from 'react'
-import LoginPage from './login_page/LoginPage'
-import StudentPortal from './student_portal/StudentPortal'
-import AdminPortal from './admin_portal/AdminPortal'
-
-import { Row, Col, Button, Alert, Spinner } from 'elemental' 
+import Config from 'Config';
 
 export default React.createClass({
   render: function () {
     return (
-      <div id="App">
-        <div id="Title">
-          <h1>Course Portal</h1>
+      <div>
+        <div id="titlebar">
+          <img id="titlebar-img" src="UBCLogo_Reverse.png"/>
+          <h1 id="titlebar-text">{Config.titlebar} | </h1>
+          <h3 id="titlebar-subtext">{Config.titlebar_subtext}</h3>
         </div>
-        {this.props.children}
-        <br/><br/>
+        <div id="body-css">
+          {this.props.children}
+        </div>
       </div>
     )}
 })
