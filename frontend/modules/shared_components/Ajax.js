@@ -76,7 +76,7 @@ module.exports = {
     },
     
     getStudents: function (successCallback, errorCallback) {
-        console.log("Ajax.js| Getting classlist..");
+        console.log("Ajax.js| Getting students..");
         $.ajax({
             type: "POST",
             url: 'http://' + Config.host + ':' + Config.port + '/api/getStudentsAdmin',

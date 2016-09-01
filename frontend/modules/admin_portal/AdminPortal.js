@@ -28,10 +28,8 @@ export default React.createClass({
   getDeliverables: function () {
     Ajax.getDeliverables(
       function success (response) {
-        console.log("AdminDeliverables.js| Retrieved "+response.length+" deliverables");
-        this.setState({ deliverablesObject: response }, function () {
-          console.log("AdminDeliverables.js| deliverablesObject set: "+JSON.stringify(this.state.deliverablesObject[1]));
-        });
+        console.log("AdminDeliverables.js| Retrieved "+response.length+" deliverables.");
+        this.setState({ deliverablesObject: response });
       }.bind(this),
       function error (xhr, status, err) {
         console.log("AdminDeliverables.js| Error retrieving deliverables!");
@@ -41,14 +39,14 @@ export default React.createClass({
   getClassList: function () {
     Ajax.getClassList(
       function success(response) {
-        console.log("AdminPortal.js| Retreived class list: " + JSON.stringify(response));
-        
+        console.log("AdminPortal.js| Retreived class list.");
+
         //convert classlist into format useable by Elemental Form-Select
         var classlistWithLabels = []
         for (var index = 0; index < response.length; index++){
           classlistWithLabels[index] = { "label": response[index] };
         }
-
+        
         this.setState({ classList: classlistWithLabels });
       }.bind(this),
       function error(xhr, status, error) {
@@ -59,7 +57,7 @@ export default React.createClass({
   getStudents: function () {
     Ajax.getStudents(
       function success(response) {
-        console.log("AdminPortal.js| Retreived students file: " + JSON.stringify(response));
+        console.log("AdminPortal.js| Retreived students file.");
         this.setState({ studentsObject: response });
       }.bind(this),
       function error(xhr, status, error) {

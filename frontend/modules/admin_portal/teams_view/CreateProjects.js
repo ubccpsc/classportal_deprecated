@@ -5,6 +5,7 @@ import ContentModule from '../../shared_components/ContentModule'
 export default React.createClass({
   createProjects: function (e) {
     e.preventDefault();
+    alert("Not yet implemented..");
     console.log("Created the projects!");
   },
   render: function () {

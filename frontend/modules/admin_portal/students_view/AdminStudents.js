@@ -12,59 +12,35 @@ export default React.createClass({
       console.log("AdminStudents.js| viewAll: " + this.state.viewAll);
     });
   },
-  renderTable: function () {
-    var studentsObject = this.props.students;
-    var myTeams = this.props.teams;
-    var numStudents = studentsObject.length;
-    var table;
-    var that = this;
-
-    function include(arr, obj) {
+  include: function(arr, obj) {
       var result = (arr.indexOf(obj) != -1);
       console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
       return (result);
-    }
-    
-    function renderStudents(studentsObject) {
-      var students = [];
-      for (var index = 0; index < numStudents; index++) {
-        //if viewAll is true, render all students; otherwise, only render students from myTeams.
-        if (that.state.viewAll ? true : include(myTeams, index.toString())) {
-          students.push(that.renderStudent(studentsObject[index]));
-        }
-      }
-      return students;
-    }  
-
-    table = (
-      <table className="tg">
-        <tbody>
-          <tr>
-            <th className="tg-yw4l">Student #</th>
-            <th className="tg-yw4l">Last</th>
-            <th className="tg-yw4l">First</th>
-            <th className="tg-yw4l">Team</th>
-            <th className="tg-yw4l">GitHub</th>
-            <th className="tg-yw4l">Grades</th>
-          </tr>
-          {renderStudents(studentsObject)}
-        </tbody>
-      </table>
-    );
-
-    return table;
   },
-  renderStudent: function (studentObject) {
+  renderStudents: function() {
+    var that = this;
+    var myTeams = this.props.teams;
+    var students = [];
+    for (var index = 0; index < this.props.students.length; index++) {
+      //if viewAll is true, render all students; otherwise, only render students from myTeams.
+      if (that.state.viewAll ? true : include(myTeams, index.toString())) {
+        students.push(that.renderStudent(index));
+      }
+    }
+    return students;
+  },
+  renderStudent: function (index) {
+    var student = this.props.students[index];
     return (
-      <tr>
-        <td className="tg-yw4l">{studentObject.sid}</td>
-        <td className="tg-yw4l">{studentObject.lastname}</td>
-        <td className="tg-yw4l">{studentObject.firstname}</td>
+      <tr key={index}>
+        <td className="tg-yw4l">{student.sid}</td>
+        <td className="tg-yw4l">{student.lastname}</td>
+        <td className="tg-yw4l">{student.firstname}</td>
         <td className="tg-yw4l">#</td>
         <td className="tg-yw4l">
-          {!!studentObject.github_name ?
-            <a href={"http://github.com/" + studentObject.github_name} target="blank" >
-              {studentObject.github_name}
+          {!!student.github_name ?
+            <a href={"http://github.com/" + student.github_name} target="blank" >
+              {student.github_name}
             </a>
             : "Not registered" }
         </td>
@@ -82,7 +58,20 @@ export default React.createClass({
             <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle View</Button>&nbsp;
           </FormField>
         </Form>
-        {!!this.props.students && this.renderTable()}
+        
+        <table className="tg">
+          <tbody>
+            <tr>
+              <th className="tg-yw4l">Student #</th>
+              <th className="tg-yw4l">Last</th>
+              <th className="tg-yw4l">First</th>
+              <th className="tg-yw4l">Team</th>
+              <th className="tg-yw4l">GitHub</th>
+              <th className="tg-yw4l">Grades</th>
+            </tr>
+            {!!this.props.students && this.renderStudents() }
+          </tbody>
+        </table>
       </ContentModule>
     )}
 })
