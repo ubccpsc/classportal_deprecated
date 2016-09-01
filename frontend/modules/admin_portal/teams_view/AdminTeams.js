@@ -62,7 +62,7 @@ export default React.createClass({
           <tbody>
             <tr>
               <th className="tg-yw4l">Team ID</th>
-              <th className="tg-yw4l">Repo</th>
+              <th className="tg-yw4l">GitHub</th>
               <th className="tg-yw4l">Members</th>
               <th className="tg-yw4l">Marks</th>
             </tr>

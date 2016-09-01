@@ -66,7 +66,7 @@ export default React.createClass({
         <h3>Register Account</h3>
         <p>Please confirm your student info below to continue.</p><br/><br/>
         <Form onSubmit={this.handleSubmit} className="form" type="horizontal">
-          <FormIconField label="Github Username" iconPosition="left" iconKey="mark-github">
+          <FormIconField label="GitHub Username" iconPosition="left" iconKey="mark-github">
             <FormInput placeholder={this.state.github} name="supported-controls-input-disabled" disabled />
           </FormIconField>
           <FormIconField label="UBC Student Number" iconPosition="left" iconKey="mortar-board">
