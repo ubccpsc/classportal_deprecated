@@ -153,7 +153,7 @@ export default class RouteHandler {
             3b) no matching csid's, so send error to app.
     */
     static registerAccount(req: restify.Request, res: restify.Response, next: restify.Next) {
-        var username = req.header('user');
+        var user = req.header('user');
         var csid = req.params.csid;
         var sid = req.params.sid;
         var validCSID = /^[a-z][0-9][a-z][0-9]$/;
@@ -163,65 +163,52 @@ export default class RouteHandler {
         Log.trace("registerAccount| Testing CSID and SID regex..");
         if (validCSID.test(csid) && validSID.test(sid)) {
             Log.trace("registerAccount| Valid regex.");
-            
-            //get class list then check if csid and sid exist and are a valid combination
-            RouteHandler.returnFile("class.csv", function (data: any) {
-                var lines = data.toString().split(/\n/);
-                Log.trace("registerAccount| Classlistlist retrieved. There are " + (lines.length - 1) + " students in the class list.");
-                        
-                // Splice up the first row to get the headings
-                var headings = lines[0].split(',');
-                
-                //data arrays are set up specifically for our class.csv format
-                //TODO: last names are unused in this function.
-                var csidArray: any[] = [];
-                var sidArray: any[] = [];
-                var lastArray: any[] = [];
-                var firstArray: any[] = [];
-                
-                // Split up the comma seperated values and sort into arrays
-                for (var index = 1; index < lines.length; index++) {
-                    var values = lines[index].split(',');
-                    csidArray.push(values[0]);
-                    sidArray.push(values[1]);
-                    lastArray.push(values[2]);
-                    firstArray.push(values[3]);
-                }
-                
-                //check if csid exists
-                Log.trace("registerAccount| Checking CSID..");
-                for (var index = 0; index < csidArray.length; index++) {
-                    if (csid == csidArray[index]) {
-                        //check if sid exists
-                        Log.trace("registerAccount| CSID Match! Checking SID..");
-                        if (sid == sidArray[index]) {
-                            Log.trace("registerAccount| SID Match! Updating student information..");
-                            RouteHandler.writeStudent(username, { "sid": sid, "csid": csid, "firstname": firstArray[index], "lastname": lastArray[index] }, function () {
-                                Log.trace("registerAccount| Account updated successfully. Sending user to homepage.");
-                                res.json(200, "success");
-                                return next();
-                            });
-                            //Log.trace("Error: writeStudent failed");
-                            //????
-                            return next();
-                        }
-                        else {
-                            //invalid login combination
-                            Log.trace("registerAccount| Error: Invalid CSID/SID combination. Returning..");
-                            res.send(500, "bad login");
-                            return next();
+
+            RouteHandler.returnFile("students.json", function (data: any) {
+                if (!!data && data.length != 0) {
+                    var studentsObject = JSON.parse(data);
+                    Log.trace("registerAccount| Classlist retrieved. There are " + (studentsObject.length) + " students in this class.");
+                    
+                    //check if csid exists
+                    Log.trace("registerAccount| Checking CSID..");
+                    for (var index = 0; index < studentsObject.length; index++) {
+                        if (csid == studentsObject[index].csid) {
+                            //check if sid exists
+                            Log.trace("registerAccount| CSID Match! Checking SID..");
+                            if (sid == studentsObject[index].sid) {
+                                Log.trace("registerAccount| SID Match! Updating student information..");
+                                
+                                //error: can't use "user" to identify
+                                RouteHandler.updateStudentObject(sid, { github_name: user }, function () {
+                                    Log.trace("registerAccount| Account updated successfully. Sending user to homepage.");
+                                    res.json(200, "success");
+                                    return next();
+                                });
+                                //Log.trace("Error: writeStudent failed");
+                                //????
+                                return;
+                            }
+                            else {
+                                //invalid login combination
+                                Log.trace("registerAccount| Error: Invalid CSID/SID combination. Returning..");
+                                res.send(500, "bad login");
+                                return;
+                            }
                         }
                     }
+                    Log.trace("registerAccount| Error: Invalid CSID. Returning..");
+                    res.send(500, "bad login");
+                    return;
                 }
-                Log.trace("registerAccount| Error: Invalid CSID. Returning..");
-                res.send(500, "bad login");
-                return next();
+                else {
+                    //error
+                }
             });
         }
         else {
             Log.trace("registerAccount| Error: Invalid SID or CSID regex. Returning..");
             res.send(500, "bad login");
-            return next();
+            return;
         }
     }
 
@@ -229,16 +216,26 @@ export default class RouteHandler {
         var user = req.header('user');
         
         Log.trace("getStudent| Retrieving student file..");
-        RouteHandler.returnStudent(user, function (response:any) {
+        RouteHandler.returnFile("students.json", function (response:any) {
             //return current student
-            if (response == null) {
+            if (response == null || response.length == 0) {
                 Log.trace("getStudent| Error! Student object: "+response);
                 res.json(500, "error");
             }
             else {
-                Log.trace("getStudent| Success! Returning..");
-                res.json(200, response);
-                return next();
+                var studentsObject = JSON.parse(response);
+
+                for (var index = 0; index < studentsObject.length; index++) {
+                    if (studentsObject[index].github_name == user) {
+                        Log.trace("getStudent| Success! Returning..");
+                        //todo: can't return github token over http!
+                        res.json(200, studentsObject[index]);
+                        return next();
+                    }
+                }
+                Log.trace("getStudent| Error! Returning..");
+                res.json(500, "error");
+                return;
             }
         });
     }
@@ -337,6 +334,7 @@ export default class RouteHandler {
         Log.trace("createTeam| Creating new team..");
         var user: string = req.header('user');
         var admin: string = req.header('admin');
+        var students: any = req.params.students;
 
         //todo: permissions: if not admin, can only set team with std1=user
         if (1) {
@@ -345,7 +343,7 @@ export default class RouteHandler {
             var newEntry = {
                 "team": file.length + 1,
                 "url": "",
-                "members": req.params.students
+                "members": students
             };
 
             Log.trace("createTeam| New team: " + JSON.stringify(newEntry));
@@ -362,7 +360,8 @@ export default class RouteHandler {
                     Log.trace("createTeam| Team added to teams.json");
 
                     for (var i = 0; i < req.params.students.length; i++) {
-                        RouteHandler.writeStudent(req.params.students[i], { "hasTeam": true }, function () {
+                        //todo: requires sid not username!!!
+                        RouteHandler.updateStudentObject(students[i], { "hasTeam": true }, function () {
                             Log.trace("createTeam| Updated " + req.params.students[i] + "'s team status.");
                         });
                     }
@@ -625,8 +624,6 @@ export default class RouteHandler {
         });
     }
     
-    //update keys in object in username file
-    //todo: rename writeStudent to updateStudent
     static writeStudent(username: string, paramsObject: any, callback: any) {
         Log.trace("writeStudent| Writing to user: " + username + " in students.json..");
         
@@ -664,6 +661,55 @@ export default class RouteHandler {
             Log.trace("writeStudent| Error: User was not found..");
             return;
         }
+    }
+
+    static include(arr:any, obj:any) {
+      var result = (arr.indexOf(obj) != -1);
+      console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
+      return (result);
+    }
+
+    //update students in students.json
+    //todo: add error callback to this (and all other functions)    
+    static updateStudentObject(sid: string, paramsObject: any, callback: any) {
+        Log.trace("updateStudentObject| Updating student: " + sid);
+        var filename = pathToRoot.concat(config.path_to_students); 
+        var file = require(filename);
+        var valuesUpdated:number = 0;
+
+        //step 1: check if sid exists
+        for (var index = 0; index < file.length; index++){
+            if (file[index].sid == sid) {
+                for (var key in paramsObject) {
+                    if (file[index].hasOwnProperty(key)) {
+                        Log.trace("updateStudentObject| New value for key: " + key);
+                        Log.trace("updateStudentObject| Old: " + file[index][key] + " New: " + paramsObject[key]);
+                        file[index][key] = paramsObject[key];
+                        valuesUpdated++;
+                    }
+                }
+                //only update file if at least 1 value was updated.
+                if (valuesUpdated > 0) {
+                    //step 3: write to file
+                    fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
+                        if (err) {
+                            Log.trace("updateStudentObject| Write unsuccessful: "+err.toString());
+                            return;
+                        }
+                        else {
+                            Log.trace("updateStudentObject| Write successful! Executing callback..");
+                            callback();
+                            return;
+                        }
+                    });
+                }
+                else {
+                    //no values to be updated
+                    return;
+                }
+            }
+        }
+        return;
     }
 
     static returnStudent(username: string, callback: any) {
@@ -766,104 +812,5 @@ export default class RouteHandler {
                 }
             }
         });
-    }
-    
-    //***OLD FUNCTIONS***//
-
-    static putSay(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.putSay()\nparams: '+JSON.stringify(req.params));
-        try {
-            // validate params
-            if (typeof req.params.val !== 'undefined') {
-                // let routeCtrl = new SayController();
-
-                let id = req.params.val;
-                let val = JSON.parse(req.body);
-
-                // let retVal = routeCtrl.say(id, val);
-                let retVal = 'foo';
-                res.json(200, retVal);
-            } else {
-                res.send(403);
-            }
-        } catch (err) {
-            Log.trace('RouteHandler.putSay() - ERROR: '+err.message);
-            res.send(404);
-        }
-
-        return next();
-    }
-    
-    static getEcho(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.getEcho()\nparams: '+JSON.stringify(req.params));
-
-        if (typeof req.params.message !== 'undefined' && req.params.message.length > 0) {
-            let val = req.params.message;
-            let ret = EchoController.echo(val);
-            res.json(200, { msg: ret });
-        } else {
-            res.json(400, { error: 'No message provided' });
-            //res.send(403);
-        }
-
-        return next();
-    }
-
-    static deleteStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-        return next();
-    }
-    
-    static getStudents(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.getStudents()\nparams: '+JSON.stringify(req.params));
-        let store = new MemoryStore();
-        store.createData();
-        res.json(200, store.getStudents());
-        return next();
-    }
-
-    static getStore(): Store {
-        return new MemoryStore();
-    }
-
-    static saveStore(store: MemoryStore): void {
-        store.persist();
-    }
-
-    static getStudentById(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.getStudentById()\nparams: '+JSON.stringify(req.params));
-        
-        
-        let store = new MemoryStore();
-        //store.createData();
-
-        var found = store.getStudent(req.params.id);
-        if (found) {
-            res.json(200, found);
-        }
-        else {
-            res.send(404, "student not found");
-        }
-        
-        store.persist();
-        return next();
-    }
-    
-    static createStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler.createStudent()\nparams: '+JSON.stringify(req.params));
-
-        var newStudent = new Student(req.body.id, req.body.name, req.body.studentNumber);
-
-        let store = new MemoryStore();
-        store.createData();
-
-        if (!req.body.hasOwnProperty('id') || !req.body.hasOwnProperty('name')) {
-            res.send(500, "error: not a student");
-        } else {
-            store.saveStudent(newStudent);
-            res.send(201, "Student "+req.body.name+" created!");
-        }
-
-
-        return next();
     }
 }
