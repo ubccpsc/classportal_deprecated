@@ -18,9 +18,19 @@ const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserv
 var config = require(pathToRoot + 'config.json');
 
 export default class RouteHandler { 
-    static getAllGrades(req:restify.Request, res: restify.Response, next: restify.Next) {
-        res.send(200, "suh, dude");
-        return;
+    static getAllGrades(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var sid = req.params.sid;
+        RouteHandler.returnFile("grades.json", function (error: any, data: any) {
+            if (!error) {
+                var myGrades = JSON.parse(data).sid;
+                res.send(200, myGrades);
+                return next();
+            }
+            else {
+                res.send(500, "error");
+                return;
+            }
+        });
     }
 
     /*
@@ -164,8 +174,8 @@ export default class RouteHandler {
         if (validCSID.test(csid) && validSID.test(sid)) {
             Log.trace("registerAccount| Valid regex.");
 
-            RouteHandler.returnFile("students.json", function (data: any) {
-                if (!!data && data.length != 0) {
+            RouteHandler.returnFile("students.json", function (error: any, data: any) {
+                if (!error && data.length > 0) {
                     var studentsObject = JSON.parse(data);
                     Log.trace("registerAccount| Classlist retrieved. There are " + (studentsObject.length) + " students in this class.");
                     
@@ -201,7 +211,8 @@ export default class RouteHandler {
                     return;
                 }
                 else {
-                    //error
+                    res.send(500, "error reading file");
+                    return;
                 }
             });
         }
@@ -216,15 +227,9 @@ export default class RouteHandler {
         var user = req.header('user');
         
         Log.trace("getStudent| Retrieving student file..");
-        RouteHandler.returnFile("students.json", function (response:any) {
-            //return current student
-            if (response == null || response.length == 0) {
-                Log.trace("getStudent| Error! Student object: "+response);
-                res.json(500, "error");
-            }
-            else {
-                var studentsObject = JSON.parse(response);
-
+        RouteHandler.returnFile("students.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                var studentsObject = JSON.parse(data);
                 for (var index = 0; index < studentsObject.length; index++) {
                     if (studentsObject[index].github_name == user) {
                         Log.trace("getStudent| Success! Returning..");
@@ -237,21 +242,25 @@ export default class RouteHandler {
                 res.json(500, "error");
                 return;
             }
+            else {
+                Log.trace("getStudent| Error! Student object: "+data);
+                res.json(500, "error");
+            }
         });
     }
 
     static getDeliverables(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("getDeliverables| Requesting file..");
-        RouteHandler.returnFile("deliverables.json", function (response: any) {
-            var data = JSON.parse(response);
-            if (data == null) {
-                Log.trace("getDeliverables| Error: Bad data. Returning..");
-                res.json(500, "null");
+        RouteHandler.returnFile("deliverables.json", function (error:any, data: any) {
+            if (!error && data.length > 0) {
+                var delivs = JSON.parse(data);
+                Log.trace("getDeliverables| Success! Returning..");
+                res.json(200, delivs);
                 return next();
             }
             else {
-                Log.trace("getDeliverables| Success! Returning..");
-                res.json(200, data);
+                Log.trace("getDeliverables| Error: Bad data. Returning..");
+                res.json(500, "null");
                 return next();    
             }
         });
@@ -263,31 +272,19 @@ export default class RouteHandler {
         
         //check sid with regex
         if (sid.match(/^\d{8}$/)) {
-            Log.trace("getGrades| Valid regex.");
-
-            //read grades.csv
-            RouteHandler.returnFile("grades.csv", function (data:any) {
-                Log.trace("getGrades| Getting grades..");
-                
-                var lines = data.toString().split(/\n/);
-                var myGrades: any[] = [];
-                // Split up the comma seperated values and sort into arrays
-                for (var i = 1; i < lines.length; i++) {
-                    var values = lines[i].split(',');
-                    if (values[0] == sid) {
-                        for (var j = 1; j < values.length; j++){
-                            myGrades.push(values[j]);
-                        }
-                    }
-                }
-
-                if (myGrades.length > 0) {
+            Log.trace("getGrades| Valid regex. Getting grades..");
+            
+            RouteHandler.returnFile("grades.json", function (error: any, data: any) {
+                if (!error && data.length > 0) {
+                    var myGrades = JSON.parse(data).sid;
                     Log.trace("getGrades| Success! Returning..");
-                    res.json(200, myGrades);    
-                }
+                    res.json(200, myGrades);
+                    return next();
+                }                    
                 else {
-                    Log.trace("getGrades| sid not found. Returning error..");
+                    Log.trace("getGrades| Grades not found. Returning error..");
                     res.json(500, "student not found");
+                    return;
                 }
             });
         }
@@ -406,9 +403,9 @@ export default class RouteHandler {
                     else {
                         Log.trace("updateClasslist| Write successful!");
                         //read new classlist
-                        RouteHandler.returnFile("classlist.csv", function (response: any) {
-                            var classArray = response.toString().split(/\n/);
-                            if (!!classArray) {
+                        RouteHandler.returnFile("classlist.csv", function (error: any, data: any) {
+                            if (!error && data.length > 0) {
+                                var classArray = data.toString().split(/\n/);
                                 //update students.json
                                 Log.trace("updateClasslist| Updating student file..");
                                 RouteHandler.updateStudents(classArray, function (success: boolean) {
@@ -428,7 +425,7 @@ export default class RouteHandler {
                                 Log.trace("updateClasslist| Error reading classlist! Returning..");
                                 res.send(500, "error: could not read classlist")
                                 return;
-                            }            
+                            }       
                         });
                     }
                 });
@@ -439,9 +436,9 @@ export default class RouteHandler {
     static getClasslist(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("getClasslist| Getting class list..");
         
-        RouteHandler.returnFile("students.json", function (response: any) {
-            if (!!response && response.length !== 0) {
-                var studentsObject = JSON.parse(response);
+        RouteHandler.returnFile("students.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                var studentsObject = JSON.parse(data);
                 var namesArray: any[] = [];
                 
                 for (var index = 0; index < studentsObject.length; index++) {
@@ -451,25 +448,29 @@ export default class RouteHandler {
 
                 Log.trace("getClasslist| Sending array of names..");
                 res.json(200, namesArray);
+                return next();
             }
             else {
                 Log.trace("getClasslist| Error reading classlist..");
                 res.json(500, "error");
+                return;
             }
         })
     }
 
     static getAllStudents(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("getAllStudents| Getting students..");
-        RouteHandler.returnFile("students.json", function (response: any) {
-            if (!!response && response.length !== 0) {
-                var studentsObject = JSON.parse(response);
+        RouteHandler.returnFile("students.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                var studentsObject = JSON.parse(data);
                 Log.trace("getAllStudents| Sending students object..");
                 res.json(200, studentsObject);
+                return next();
             }
             else {
                 Log.trace("getClasslist| Error reading classlist..");
                 res.json(500, "error");
+                return;
             }
         })
     }
@@ -480,13 +481,13 @@ export default class RouteHandler {
     //in classlist, not in students.json. if not, redirect to error page (Please email prof holmes @ ..)
     //todo: make sure we don't overwrite existing info by accident!
     static updateStudents(classlist:any, callback:any) {
-        RouteHandler.returnFile("students.json", function (response: any) {
+        RouteHandler.returnFile("students.json", function (error: any, data:any) {
             var studentsFile: any[];
 
             //check if response exists and is not 0-length file
             //todo: look into streams instead of fs.readFile
-            if (!!response && response.length !== 0) {    
-                studentsFile = JSON.parse(response);
+            if (!error && data.length > 0) {
+                studentsFile = JSON.parse(data);
             }
             else {
                 studentsFile = [];
@@ -746,13 +747,13 @@ export default class RouteHandler {
 
         fs.readFile(filename, function read(err: any, data: any) {
             if (err) {
-                Log.trace("returnFile| Error reading file: " + err.toString());
-                //todo: should we callback(null)?
+                Log.trace("returnFile| Error reading file! Returning error..");
+                callback(true, null);
                 return;
             }
             else {
-                Log.trace("returnFile| File read successfully. Executing callback..");
-                callback(data);
+                Log.trace("returnFile| File read successfully! Returning data..");
+                callback(null, data);
                 return;
             }
         });

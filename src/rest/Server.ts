@@ -152,7 +152,6 @@ function requireTempToken(req: restify.Request, res: restify.Response, next: res
 //can be called by both regular users (students) and admins.
 function requireToken(req: restify.Request, res: restify.Response, next: restify.Next) {
     Log.trace("checkToken| Checking token..");
-    
     var user: string = req.header('user');
     var token: string = req.header('token');
     var admin: string = req.header('admin');
@@ -160,26 +159,33 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
     //check that user & token fields are non-empty
     if (!!user && !!token) {
         //evaluate token and continue to next middleware if match
-        RouteHandler.returnFile("tokens.json", function (response: any) {
-            var file = JSON.parse(response);
-            var servertoken: string;
-            
-            //get saved token
-            if (admin === "true") {
-                servertoken = file.admins[user];
+        RouteHandler.returnFile("tokens.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                var file = JSON.parse(data);
+                var servertoken: string;
+                
+                //get saved token
+                if (admin === "true") {
+                    servertoken = file.admins[user];
+                }
+                else {
+                    servertoken = file.students[user];
+                }
+                
+                //the next middleware called can be accessed by both students and admins alike.
+                if (!!servertoken && (token === servertoken)) {
+                    Log.trace("checkToken| Tokens match! Continuing to next middleware..\n----------------------------------------------------");
+                    return next();
+                }
+                else {
+                    Log.trace("checkToken| Error: Tokens do not match (" + token + ":" + servertoken + ") Returning..");
+                    res.send(500, "bad request");
+                    return;
+                }
             }
             else {
-                servertoken = file.students[user];
-            }
-            
-            //the next middleware called can be accessed by both students and admins alike.
-            if (!!servertoken && (token === servertoken)) {
-                Log.trace("checkToken| Tokens match! Continuing to next middleware..\n----------------------------------------------------");
-                return next();
-            }
-            else {
-                Log.trace("checkToken| Error: Tokens do not match (" + token + ":" + servertoken + ") Returning..");
-                res.send(500, "bad request");
+                Log.trace("checkToken| Could not read file! Returning..");
+                res.send(500, "Error reading tokens.json");
                 return;
             }
         });
