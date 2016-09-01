@@ -105,7 +105,7 @@ export default class GithubProjectController {
      * @param teamName
      * @returns {Promise<T>}
      */
-    public listTeams(): Promise<[]> {
+    public listTeams(): Promise<{}> {
         let ctx = this;
 
         Log.info("GithubProjectController::listTeams(..) - start");
