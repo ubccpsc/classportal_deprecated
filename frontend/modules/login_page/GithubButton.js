@@ -4,7 +4,7 @@ import { Glyph, Col, Row, Button, Alert, Form, FormField } from 'elemental'
 export default React.createClass({
   handleSubmit: function (event) {
     event.preventDefault();
-    window.location = "https://github.com/login/oauth/authorize?client_id=97ae59518a9d5cae2550&redirect_uri=http://localhost:4321/postlogin";
+    window.location = "https://github.com/login/oauth/authorize?client_id=7e8402ce48a2c3f08ca1&redirect_uri=http://skaha.cs.ubc.ca:8020/postlogin";
   },
   render: function () {
     return (
