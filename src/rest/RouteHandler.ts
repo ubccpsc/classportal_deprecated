@@ -311,12 +311,12 @@ export default class RouteHandler {
         fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
             if (err) {
                 Log.trace("deleteServerToken| Error: Write unsuccessful. Returning..");
-                res.send(500, "bad logout")
+                res.send(500, "bad logout");
                 return next();
             }
             else {
                 Log.trace("deleteServerToken| Success! Returning..");
-                res.send(200, "success")
+                res.send(200, "success");
                 return next();
             }
         });
@@ -350,7 +350,7 @@ export default class RouteHandler {
             fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
                 if (err) {
                     Log.trace("createTeam| Write error: " + err.toString());
-                    res.send(500, "error")
+                    res.send(500, "error");
                     return;
                 }
                 else {
@@ -364,14 +364,14 @@ export default class RouteHandler {
                     }
                     
                     Log.trace("createTeam| Team " + newEntry.id + " created! Returning..");
-                    res.send(200, newEntry.id)
+                    res.send(200, newEntry.id);
                     return next();
                 }
             });
         }
         else {
             Log.trace("createTeam| Error: Bad permission");
-            res.send(500, "bad permissions")
+            res.send(500, "bad permissions");
             return;
         }
     }
