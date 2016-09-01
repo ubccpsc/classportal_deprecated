@@ -15,9 +15,9 @@ export default React.createClass({
   getInitialState: function() {
     return {
       adminObject: {
-          role: "Prof",
+          role: "TA",
           firstname: "Michael",
-          teams: ["1", "2", "3"]
+          teams: ["1", "2"]
         },
       teamsObject: '',
       studentsObject: '',

@@ -15,8 +15,9 @@ export default React.createClass({
     var deliverable = this.props.deliverables[index];
     return (
       <tr key={index}>
-        <td className="tg-edam">
-          <a href={deliverable.url} target="blank" >{deliverable.name}</a>
+        <td className="tg-edam">{deliverable.name}</td>
+        <td className="tg-yw4l">
+          <a href={deliverable.url} target="blank" >View</a>
         </td>
         <td className="tg-yw4l">{deliverable.open}</td>
         <td className="tg-yw4l">{deliverable.due}</td>
@@ -30,10 +31,11 @@ export default React.createClass({
         <table className="tg">
           <tbody>
             <tr>
+              <th className="tg-yw4l">Name</th>
               <th className="tg-yw4l">Link</th>
-              <th className="tg-yw4l">Open Date</th>
-              <th className="tg-yw4l">Due Date</th>
-              <th className="tg-yw4l">Release Date</th>
+              <th className="tg-yw4l">Open</th>
+              <th className="tg-yw4l">Due</th>
+              <th className="tg-yw4l">Release</th>
             </tr>
             {!!this.props.deliverables && this.renderDeliverables() }
           </tbody>

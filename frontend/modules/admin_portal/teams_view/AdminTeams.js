@@ -4,7 +4,7 @@ import ContentModule from '../../shared_components/ContentModule'
 
 export default React.createClass({
   getInitialState: function () {
-    return { viewAll: false };
+    return { viewAll: true };
   },
   toggleView: function (e) {
     e.preventDefault();
@@ -39,7 +39,10 @@ export default React.createClass({
               View
             </a>
             : "Not set" }</td>
-        <td className="tg-yw4l">{team.members}</td>
+        <td className="tg-edam">
+          <a href="" target="blank">{team.members[0]}</a>,&nbsp;
+          <a href="" target="blank">{team.members[1]}</a>
+        </td>
         <td className="tg-yw4l">
           <a href="" target="blank">View / Submit</a>
         </td>

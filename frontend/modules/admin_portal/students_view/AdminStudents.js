@@ -37,13 +37,14 @@ export default React.createClass({
         <td className="tg-yw4l">{student.sid}</td>
         <td className="tg-yw4l">{student.lastname}</td>
         <td className="tg-yw4l">{student.firstname}</td>
-        <td className="tg-yw4l">#</td>
+        <td className="tg-yw4l">
+          {!!student.hasTeam ? "#": "-" }</td>
         <td className="tg-yw4l">
           {!!student.github_name ?
             <a href={"http://github.com/" + student.github_name} target="blank" >
               {student.github_name}
             </a>
-            : "Not registered" }</td>
+            : "-" }</td>
         <td className="tg-yw4l">
           <a>View/Edit</a>
         </td>
