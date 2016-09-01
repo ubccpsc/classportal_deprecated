@@ -57,6 +57,24 @@ module.exports = {
         });
     },
 
+    getAdmin: function (successCallback, errorCallback) {
+        console.log("Ajax.js| Getting admin..");
+        $.ajax({
+            type: "POST",
+            url: 'http://' + Config.host + ':' + Config.port + '/api/getAdmin',
+            headers: {
+                "user": localStorage.user,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: {},
+            dataType: 'json',
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
+    
     getClassList: function (successCallback, errorCallback) {
         console.log("Ajax.js| Getting classlist..");
         $.ajax({

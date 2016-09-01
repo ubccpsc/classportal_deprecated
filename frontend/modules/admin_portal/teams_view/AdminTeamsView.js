@@ -11,7 +11,7 @@ export default React.createClass({
       <div>
         <AdminTeams teams={this.props.teams} myTeams={this.props.admin.teams} />
         <CreateTeam classList={this.props.classList} />
-        {this.props.admin.role === "Prof" && (<CreateProjects/>)}
+        {this.props.admin.prof && (<CreateProjects/>)}
       </div>
     )}
 })

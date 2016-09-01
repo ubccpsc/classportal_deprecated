@@ -32,7 +32,7 @@ export default React.createClass({
     var team = this.props.teams[index];
     return (
       <tr key={index}>
-        <td className="tg-yw4l">{team.number}</td>
+        <td className="tg-yw4l">{team.id}</td>
         <td className="tg-yw4l">
           {!!team.url ?
             <a href={team.url} target="blank" >
@@ -61,7 +61,7 @@ export default React.createClass({
         <table className="tg">
           <tbody>
             <tr>
-              <th className="tg-yw4l">Team</th>
+              <th className="tg-yw4l">Team ID</th>
               <th className="tg-yw4l">Repo</th>
               <th className="tg-yw4l">Members</th>
               <th className="tg-yw4l">Marks</th>

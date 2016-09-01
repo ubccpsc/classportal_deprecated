@@ -338,7 +338,7 @@ export default class RouteHandler {
             var filename = pathToRoot.concat(config.path_to_teams);
             var file = require(filename);        
             var newEntry = {
-                "number": file.length + 1,
+                "id": file.length + 1,
                 "url": "",
                 "members": students
             };
@@ -363,8 +363,8 @@ export default class RouteHandler {
                         });
                     }
                     
-                    Log.trace("createTeam| Team " + newEntry.number + " created! Returning..");
-                    res.send(200, newEntry.number)
+                    Log.trace("createTeam| Team " + newEntry.id + " created! Returning..");
+                    res.send(200, newEntry.id)
                     return next();
                 }
             });
@@ -492,6 +492,25 @@ export default class RouteHandler {
         })
     }
     
+    static getAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var username = req.header('user');
+        
+        Log.trace("getAdmin| Getting admin file..");
+        RouteHandler.returnFile("admins.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                var admin = JSON.parse(data)[username];
+                Log.trace("getAllStudents| Sending admin.." + JSON.stringify(admin));
+                res.json(200, admin);
+                return next();
+            }
+            else {
+                Log.trace("getAdmin| Error reading file..");
+                res.json(500, "error");
+                return;
+            }
+        })
+    }
+
     //***HELPER FUNCTIONS***//
 
     //todo: on login, let students only log in if student exists

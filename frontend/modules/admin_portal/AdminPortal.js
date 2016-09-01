@@ -14,11 +14,7 @@ var util = require('util');
 export default React.createClass({
   getInitialState: function() {
     return {
-      adminObject: {
-          role: "TA",
-          firstname: "Michael",
-          teams: ["1", "2"]
-        },
+      adminObject: '',
       teamsObject: '',
       studentsObject: '',
       gradesObject: '',
@@ -26,43 +22,14 @@ export default React.createClass({
       classList: ''
     };
   },
-  getDeliverables: function () {
-    Ajax.getDeliverables(
-      function success (response) {
-        console.log("AdminDeliverables.js| Retrieved "+response.length+" deliverables.");
-        this.setState({ deliverablesObject: response });
-      }.bind(this),
-      function error (xhr, status, err) {
-        console.log("AdminDeliverables.js| Error retrieving deliverables!");
-      }.bind(this)
-    )
-  },
-  getClassList: function () {
-    Ajax.getClassList(
+  getAdmin: function () {
+    Ajax.getAdmin(
       function success(response) {
-        console.log("AdminPortal.js| Retreived class list.");
-
-        //convert classlist into format useable by Elemental Form-Select
-        var classlistWithLabels = []
-        for (var index = 0; index < response.length; index++){
-          classlistWithLabels[index] = { "label": response[index] };
-        }
-        
-        this.setState({ classList: classlistWithLabels });
+        console.log("AdminPortal.js| Retreived admin file. " + response);
+        this.setState({ adminObject: response });
       }.bind(this),
       function error(xhr, status, error) {
-        console.log("AdminPortal.js| Error getting classlist!");
-      }.bind(this)
-    )
-  },
-  getStudents: function () {
-    Ajax.getStudents(
-      function success(response) {
-        console.log("AdminPortal.js| Retreived students file.");
-        this.setState({ studentsObject: response });
-      }.bind(this),
-      function error(xhr, status, error) {
-        console.log("AdminPortal.js| Error getting classlist!");
+        console.log("AdminPortal.js| Error getting admin!");
       }.bind(this)
     )
   },
@@ -77,7 +44,48 @@ export default React.createClass({
       }.bind(this)
     )
   },
+  getStudents: function () {
+    Ajax.getStudents(
+      function success(response) {
+        console.log("AdminPortal.js| Retreived students file.");
+        this.setState({ studentsObject: response });
+      }.bind(this),
+      function error(xhr, status, error) {
+        console.log("AdminPortal.js| Error getting students!");
+      }.bind(this)
+    )
+  },
+  getDeliverables: function () {
+    Ajax.getDeliverables(
+      function success (response) {
+        console.log("AdminDeliverables.js| Retrieved deliverables file.");
+        this.setState({ deliverablesObject: response });
+      }.bind(this),
+      function error (xhr, status, err) {
+        console.log("AdminDeliverables.js| Error retrieving deliverables!");
+      }.bind(this)
+    )
+  },
+  getClassList: function () {
+    Ajax.getClassList(
+      function success(response) {
+        console.log("AdminPortal.js| Retreived classlist.");
+
+        //convert classlist into format useable by Elemental Form-Select
+        var classlistWithLabels = []
+        for (var index = 0; index < response.length; index++){
+          classlistWithLabels[index] = { "label": response[index] };
+        }
+        
+        this.setState({ classList: classlistWithLabels });
+      }.bind(this),
+      function error(xhr, status, error) {
+        console.log("AdminPortal.js| Error getting classlist!");
+      }.bind(this)
+    )
+  },
   componentDidMount: function () {
+    this.getAdmin();
     this.getDeliverables();
     this.getClassList();
     this.getStudents();
@@ -114,7 +122,7 @@ export default React.createClass({
           </Row>
         </div>
 
-        <Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.role} user={localStorage.user}/>
+        <Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.prof ? "Prof" : "TA"} user={localStorage.user}/>
 
         {!!this.state.deliverablesObject && !!this.state.classList && childrenWithProps}
 
