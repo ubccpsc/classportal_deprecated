@@ -5,6 +5,7 @@
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",
     "form-data": "registry:dt/form-data#0.0.0+20160316155526",
     "mocha": "registry:dt/mocha#2.2.5+20160619032855",
+    "moment": "registry:dt/moment#2.11.1+20160829143156",
     "node": "registry:dt/node#6.0.0+20160621231320",
     "request": "registry:dt/request#0.0.0+20160524135346",
     "request-promise": "registry:dt/request-promise#0.4.2+20160316155526",
