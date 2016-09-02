@@ -278,6 +278,8 @@ export default class RouteHandler {
                 if (!error && data.length > 0) {
                     var myGrades = JSON.parse(data).sid;
                     Log.trace("getGrades| Success! Returning..");
+                    // TODO: if the user is an admin, return
+                    // TODO: if the user is not an admin, make sure the release date for the deliverable has been passed before returning a grade
                     res.json(200, myGrades);
                     return next();
                 }                    
