@@ -204,5 +204,25 @@ module.exports = {
             success: successCallback,
             error: errorCallback
         });
+    },
+
+    register: function(sid, csid, successCallback, errorCallback) {
+        console.log("Ajax.js| Registering student..");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/register",
+            headers: {
+                "user": localStorage.user,
+                "token": localStorage.token,
+            },
+            data: {
+                "sid": sid,
+                "csid": csid
+            },
+            dataType: 'json',
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
     }
 }
