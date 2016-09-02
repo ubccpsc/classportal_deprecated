@@ -21,10 +21,6 @@ export default React.createClass({
         </td>
         <td className="tg-edam">{deliverable.open}</td>
         <td className="tg-edam">{deliverable.due}</td>
-        <!--
-         Don't show grad release date
-        <td className="tg-edam">{deliverable.gradeRelease}</td>
-        -->
       </tr>
     );
   },
@@ -38,10 +34,6 @@ export default React.createClass({
               <th className="tg-yw4l">Link</th>
               <th className="tg-yw4l">Open</th>
               <th className="tg-yw4l">Due</th>
-              <!--
-              Don't show grad release date
-              <th className="tg-yw4l">Release</th>
-              -->
             </tr>
             {!!this.props.deliverables && this.renderDeliverables() }
           </tbody>

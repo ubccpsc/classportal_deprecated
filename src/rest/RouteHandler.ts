@@ -4,7 +4,6 @@
 
 import restify = require('restify');
 import http = require('http');
-import qs = require('querystring');
 import request = require('request');
 import fs = require('fs');
 

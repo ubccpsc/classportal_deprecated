@@ -1,12 +1,12 @@
 import React from 'react'
-import Config from 'Config';
+import config from 'config';
 
 module.exports = {
     getStudent: function (successCallback, errorCallback) {
         console.log("Ajax.js| Getting students..");
         $.ajax({
-            type: 'POST',
-            url: 'http://' + Config.host + ':' + Config.port + '/api/getStudent',
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/getStudent",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
@@ -23,8 +23,8 @@ module.exports = {
     getDeliverables: function (successCallback, errorCallback) {
         console.log("Ajax.js| Getting deliverables..");
         $.ajax({
-            type: 'POST',
-            url: 'http://' + Config.host + ':' + Config.port + '/api/getDeliverables',
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/getDeliverables",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
@@ -42,8 +42,8 @@ module.exports = {
     getGrades: function (data, successCallback, errorCallback) {
         console.log("Ajax.js| Getting grades..");
         $.ajax({
-            type: 'POST',
-            url: 'http://' + Config.host + ':' + Config.port + '/api/getGrades',
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/getGrades",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
@@ -61,14 +61,14 @@ module.exports = {
         console.log("Ajax.js| Getting admin..");
         $.ajax({
             type: "POST",
-            url: 'http://' + Config.host + ':' + Config.port + '/api/getAdmin',
+            url: "http://" + config.host + ":" + config.port + "/api/getAdmin",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
             data: {},
-            dataType: 'json',
+            dataType: "json",
             cache: false,
             success: successCallback,
             error: errorCallback
@@ -79,14 +79,14 @@ module.exports = {
         console.log("Ajax.js| Getting classlist..");
         $.ajax({
             type: "POST",
-            url: 'http://' + Config.host + ':' + Config.port + '/api/getClassList',
+            url: "http://" + config.host + ":" + config.port + "/api/getClassList",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
             data: {},
-            dataType: 'json',
+            dataType: "json",
             cache: false,
             success: successCallback,
             error: errorCallback
@@ -97,14 +97,14 @@ module.exports = {
         console.log("Ajax.js| Getting students..");
         $.ajax({
             type: "POST",
-            url: 'http://' + Config.host + ':' + Config.port + '/api/getStudentsAdmin',
+            url: "http://" + config.host + ":" + config.port + "/api/getStudentsAdmin",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
             data: {},
-            dataType: 'json',
+            dataType: "json",
             cache: false,
             success: successCallback,
             error: errorCallback
@@ -115,14 +115,14 @@ module.exports = {
         console.log("Ajax.js| Getting teams..");
         $.ajax({
             type: "POST",
-            url: 'http://' + Config.host + ':' + Config.port + '/api/getTeamsAdmin',
+            url: "http://" + config.host + ":" + config.port + "/api/getTeamsAdmin",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
             data: {},
-            dataType: 'json',
+            dataType: "json",
             cache: false,
             success: successCallback,
             error: errorCallback
@@ -134,14 +134,14 @@ module.exports = {
         console.log("Ajax.js| Logging out..");
         $.ajax({
             type: "POST",
-            url: 'http://' + Config.host + ':' + Config.port + '/api/logout',
+            url: "http://" + config.host + ":" + config.port + "/api/logout",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
             data: {},
-            dataType: 'json',
+            dataType: "json",
             cache: false,
             success: successCallback,
             error: errorCallback
@@ -153,14 +153,14 @@ module.exports = {
         console.log("Ajax.js| Creating team..");
         $.ajax({
             type: "POST",
-            url: 'http://' + Config.host + ':' + Config.port + '/api/createTeam',
+            url: "http://" + config.host + ":" + config.port + "/api/createTeam",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
             data: data,
-            dataType: 'json',
+            dataType: "json",
             cache: false,
             success: successCallback,
             error: errorCallback
@@ -172,7 +172,7 @@ module.exports = {
         console.log("Ajax.js| Submitting new class list..");
         $.ajax({
             type: "POST",
-            url: 'http://' + Config.host + ':' + Config.port + '/api/submitClassList',
+            url: "http://" + config.host + ":" + config.port + "/api/submitClassList",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
@@ -182,6 +182,25 @@ module.exports = {
             cache: false,
             contentType: false,
             processData: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
+
+    authenticateAuthcode: function (authcode, successCallback, errorCallback) {
+        console.log("Ajax.js| Authenticating authcode..");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/authenticate",
+            headers: {
+                "user": "temp",
+                "token": "temp"
+            },
+            data: {
+                "authcode": authcode
+            },
+            dataType: "json",
+            cache: false,
             success: successCallback,
             error: errorCallback
         });

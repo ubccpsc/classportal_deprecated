@@ -76,7 +76,7 @@ export default React.createClass({
               <th className="tg-yw4l">Team ID</th>
               <th className="tg-yw4l">GitHub</th>
               <th className="tg-yw4l">Members</th>
-              <th className="tg-yw4l">Marks</th>
+              <th className="tg-yw4l">Grades</th>
             </tr>
             {!!this.props.teams && this.renderTeams() }
           </tbody>

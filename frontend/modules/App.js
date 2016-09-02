@@ -1,5 +1,5 @@
 import React from 'react'
-import Config from 'Config';
+import config from 'config';
 
 export default React.createClass({
   render: function () {
@@ -7,8 +7,8 @@ export default React.createClass({
       <div>
         <div id="titlebar">
           <img id="titlebar-img" src="UBCLogo_Reverse.png"/>
-          <h1 id="titlebar-text">{Config.titlebar} | </h1>
-          <h3 id="titlebar-subtext">{Config.titlebar_subtext}</h3>
+          <h1 id="titlebar-text">{config.titlebar} | </h1>
+          <h3 id="titlebar-subtext">{config.titlebar_subtext}</h3>
         </div>
         <div id="body-css">
           {this.props.children}

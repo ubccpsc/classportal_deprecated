@@ -1,10 +1,14 @@
 import React from 'react'
 import { Glyph, Col, Row, Button, Alert, Form, FormField } from 'elemental'
+import config from 'config'
 
 export default React.createClass({
   handleSubmit: function (event) {
     event.preventDefault();
-    window.location = "https://github.com/login/oauth/authorize?client_id=7e8402ce48a2c3f08ca1&redirect_uri=http://skaha.cs.ubc.ca:8020/postlogin";
+    
+    var client_id = config.client_id;
+    var redirect_uri = "http://" + config.host + ":" + config.port + "/postlogin";
+    window.location = "https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=" + redirect_uri;
   },
   render: function () {
     return (
