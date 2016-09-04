@@ -26,6 +26,8 @@ import Log from "../Util";
 import RouteHandler from './RouteHandler';
 const path = require('path');
 
+import Helper from './Helper';
+
 export default class Server {
 
     private port:number;
@@ -161,7 +163,7 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
     //check that user & token fields are non-empty
     if (!!user && !!token) {
         //evaluate token and continue to next middleware if match
-        RouteHandler.returnFile("tokens.json", function (error: any, data: any) {
+        Helper.returnFile("tokens.json", function (error: any, data: any) {
             if (!error && data.length > 0) {
                 var file = JSON.parse(data);
                 var servertoken: string;
