@@ -15,7 +15,7 @@ export default React.createClass({
       studentObject: '',
       deliverablesObject: '',
       gradesObject: '',
-      classList: ''
+      classlist: ''
     };
   },
   //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json  
@@ -68,7 +68,7 @@ export default React.createClass({
           classlistWithLabels[index] = { "label": response[index] };
         }
         
-        this.setState({ classList: classlistWithLabels });
+        this.setState({ classlist: classlistWithLabels });
       }.bind(this),
       function error(xhr, status, error) {
         console.log("StudentPortal.js| Error getting classlist!");
@@ -86,7 +86,7 @@ export default React.createClass({
 
         {!!this.state.studentObject.team ?
           (<DisplayTeam teamNumber={this.state.studentObject.team}/>) :
-            !!this.state.classList && (<CreateTeam classList={this.state.classList} studentName={this.state.studentObject.firstname + " " + this.state.studentObject.lastname} />) }
+            !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} studentName={this.state.studentObject.firstname + " " + this.state.studentObject.lastname} />) }
             
         <Deliverables deliverables={this.state.deliverablesObject}/>
         

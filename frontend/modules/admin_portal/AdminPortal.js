@@ -22,6 +22,7 @@ export default React.createClass({
       classList: ''
     };
   },
+  //returns admin object from admins.json
   getAdmin: function () {
     Ajax.getAdmin(
       function success(response) {
@@ -33,6 +34,7 @@ export default React.createClass({
       }.bind(this)
     )
   },
+  //returns teams.json
   getTeams: function () {
     Ajax.getTeams(
       function success(response) {
@@ -44,6 +46,7 @@ export default React.createClass({
       }.bind(this)
     )
   },
+  //returns students.json
   getStudents: function () {
     Ajax.getStudents(
       function success(response) {
@@ -55,6 +58,7 @@ export default React.createClass({
       }.bind(this)
     )
   },
+  //returns deliverables.json
   getDeliverables: function () {
     Ajax.getDeliverables(
       function success (response) {
@@ -63,24 +67,6 @@ export default React.createClass({
       }.bind(this),
       function error (xhr, status, err) {
         console.log("AdminDeliverables.js| Error retrieving deliverables!");
-      }.bind(this)
-    )
-  },
-  getClassList: function () {
-    Ajax.getClassList(
-      function success(response) {
-        console.log("AdminPortal.js| Retreived classlist.");
-
-        //convert classlist into format useable by Elemental Form-Select
-        var classlistWithLabels = []
-        for (var index = 0; index < response.length; index++){
-          classlistWithLabels[index] = { "label": response[index] };
-        }
-        
-        this.setState({ classList: classlistWithLabels });
-      }.bind(this),
-      function error(xhr, status, error) {
-        console.log("AdminPortal.js| Error getting classlist!");
       }.bind(this)
     )
   },
