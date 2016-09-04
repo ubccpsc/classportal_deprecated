@@ -28,7 +28,7 @@ export default React.createClass({
 
     console.log("files: " + JSON.stringify(files));
     
-    Ajax.submitClassList(
+    Ajax.submitClasslist(
       files,
       function success() {
         alert("Successfully updated classlist!");

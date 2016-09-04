@@ -88,14 +88,14 @@ export default class Server {
                 that.rest.post('/api/getStudent', logRequest, requireToken, RouteHandler.getStudent);
                 that.rest.post('/api/getDeliverables', logRequest, requireToken, RouteHandler.getDeliverables);
                 that.rest.post('/api/getGrades', logRequest, requireToken, RouteHandler.getGrades);
-                that.rest.post('/api/getClassList', logRequest, requireToken, RouteHandler.getClasslist);
+                that.rest.post('/api/getClasslist', logRequest, requireToken, RouteHandler.getClasslist);
                 that.rest.post('/api/createTeam', logRequest, requireToken, RouteHandler.createTeam);
                 
                 //called by logout button
                 that.rest.post('/api/logout', logRequest, requireToken, RouteHandler.deleteServerToken);
                 
                 /* Requires ADMIN token */
-                that.rest.post('/api/submitClassList', logRequest, requireAdmin, requireToken, RouteHandler.updateClasslist);
+                that.rest.post('/api/submitClasslist', logRequest, requireAdmin, requireToken, RouteHandler.updateClasslist);
                 that.rest.post('/api/getAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAdmin);
                 that.rest.post('/api/getGradesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllGrades);
                 that.rest.post('/api/getStudentsAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllStudents);

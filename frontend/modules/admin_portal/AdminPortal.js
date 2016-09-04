@@ -19,7 +19,7 @@ export default React.createClass({
       studentsObject: '',
       gradesObject: '',
       deliverablesObject: '',
-      classList: ''
+      classlist: ''
     };
   },
   //returns admin object from admins.json
@@ -62,18 +62,36 @@ export default React.createClass({
   getDeliverables: function () {
     Ajax.getDeliverables(
       function success (response) {
-        console.log("AdminDeliverables.js| Retrieved deliverables file.");
+        console.log("AdminPortal.js| Retrieved deliverables file.");
         this.setState({ deliverablesObject: response });
       }.bind(this),
       function error (xhr, status, err) {
-        console.log("AdminDeliverables.js| Error retrieving deliverables!");
+        console.log("AdminPortal.js| Error retrieving deliverables!");
+      }.bind(this)
+    )
+  },
+  getClasslist: function () {
+    Ajax.getClasslist(
+      function success(response) {
+        console.log("AdminPortal.js| Retrieved class list:" + response);
+        
+        //convert classlist into format useable by Elemental Form-Select
+        var classlistWithLabels = []
+        for (var index = 0; index < response.length; index++){
+          classlistWithLabels[index] = { "label": response[index] };
+        }
+        
+        this.setState({ classlist: classlistWithLabels });
+      }.bind(this),
+      function error(xhr, status, error) {
+        console.log("AdminPortal.js| Error getting classlist!");
       }.bind(this)
     )
   },
   componentDidMount: function () {
     this.getAdmin();
     this.getDeliverables();
-    this.getClassList();
+    this.getClasslist();
     this.getStudents();
     this.getTeams();
   },
@@ -88,7 +106,7 @@ export default React.createClass({
         "students": that.state.studentsObject,
         "grades": that.state.gradesObject,
         "deliverables": that.state.deliverablesObject,
-        "classList": that.state.classList
+        "classlist": that.state.classlist
       });
     });
     
@@ -110,7 +128,7 @@ export default React.createClass({
 
         <Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.prof ? "Prof" : "TA"} user={localStorage.user}/>
 
-        {!!this.state.deliverablesObject && !!this.state.classList && childrenWithProps}
+        {!!this.state.deliverablesObject && !!this.state.classlist && childrenWithProps}
 
       </div>
     )}

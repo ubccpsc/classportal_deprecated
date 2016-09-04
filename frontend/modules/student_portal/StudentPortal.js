@@ -58,7 +58,7 @@ export default React.createClass({
     )
   },
   getClasslist: function () {
-    Ajax.getClassList(
+    Ajax.getClasslist(
       function success(response) {
         console.log("StudentPortal.js| Retrieved class list:" + response);
         

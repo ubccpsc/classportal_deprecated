@@ -75,11 +75,11 @@ module.exports = {
         });
     },
     
-    getClassList: function (successCallback, errorCallback) {
+    getClasslist: function (successCallback, errorCallback) {
         console.log("Ajax.js| Getting classlist..");
         $.ajax({
             type: "POST",
-            url: "http://" + config.host + ":" + config.port + "/api/getClassList",
+            url: "http://" + config.host + ":" + config.port + "/api/getClasslist",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,
@@ -170,11 +170,11 @@ module.exports = {
     },
 
     //send csv
-    submitClassList: function (formData, successCallback, errorCallback) {
+    submitClasslist: function (formData, successCallback, errorCallback) {
         console.log("Ajax.js| Submitting new class list..");
         $.ajax({
             type: "POST",
-            url: "http://" + config.host + ":" + config.port + "/api/submitClassList",
+            url: "http://" + config.host + ":" + config.port + "/api/submitClasslist",
             headers: {
                 "user": localStorage.user,
                 "token": localStorage.token,

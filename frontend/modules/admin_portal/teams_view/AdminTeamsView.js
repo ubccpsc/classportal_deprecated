@@ -10,8 +10,8 @@ export default React.createClass({
     return (
       <div>
         <AdminTeams teams={this.props.teams} students={this.props.students} myTeams={this.props.admin.teams} />
-        <CreateTeam students={this.props.students} />
-        {this.props.admin.prof && (<CreateProjects/>)}
+        <CreateTeam classlist={this.props.classlist} />
+        {this.props.admin.prof && (<CreateProjects />)}
       </div>
     )}
 })

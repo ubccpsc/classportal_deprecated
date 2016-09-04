@@ -3,14 +3,14 @@ import { FileUpload, Form, FormRow, FormField, FormInput, FormIconField, FormSel
 import ContentModule from '../../shared_components/ContentModule'
 import Ajax from '../../shared_components/Ajax'
 import AdminStudents from './AdminStudents'
-import UploadClassList from './UploadClassList'
+import UploadClasslist from './UploadClasslist'
 
 export default React.createClass({
   render: function () {
     return (
       <div>
         <AdminStudents students={this.props.students} myTeams={this.props.admin.teams} />
-        {this.props.admin.prof && (<UploadClassList/>)}
+        {this.props.admin.prof && (<UploadClasslist/>)}
       </div>
     )}
 })
