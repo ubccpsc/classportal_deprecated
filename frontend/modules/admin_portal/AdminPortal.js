@@ -1,7 +1,7 @@
 import React from 'react'
 import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
 
-import NavLink from '../NavLink'
+import NavLink from '../shared_components/NavLink'
 import Logout from '../shared_components/Logout'
 import Ajax from '../shared_components/Ajax'
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import {browserHistory } from 'react-router'
 import {Row,Col,Form,FormField,Button,FormInput,FormIconField,Glyph} from 'elemental'
-import Ajax from './shared_components/Ajax'
+import Ajax from '../shared_components/Ajax'
 
 const sidRegex = /^([0-9]){8}$/;
 const csidRegex = /^[a-z][0-9][a-z][0-9]$/;

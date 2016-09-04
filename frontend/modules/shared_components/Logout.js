@@ -1,6 +1,5 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, Glyph, Button } from 'elemental'
-import Auth from '../Auth'
 import {browserHistory} from 'react-router'
 import Ajax from '../shared_components/Ajax'
 
@@ -11,7 +10,6 @@ export default React.createClass({
       function success (response) {
         console.log("Logout.js| Success: " + response);
         localStorage.clear();
-        Auth.logout();
         console.log("Logout.js| Logged out!");
         browserHistory.push("/login");
       }.bind(this),
@@ -20,7 +18,6 @@ export default React.createClass({
         //user out as normal instead of leaving them stuck in the course portal.
         console.log("Logout.js| Error: " + status + err);
         localStorage.clear();
-        Auth.logout();
         console.log("Logout.js| Logged out!");
         browserHistory.push("/login");
       }.bind(this)

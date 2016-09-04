@@ -1,7 +1,7 @@
 import React from 'react'
 import {Spinner} from 'elemental'
 import {browserHistory} from 'react-router'
-import Ajax from './shared_components/Ajax'
+import Ajax from '../shared_components/Ajax'
 
 export default React.createClass({
   getInitialState: function () {
