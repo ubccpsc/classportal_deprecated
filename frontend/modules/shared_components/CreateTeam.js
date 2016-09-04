@@ -6,35 +6,42 @@ import config from 'config'
 
 export default React.createClass({
   getInitialState: function () {
-    return { selectedStudents: [] };
+    return { newTeam: [] };
   },
-  //TODO: NOT DONE
   handleSubmit: function (e) {
     e.preventDefault();
-    var newTeam = this.state.selectedStudents;
+    var newTeam = this.state.newTeam;
+    var alertMessage = "Forming team with students: ";
+
     //check for valid students
     for (var i = 0; i < config.team_size; i++) {
       //check that there actually is a selected student at this index 
-      if (!newTeam[i]) {
+      if (!!newTeam[i] && typeof newTeam[i] === 'string') {
+        
+        //check that this student was not previously selected
+        for (var j = 0; j < i; j++){
+          if (newTeam[i] === newTeam[j]) {
+            alert("Error: Invalid team.");
+            return;
+          }
+        }
+
+        alertMessage += newTeam[i] + " ";
+      }
+      else {
         alert("Error: Invalid team.");
         return;
       }
-      //check that this student was not previously selected
-      for (var j = 0; j < i; j++){
-        if (newTeam[i] === newTeam[j]) {
-          alert("Error: Invalid team.");
-          return;
-        }
-      }
+      
     }
 
-    alert("Forming team with students: " + newTeam);
+    alert(alertMessage);
     Ajax.createTeam(
       newTeam,
       function success (response) {
         console.log("CreateTeam.js| Success: " + response);
         alert("Success: Team " + response + " created!")
-        window.location.reload(true);
+        //window.location.reload(true);
       }.bind(this),
       function error (xhr, status, err) {
         console.log("CreateTeam.js| Error: " + status + err);
@@ -43,10 +50,11 @@ export default React.createClass({
     )
   },
   handleSelect: function (that, value) {
-    var newSelectedStudents = this.state.selectedStudents;
     if (!!value) {
-      newSelectedStudents[that] = value;
-      this.setState({ selectedStudents: newSelectedStudents });
+      //this.state is immutable, so setState a new array 
+      var temp = this.state.newTeam;
+      temp[that] = value;
+      this.setState({ newTeam: temp });
     }
     else {
       alert("Error: Bad selection");

@@ -149,7 +149,7 @@ module.exports = {
     },
 
     //submit 2 students, expects server to form team and update their student objects.
-    createTeam: function (data, successCallback, errorCallback) {
+    createTeam: function (newTeam, successCallback, errorCallback) {
         console.log("Ajax.js| Creating team..");
         $.ajax({
             type: "POST",
@@ -159,7 +159,9 @@ module.exports = {
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
-            data: data,
+            data: {
+                "newTeam": newTeam
+            },
             dataType: "json",
             cache: false,
             success: successCallback,

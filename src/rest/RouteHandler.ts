@@ -16,7 +16,7 @@ import Log from '../Util';
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
 var config = require(pathToRoot + 'config.json');
 
-export default class RouteHandler { 
+export default class RouteHandler {
     static getAllGrades(req: restify.Request, res: restify.Response, next: restify.Next) {
         var sid = req.params.sid;
         RouteHandler.returnFile("grades.json", function (error: any, data: any) {
@@ -42,33 +42,10 @@ export default class RouteHandler {
         4a) if yes, update the user's githubtoken and redirect app to the homepage.
         4b) if no, create blank student and redirect app to registration page.
     */
-    static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {    
+    static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("authenticateGithub| Checking authcode..");
         
-        //only continue if authcode is present.
-        if (!!req.params.authcode) {
-            //build the request options object
-            var options = {
-                method: 'post',
-                body: { client_id: config.client_id,
-                        client_secret: config.client_secret,
-                        code: req.params.authcode },
-                json: true,
-                url: 'https://github.com/login/oauth/access_token',
-                headers: {}
-            };
-            
-            Log.trace("authenticateGithub| Requesting access token from Github..");
-            request(options, requestGithubTokenCallback);
-            return next();
-        }
-        else {
-            Log.trace("authenticateGithub| Error: Missing authcode.");
-            res.send(500, "missing authcode");
-            return;
-        }
-
-        //callback executed after successful request to Github for access token.
+        //this callback is executed after a successful request to Github for access token.
         function requestGithubTokenCallback(err1: any, res1: any, body1: any) {
             if (!err1 && res1.statusCode == 200) {
                 var githubtoken = body1.access_token;
@@ -79,7 +56,7 @@ export default class RouteHandler {
                     if (!err2 && res2.statusCode == 200) {
                         var obj = JSON.parse(body2);
                         var username = obj.login;
-                        Log.trace("authenticateGithub| Successfully acquired username: "+username);
+                        Log.trace("authenticateGithub| Successfully acquired username: " + username);
                                     
                         //check if username matches list of admin usernames.
                         RouteHandler.isAdmin(username, function (isAdmin: boolean) {
@@ -148,6 +125,30 @@ export default class RouteHandler {
             }
         }
 
+        //only continue if authcode is present.
+        if (!!req.params.authcode) {
+            //build the request options object
+            var options = {
+                method: 'post',
+                body: {
+                    client_id: config.client_id,
+                    client_secret: config.client_secret,
+                    code: req.params.authcode
+                },
+                json: true,
+                url: 'https://github.com/login/oauth/access_token',
+                headers: {}
+            };
+            
+            Log.trace("authenticateGithub| Requesting access token from Github..");
+            request(options, requestGithubTokenCallback);
+            return next();
+        }
+        else {
+            Log.trace("authenticateGithub| Error: Missing authcode.");
+            res.send(500, "missing authcode");
+            return;
+        }
     }
 
     /*
@@ -166,7 +167,7 @@ export default class RouteHandler {
         var csid = req.params.csid;
         var sid = req.params.sid;
         var validCSID = /^[a-z][0-9][a-z][0-9]$/;
-        var validSID = /^\d{8}$/; 
+        var validSID = /^\d{8}$/;
         
         //first, test CSID and SID regex
         Log.trace("registerAccount| Testing CSID and SID regex..");
@@ -242,7 +243,7 @@ export default class RouteHandler {
                 return;
             }
             else {
-                Log.trace("getStudent| Error! Student object: "+data);
+                Log.trace("getStudent| Error! Student object: " + data);
                 res.json(500, "error");
             }
         });
@@ -250,7 +251,7 @@ export default class RouteHandler {
 
     static getDeliverables(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("getDeliverables| Requesting file..");
-        RouteHandler.returnFile("deliverables.json", function (error:any, data: any) {
+        RouteHandler.returnFile("deliverables.json", function (error: any, data: any) {
             if (!error && data.length > 0) {
                 var delivs = JSON.parse(data);
                 Log.trace("getDeliverables| Success! Returning..");
@@ -260,7 +261,7 @@ export default class RouteHandler {
             else {
                 Log.trace("getDeliverables| Error: Bad data. Returning..");
                 res.json(500, "null");
-                return next();    
+                return next();
             }
         });
     }
@@ -281,7 +282,7 @@ export default class RouteHandler {
                     // TODO: if the user is not an admin, make sure the release date for the deliverable has been passed before returning a grade
                     res.json(200, myGrades);
                     return next();
-                }                    
+                }
                 else {
                     Log.trace("getGrades| Grades not found. Returning error..");
                     res.json(500, "student not found");
@@ -298,11 +299,11 @@ export default class RouteHandler {
     static deleteServerToken(req: restify.Request, res: restify.Response, next: restify.Next) {
         var user: string = req.header('user');
         var admin: string = req.header('admin');
-        var filename = pathToRoot.concat(config.path_to_tokens); 
+        var filename = pathToRoot.concat(config.path_to_tokens);
         var file = require(filename);
         
         //overwrite or create
-        Log.trace("deleteServerToken| Deleting servertoken for user: "+user);
+        Log.trace("deleteServerToken| Deleting servertoken for user: " + user);
         if (admin === "true")
             file.admins[user] = "";
         else
@@ -323,6 +324,45 @@ export default class RouteHandler {
         });
     }
     
+    //input: array with team member names
+    //output: array team member sids
+    static teamNameToSid(nameArray: any[], callback: any) {
+        Log.trace("teamNameToSid| Converting member names to sid..");
+
+        if (!!nameArray) {
+            RouteHandler.returnFile("students.json", function (error: any, data: any) {
+                if (!error && data.length > 0) {
+                    var students = JSON.parse(data);
+                    var sidArray: any[] = [];
+
+                    //for each student in supplied array, check name against student file
+                    for (var i = 0; i < nameArray.length; i++) {
+                        for (var j = 0; j < students.length; j++) {
+                            if (nameArray[i] === students[j].firstname + " " + students[j].lastname) {
+                                sidArray[i] = students[j].sid;
+                                break;
+                            }
+                        }
+                    }
+                    //if success, return result (todo: check this)
+                    callback(null, sidArray);
+                }
+                else {
+                    //error: file read error
+                    Log.trace("convertFullnameToSid| File read error. Returning..");
+                    callback(true, null);
+                    return;
+                }
+            })
+        }
+        else {
+            //error: bad input
+            Log.trace("convertFullnameToSid| Bad input. Returning..");
+            callback(true, null);
+            return;
+        }
+    }
+
     /*
         add new entry to teams.json
         assign team in admins.json
@@ -332,49 +372,102 @@ export default class RouteHandler {
         Log.trace("createTeam| Creating new team..");
         var user: string = req.header('user');
         var admin: string = req.header('admin');
-        var students: any = req.params.students;
+        var nameArray: any = req.params.newTeam;
+        
+        //for each student name in array, convert to sid
+        RouteHandler.teamNameToSid(nameArray, function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                var sidArray = data;
 
-        //todo: permissions: if not admin, can only set team with std1=user
-        if (1) {
-            var filename = pathToRoot.concat(config.path_to_teams);
-            var file = require(filename);        
-            var newEntry = {
-                "id": file.length + 1,
-                "url": "",
-                "members": students
-            };
+                //todo: check permissions. If not admin, can only set team with std1=user
+                if (1) {
+                    var filename = pathToRoot.concat(config.path_to_teams);
+                    var file = require(filename);
+                    var newTeam = {
+                        "id": file.length + 1,
+                        "url": "",
+                        "members": sidArray
+                    };
+                    file.push(newTeam);
 
-            Log.trace("createTeam| New team: " + JSON.stringify(newEntry));
-            
-            file.push(newEntry);
-            
-            fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
-                if (err) {
-                    Log.trace("createTeam| Write error: " + err.toString());
-                    res.send(500, "error");
-                    return;
+                    Log.trace("createTeam| Adding new team: " + JSON.stringify(newTeam));
+                    fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
+                        if (err) {
+                            Log.trace("createTeam| Write error: " + err.toString());
+                            res.send(500, "error");
+                            return;
+                        }
+                        else {
+                            //finally, set hasTeam=true in student file for each student
+                            RouteHandler.updateHasTeamStatus(sidArray, true, function (error: any, data: any) {
+                                if (!error && data.length > 0) {
+                                    //finally, return team num
+                                    Log.trace("createTeam| Team " + newTeam.id + " created! Returning..");
+                                    res.send(200, newTeam.id);
+                                    return next();
+                                }
+                                else {
+                                    Log.trace("createTeam| Error: Could not update student file");
+                                    res.send(500, "error");
+                                    return;
+                                }
+                            });
+                        }
+                    });
                 }
                 else {
-                    Log.trace("createTeam| Team added to teams.json");
-
-                    for (var i = 0; i < req.params.students.length; i++) {
-                        //todo: requires sid not username!!!
-                        RouteHandler.updateStudentObject(students[i], { "hasTeam": true }, function () {
-                            Log.trace("createTeam| Updated " + req.params.students[i] + "'s team status.");
-                        });
-                    }
-                    
-                    Log.trace("createTeam| Team " + newEntry.id + " created! Returning..");
-                    res.send(200, newEntry.id);
-                    return next();
+                    Log.trace("createTeam| Error: Bad permission");
+                    res.send(500, "not permitted");
+                    return;
                 }
-            });
-        }
-        else {
-            Log.trace("createTeam| Error: Bad permission");
-            res.send(500, "bad permissions");
-            return;
-        }
+            }
+            else {
+                //error: bad team 
+                res.send(500, "bad team");
+                return;
+            }
+        });
+    }
+
+    //helper to update students to hasTeam
+    static updateHasTeamStatus(sidArray: any[], hasTeam: boolean, callback: any) {
+        Log.trace("updateHasTeamStatus| Updating hasTeam status of the new team members..");
+
+        RouteHandler.returnFile("students.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                var filename = pathToRoot.concat(config.path_to_students);
+                var studentsFile = JSON.parse(data);
+
+                for (var i = 0; i < sidArray.length; i++) {
+                    for (var j = 0; j < studentsFile.length; j++) {
+                        if (sidArray[i] == studentsFile[j].sid) {
+                            Log.trace("updateHasTeamStatus| Updating member #" + i + "'s hasTeam status..");
+                            studentsFile.hasTeam = hasTeam;
+                            break;
+                        }
+                    }
+                }
+
+                //TODO: this executes before the above for loop is finished executing!!!
+                fs.writeFile(filename, JSON.stringify(studentsFile, null, 2), function (err: any) {
+                    if (err) {
+                        Log.trace("updateHasTeamStatus| Write error: " + err.toString());
+                        callback(true, null);
+                        return;
+                    }
+                    else {
+                        Log.trace("updateHasTeamStatus| Finished updating hasTeam statuses.");
+                        callback(null, "done");
+                        return;
+                    }
+                });
+            }
+            else {
+                Log.trace("updateHasTeamStatus| Error: Bad file read");
+                callback(true, null);
+                return;
+            }
+        });
     }
 
     /*
