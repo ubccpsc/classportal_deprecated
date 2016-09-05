@@ -35,8 +35,8 @@ export default React.createClass({
         console.log("AdminPortal.js| Retrieved class list:" + response);
         
         //convert classlist into format useable by Elemental Form-Select
-        var classlistWithLabels = []
-        for (var index = 0; index < response.length; index++){
+        var classlistWithLabels = [];
+        for (var index = 0; index < response.length; index++) {
           classlistWithLabels[index] = { "label": response[index] };
         }
         
@@ -45,7 +45,7 @@ export default React.createClass({
       function error(xhr, status, error) {
         console.log("AdminPortal.js| Error getting classlist!");
       }.bind(this)
-    )
+    );
   },
   componentDidMount: function () {
     this.getFilesAdmin();
