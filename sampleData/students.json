@@ -1,10 +1,11 @@
 [
   {
-    "id": 1,
-    "url": "",
-    "members": [
-      "00000001",
-      "00000002"
-    ]
+    "csid": "a1a1",
+    "sid": "12345678",
+    "lastname": "Sargent",
+    "firstname": "Michael",
+    "github_name": "",
+    "github_token": "",
+    "hasTeam": false
   }
 ]

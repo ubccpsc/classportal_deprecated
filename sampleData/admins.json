@@ -1,16 +1,13 @@
-{
-	"prof_usernmae": {
-		"firstname": "profFirst",
-		"lastname": "profLast",
-		"prof": true,
-		"githubtoken": "",
-		"teams": ["1", "2"]
-	},
-	"ta_usernmae": {
-		"firstname": "taFirst",
-		"lastname": "taLast",
-		"prof": false,
-		"githubtoken": "",
-		"teams": ["3", "4"]
-	}
-}
+[
+  {
+    "firstname": "Reid",
+    "lastname": "Holmes",
+    "github_name": "",
+    "github_token": "",
+    "prof": true,
+    "teams": [
+      "1",
+      "2"
+    ]
+  }
+]
