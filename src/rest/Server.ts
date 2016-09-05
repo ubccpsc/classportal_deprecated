@@ -86,7 +86,7 @@ export default class Server {
                 
                 /* Requires TEMP token */
                 //called upon login
-                that.rest.post('/api/authenticate', requireTempToken, RouteHandler.userLogin);
+                that.rest.post('/api/login', requireTempToken, RouteHandler.userLogin);
                 
                 /* Requires STUDENT OR ADMIN token */
                 //called after submitting registration

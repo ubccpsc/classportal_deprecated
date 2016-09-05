@@ -29,7 +29,7 @@ export default React.createClass({
   sendAuthCode: function(){
     var that = this;
     this.getAuthCode(window.location.href, function (authcode) {
-      Ajax.authenticateAuthcode(
+      Ajax.login(
         authcode,
         function success(response) {
           console.log("PostLogin.js| Authentication success! Response: " + JSON.stringify(response));

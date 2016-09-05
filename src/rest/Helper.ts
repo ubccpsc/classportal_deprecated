@@ -52,8 +52,36 @@ export default class Helper {
             return;
         }
     }
+
+    static isAdmin(username: string, callback: any) {
+        Log.trace("isAdmin| Checking admin status..");
+        var filename = pathToRoot.concat(config.path_to_admins);
+
+        fs.readFile(filename, function read(err: any, data: any) {
+            if (err) {
+                Log.trace("isAdmin| Error reading file: " + err.toString());
+                callback(false);
+                return;
+            }
+            else {
+                var file = JSON.parse(data);
+                if (_.findIndex(file, { 'github_name': username }) >= 0) {
+                    Log.trace("isAdmin| User is an admin.");
+                    callback(true);
+                    return;
+                }
+                else {
+                    Log.trace("isAdmin| User is not an admin.");
+                    callback(false);
+                    return;
+                }
+            }
+        });
+    }
+
     
-    /*these functions still need to be cleaned up and checked for errors*/
+    /*below functions still need to be cleaned up and checked for errors*/
+
     static parseClasslist(file: any, callback: any) {
         Log.trace("parseCSV| Reading file..");
         
@@ -216,29 +244,4 @@ export default class Helper {
         });
     }
 
-    static isAdmin(username: string, callback: any) {
-        Log.trace("isAdmin| Checking admin status..");
-        var filename = pathToRoot.concat(config.path_to_admins);
-
-        fs.readFile(filename, function read(err: any, data: any) {
-            if (err) {
-                Log.trace("isAdmin| Error reading file: " + err.toString());
-                callback(false);
-                return;
-            }
-            else {
-                var file = JSON.parse(data);
-                if (_.findIndex(file, { 'github_name': username }) >= 0) {
-                    Log.trace("isAdmin| User is an admin.");
-                    callback(true);
-                    return;
-                }
-                else {
-                    Log.trace("isAdmin| User is not an admin.");
-                    callback(false);
-                    return;
-                }
-            }
-        });
-    }
 }

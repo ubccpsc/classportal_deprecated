@@ -10,7 +10,7 @@ export default React.createClass({
     return (
       <div>
         <AdminStudents students={this.props.students} myTeams={this.props.admin.teams} />
-        {this.props.admin.prof && (<UploadClasslist/>)}
+        {this.props.admin.prof===true && (<UploadClasslist/>)}
       </div>
     )}
 })
