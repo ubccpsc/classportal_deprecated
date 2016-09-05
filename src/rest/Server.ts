@@ -97,12 +97,15 @@ export default class Server {
                 that.rest.post('/api/logout', logRequest, requireToken, RouteHandler.deleteServerToken);
                 
                 /* Requires ADMIN token */
-                that.rest.post('/api/submitClasslist', logRequest, requireAdmin, requireToken, RouteHandler.updateClasslist);
-                that.rest.post('/api/getAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAdmin);
                 that.rest.post('/api/getGradesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllGrades);
+                that.rest.post('/api/getFilesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getFilesAdmin);
+                
+                //outdated
+                that.rest.post('/api/getAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAdmin);
+                that.rest.post('/api/submitClasslist', logRequest, requireAdmin, requireToken, RouteHandler.updateClasslist);
                 that.rest.post('/api/getStudentsAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllStudents);
                 that.rest.post('/api/getTeamsAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllTeams);
-                
+
                 //serve static css and js files
                 that.rest.get(/\w+\.(?:(js)|(css)|(png))/, restify.serveStatic({
                     directory: __dirname.substring(0, __dirname.lastIndexOf("/src")) + '/frontend/public',

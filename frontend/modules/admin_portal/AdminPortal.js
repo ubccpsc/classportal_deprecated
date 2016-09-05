@@ -88,12 +88,29 @@ export default React.createClass({
       }.bind(this)
     )
   },
+  getFilesAdmin: function () {
+    Ajax.getFilesAdmin(
+      function success(response) {
+        console.log("AdminPortal.js| Retrieved files!");
+        console.log("AdminPortal.js| admins.json: " + response.admins);
+        console.log("AdminPortal.js| students.json: " + response.students);
+        console.log("AdminPortal.js| teams.json: " + response.teams);
+        console.log("AdminPortal.js| deliverables.json: " + response.deliverables);
+      }.bind(this),
+      function error(xhr, status, error) {
+        console.log("AdminPortal.js| Error getting files!");
+      }.bind(this)
+    )
+  },
   componentDidMount: function () {
-    this.getAdmin();
+    this.getFilesAdmin();
+    
+    /*this.getAdmin();
     this.getDeliverables();
     this.getClasslist();
     this.getStudents();
     this.getTeams();
+    */
   },
   render: function () {
     var that = this;

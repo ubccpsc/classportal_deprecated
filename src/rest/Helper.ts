@@ -8,6 +8,52 @@ var config = require(pathToRoot + 'config.json');
 
 //General purpose read/write functions
 export default class Helper {
+    //todo: test!
+    //purpose: update students.json or admins.json
+    //sample input: "students.json", mksarge, {'hasTeam: true'}, callback
+    //implemented with lodash
+    static updateUser(userType:string, username: string, paramsObject: any, callback: any) {
+        Log.trace("updateUser| Writing to user: " + username + " in students.json..");
+        
+        var filename = pathToRoot.concat(config.private_folder, userType);
+        var file = require(filename);
+
+        //check if username exists
+        var userIndex:number = _.findIndex(file, { 'github_name': username });
+        if (userIndex >= 0) {
+            //update file
+            var count = 0;
+            for (var key in paramsObject) {
+                if (file[userIndex].hasOwnProperty(key)) {
+                    Log.trace('updateStudentOrAdmin| Writing to ' + key + ': ' + paramsObject[key]);
+                    file[userIndex][key] = paramsObject[key];
+                    count++;
+                }
+            }
+            Log.trace('updateUser| Updated ' + count + ' key(s).');
+
+            //write to file
+            fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
+                if (err) {
+                    Log.trace("updateUser| Write unsuccessful: " + err.toString());
+                    callback(true, null);
+                    return;
+                }
+                else {
+                    Log.trace("updateUser| Write successful! Executing callback..");
+                    callback(null, true);
+                    return;
+                }
+            });
+        }
+        else {
+            Log.trace("updateUser| Error: User was not found..");
+            callback(true, null);
+            return;
+        }
+    }
+    
+    /*these functions still need to be cleaned up and checked for errors*/
     static parseClasslist(file: any, callback: any) {
         Log.trace("parseCSV| Reading file..");
         
@@ -119,53 +165,6 @@ export default class Helper {
         });
     }
 
-    //implemented with lodash. test this!
-    static updateUser(userType:string, username: string, paramsObject: any, callback: any) {
-        Log.trace("updateUser| Writing to user: " + username + " in students.json..");
-        
-        var filename = pathToRoot.concat(config.private_folder, userType);
-        var file = require(filename);
-
-        //check if username exists
-        var userIndex:number = _.findIndex(file, { 'github_name': username });
-        if (userIndex >= 0) {
-            //update file
-            var count = 0;
-            for (var key in paramsObject) {
-                if (file[userIndex].hasOwnProperty(key)) {
-                    Log.trace('updateStudentOrAdmin| Writing to ' + key + ': ' + paramsObject[key]);
-                    file[userIndex][key] = paramsObject[key];
-                    count++;
-                }
-            }
-            Log.trace('updateUser| Updated ' + count + ' key(s).');
-
-            //write to file
-            fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
-                if (err) {
-                    Log.trace("updateUser| Write unsuccessful: " + err.toString());
-                    callback(true, null);
-                    return;
-                }
-                else {
-                    Log.trace("updateUser| Write successful! Executing callback..");
-                    callback(null, true);
-                    return;
-                }
-            });
-        }
-        else {
-            Log.trace("updateUser| Error: User was not found..");
-            callback(true, null);
-            return;
-        }
-    }
-
-    static include(arr: any, obj: any) {
-        var result = (arr.indexOf(obj) != -1);
-        console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
-        return (result);
-    }
 
     //todo: returns bad data when reading empty (0-length) file. look into i/o streams    
     static returnFile(file: string, callback: any) {

@@ -440,8 +440,8 @@ export default class RouteHandler {
         Log.trace("getAdmin| Getting admin file..");
         Helper.returnFile("admins.json", function (error: any, data: any) {
             if (!error && data.length > 0) {
-                var admin = JSON.parse(data)[username];
-                Log.trace("getAllStudents| Sending admin.." + JSON.stringify(admin));
+                var admin = JSON.parse(data);
+                Log.trace("getAllStudents| Sending admin file..");
                 res.json(200, admin);
                 return next();
             }
@@ -466,5 +466,60 @@ export default class RouteHandler {
                 return;
             }
         });
+    }
+
+
+
+
+
+
+
+    //send admins, students, teams, deliverables files back to admin portal
+    static getFilesAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var filesObject = {
+            "admins": "",
+            "students": "",
+            "teams": "",
+            "deliverables": ""
+        }
+        
+        Helper.returnFile("admins.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                filesObject.admins = JSON.parse(data);
+            }
+            else {
+                filesObject.admins = "err";
+            }
+        });
+
+        Helper.returnFile("students.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                filesObject.students = JSON.parse(data);
+            }
+            else {
+                filesObject.students = "err";
+            }
+        });
+
+        Helper.returnFile("teams.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                filesObject.teams = JSON.parse(data);
+            }
+            else {
+                filesObject.teams = "err";
+            }
+        });
+
+        Helper.returnFile("deliverables.json", function (error: any, data: any) {
+            if (!error && data.length > 0) {
+                filesObject.deliverables = JSON.parse(data);
+            }
+            else {
+                filesObject.deliverables = "err";
+            }
+        });
+        
+        res.send(200, filesObject)
+        return;
     }
 }

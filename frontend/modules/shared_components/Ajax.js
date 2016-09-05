@@ -215,7 +215,7 @@ module.exports = {
             url: "http://" + config.host + ":" + config.port + "/api/register",
             headers: {
                 "user": localStorage.user,
-                "token": localStorage.token,
+                "token": localStorage.token
             },
             data: {
                 "sid": sid,
@@ -226,5 +226,23 @@ module.exports = {
             success: successCallback,
             error: errorCallback
         });
+    },
+
+    getFilesAdmin: function(successCallback, errorCallback) {
+        console.log("Ajax.js| Getting all files for admin portal..");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/getFilesAdmin",
+            headers: {
+                "user": localStorage.user,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            dataType: 'json',
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
     }
+
 }
