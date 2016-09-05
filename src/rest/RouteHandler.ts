@@ -13,6 +13,7 @@ import Student from '../model/Student';
 import Log from '../Util';
 
 import LoginController from '../controller/LoginController';
+import RegisterController from '../controller/RegisterController';
 import TeamController from '../controller/TeamController';
 import Helper from './Helper';
 
@@ -24,6 +25,35 @@ var config = require(pathToRoot + 'config.json');
 
 export default class RouteHandler {
     
+    //input: Github authcode 
+    //response: object containing redirect path, username, and auth token
+    static userLogin(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("userLogin| Checking authcode..");
+        var authcode = req.params.authcode;
+
+        //check for valid authcode format
+        if (typeof authcode === 'string' && authcode.length > 0) {
+            //perform login process
+            LoginController.login(authcode, function (error:any, data:any) {
+                if (!error) {
+                    Log.trace("userLogin| Login success. Response: " + JSON.stringify(data));
+                    res.send(200, data);
+                    return next();
+                }
+                else {
+                    Log.trace("userLogin| Error: " + error);
+                    res.send(500, error);
+                    return;
+                }
+            });
+        }
+        else {
+            Log.trace("userLogin| Error: Bad authcode.");
+            res.send(500, "bad authcode");
+            return;
+        }
+    }
+
     //send admins, students, teams, deliverables files back to admin portal
     static getFilesAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("getFilesAdmin| Getting files..");
@@ -105,133 +135,39 @@ export default class RouteHandler {
         );
     }
 
-    /* functions below still need to be cleaned up */
-
-    static registerStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
-        /*
-        //create new student with gitub username and githubtoken.
-        LoginController.createBlankStudent(username, githubtoken, function () {
-            //finally, send app to registration page.
-            //todo: double check this action
-            Log.trace("authenticateGithub| Redirecting to registration page.");
-            res.json(200, "/register~" + username + "~" + servertoken);
-        });
-
-        
-        else {
-        Log.trace("authenticateGithub| User has not completed registration. Redirecting to registration page.");
-        //TODO: what's stopping someone from manually entering the student portal from the registration screen?'
-        res.json(200, "/register~" + username + "~" + servertoken);
-        }
-
-        */
-    }
     
-    //input: Github authcode 
-    //response: object containing redirect path, username, and auth token
-    static userLogin(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("userLogin| Checking authcode..");
-        var authcode = req.params.authcode;
-
-        //check for valid authcode format
-        if (typeof authcode === 'string' && authcode.length > 0) {
-            //perform login process
-            LoginController.login(authcode, function (error:any, data:any) {
-                if (!error) {
-                    Log.trace("userLogin| Login success. Response: " + JSON.stringify(data));
-                    res.send(200, data);
-                    return next();
-                }
-                else {
-                    Log.trace("userLogin| Error: " + error);
-                    res.send(500, error);
-                    return;
-                }
-            });
-        }
-        else {
-            Log.trace("userLogin| Error: Bad authcode.");
-            res.send(500, "bad authcode");
-            return;
-        }
-    }
-
+    /* TODO: functions below still need to be cleaned up */
+    
     /*
-        This function is called from the "link account" page, after a SID and CSID is entered to link Github and UBC details. 
-        Parameters: github username, sid, csid
-        Actions:
-        1) get class list
-        2) iterate thru csid's for a match
-            3a) csid exists, so check if sid matches
-                4a) if match, update blank student's' file and redirect app to homepage.
-                4b) if csid and sid doesn't' match, send error to app.
-            3b) no matching csid's, so send error to app.
+        input: authcode, sid and csid
+        actions:
+        1)get class list
+        2)iterate thru csid's for a match
+        3a) csid exists, so check if sid matches
+        4a) if match, update blank student's' file and redirect app to homepage.
+        4b) if csid and sid doesn't' match, send error to app.
+        3b) no matching csid's, so send error to app.
     */
     static registerAccount(req: restify.Request, res: restify.Response, next: restify.Next) {
         var user = req.header('user');
-        var csid = req.params.csid;
         var sid = req.params.sid;
-        var validCSID = /^[a-z][0-9][a-z][0-9]$/;
-        var validSID = /^\d{8}$/;
-        
-        //first, test CSID and SID regex
-        Log.trace("registerAccount| Testing CSID and SID regex..");
-        if (validCSID.test(csid) && validSID.test(sid)) {
-            Log.trace("registerAccount| Valid regex.");
+        var csid = req.params.csid;
+        var authcode = req.params.authcode;
 
-            Helper.returnFile("students.json", function (error: any, data: any) {
-                if (!error && data.length > 0) {
-                    var studentsObject = JSON.parse(data);
-                    Log.trace("registerAccount| Classlist retrieved. There are " + (studentsObject.length) + " students in this class.");
-                    
-                    //check if csid exists
-                    Log.trace("registerAccount| Checking CSID..");
-                    for (var index = 0; index < studentsObject.length; index++) {
-                        if (csid == studentsObject[index].csid) {
-                            //check if sid exists
-                            Log.trace("registerAccount| CSID Match! Checking SID..");
-                            if (sid == studentsObject[index].sid) {
-                                Log.trace("registerAccount| SID Match! Updating student information..");
-                                
-                                //error: can't use "user" to identify
-                                Helper.updateUser("students.json", sid, { github_name: user }, function (error:any, data:any) {
-                                    if (!error && data.length > 0) {
-                                        Log.trace("registerAccount| Account updated successfully. Sending user to homepage.");
-                                        res.json(200, "success");
-                                        return next();
-                                    }
-                                    else {
-                                        Log.trace("registerAccount| Error updating file!");
-                                        res.json(500, error);
-                                        return;
-                                    }
-                                });
-                                //Log.trace("Error: writeStudent failed");
-                                //????
-                                return;
-                            }
-                            else {
-                                //invalid login combination
-                                Log.trace("registerAccount| Error: Invalid CSID/SID combination. Returning..");
-                                res.send(500, "bad login");
-                                return;
-                            }
-                        }
-                    }
-                    Log.trace("registerAccount| Error: Invalid CSID. Returning..");
-                    res.send(500, "bad login");
-                    return;
+        if (typeof user === 'string' && typeof sid === 'string' && typeof csid === 'string' && typeof authcode === 'string') {
+            RegisterController.register(user, sid, csid, authcode, function (error: any, data: any) {
+                if (!error && !!data) {
+                    //todo
+                    res.send(200, "success!");
+                    return next();
                 }
                 else {
-                    res.send(500, "error reading file");
-                    return;
+                    return res.send(500, "register error");
                 }
             });
         }
         else {
-            Log.trace("registerAccount| Error: Invalid SID or CSID regex. Returning..");
-            res.send(500, "bad login");
-            return;
+            return res.send(500, "bad input");
         }
     }
 
