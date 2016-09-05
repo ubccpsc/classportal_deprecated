@@ -228,10 +228,16 @@ export default class Helper {
             }
             else {
                 var file = JSON.parse(data);
-                var isAdmin: boolean = Boolean(_.findIndex(file, { 'github_name': username }));
-                Log.trace("isAdmin| " + username + ": " + isAdmin);
-                callback(isAdmin);
-                return;
+                if (_.findIndex(file, { 'github_name': username }) >= 0) {
+                    Log.trace("isAdmin| User is an admin.");
+                    callback(true);
+                    return;
+                }
+                else {
+                    Log.trace("isAdmin| User is not an admin.");
+                    callback(false);
+                    return;
+                }
             }
         });
     }

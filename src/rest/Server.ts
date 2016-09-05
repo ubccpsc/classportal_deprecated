@@ -73,6 +73,12 @@ export default class Server {
                     
                     //log request method and url
                     console.log('\n' + req.method + ' ' + req.url);
+
+                    //for post requests, print headers and params
+                    if (req.method === 'POST') {
+                        console.log("User: " + req.header('user') + " | Token: " + req.header('token') + " | Admin: " + req.header('admin'));
+                        console.log("Params: " + JSON.stringify(req.params) + "\n----------------------------------------------------");
+                    }
                     return next();
                 });
 
@@ -80,31 +86,31 @@ export default class Server {
                 
                 /* Requires TEMP token */
                 //called upon login
-                that.rest.post('/api/authenticate', logRequest, requireTempToken, RouteHandler.userLogin);
+                that.rest.post('/api/authenticate', requireTempToken, RouteHandler.userLogin);
                 
                 /* Requires STUDENT OR ADMIN token */
                 //called after submitting registration
                 //TODO: what's stopping an admin from calling this?
-                that.rest.post('/api/register', logRequest, requireToken, RouteHandler.registerAccount);
+                that.rest.post('/api/register', requireToken, RouteHandler.registerAccount);
                 //called upon arriving at student portal
-                that.rest.post('/api/getStudent', logRequest, requireToken, RouteHandler.getStudent);
-                that.rest.post('/api/getDeliverables', logRequest, requireToken, RouteHandler.getDeliverables);
-                that.rest.post('/api/getGrades', logRequest, requireToken, RouteHandler.getGrades);
-                that.rest.post('/api/getClasslist', logRequest, requireToken, RouteHandler.getClasslist);
-                that.rest.post('/api/createTeam', logRequest, requireToken, RouteHandler.createTeam);
+                that.rest.post('/api/getStudent', requireToken, RouteHandler.getStudent);
+                that.rest.post('/api/getDeliverables', requireToken, RouteHandler.getDeliverables);
+                that.rest.post('/api/getGrades', requireToken, RouteHandler.getGrades);
+                that.rest.post('/api/getClasslist', requireToken, RouteHandler.getClasslist);
+                that.rest.post('/api/createTeam', requireToken, RouteHandler.createTeam);
                 
                 //called by logout button
-                that.rest.post('/api/logout', logRequest, requireToken, RouteHandler.deleteServerToken);
+                that.rest.post('/api/logout', requireToken, RouteHandler.deleteServerToken);
                 
                 /* Requires ADMIN token */
-                that.rest.post('/api/getGradesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllGrades);
-                that.rest.post('/api/getFilesAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getFilesAdmin);
+                that.rest.post('/api/getGradesAdmin', requireAdmin, requireToken, RouteHandler.getAllGrades);
+                that.rest.post('/api/getFilesAdmin', requireAdmin, requireToken, RouteHandler.getFilesAdmin);
                 
                 //outdated
-                that.rest.post('/api/getAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAdmin);
-                that.rest.post('/api/submitClasslist', logRequest, requireAdmin, requireToken, RouteHandler.updateClasslist);
-                that.rest.post('/api/getStudentsAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllStudents);
-                that.rest.post('/api/getTeamsAdmin', logRequest, requireAdmin, requireToken, RouteHandler.getAllTeams);
+                that.rest.post('/api/getAdmin', requireAdmin, requireToken, RouteHandler.getAdmin);
+                that.rest.post('/api/submitClasslist', requireAdmin, requireToken, RouteHandler.updateClasslist);
+                that.rest.post('/api/getStudentsAdmin', requireAdmin, requireToken, RouteHandler.getAllStudents);
+                that.rest.post('/api/getTeamsAdmin', requireAdmin, requireToken, RouteHandler.getAllTeams);
 
                 //serve static css and js files
                 that.rest.get(/\w+\.(?:(js)|(css)|(png))/, restify.serveStatic({
@@ -127,14 +133,6 @@ export default class Server {
             }
         });
     }
-}
-
-function logRequest(req: restify.Request, res: restify.Response, next: restify.Next) {
-    //for user-defined apis, log request auth headers and request params
-    console.log("User: " + req.header('user') + " | Token: " + req.header('token') + " | Admin: " + req.header('admin'));
-    console.log("Params: " + JSON.stringify(req.params));
-    console.log("----------------------------------------------------");
-    return next();
 }
 
 function requireTempToken(req: restify.Request, res: restify.Response, next: restify.Next) {
