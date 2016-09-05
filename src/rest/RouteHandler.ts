@@ -17,12 +17,96 @@ import TeamController from '../controller/TeamController';
 import Helper from './Helper';
 
 var _ = require('lodash');
+var async = require('async');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
 var config = require(pathToRoot + 'config.json');
 
 export default class RouteHandler {
     
+    //send admins, students, teams, deliverables files back to admin portal
+    static getFilesAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("getFilesAdmin| Getting files..");
+        var user = req.header('user');
+        var filesObject = {
+            "adminObject": "",
+            "studentsFile": "",
+            "teamsFile": "",
+            "deliverablesFile": ""
+        }
+        
+        async.parallel([
+            function (callback: any) {
+                Helper.returnFile("admins.json", function (error: any, data: any) {
+                    if (!error && data.length > 0) {
+                        var admins = JSON.parse(data);
+                        var adminObject =  _.find(admins, { 'github_name': user });
+                        if (!!adminObject) {
+                            filesObject.adminObject = adminObject;
+                        }
+                        else {
+                            filesObject.adminObject = "err";
+                        }
+                        callback(null);
+                    }
+                    else {
+                        filesObject.adminObject = "err";
+                        callback(null);
+                    }
+                });
+            },
+            function (callback: any) {
+                Helper.returnFile("students.json", function (error: any, data: any) {
+                    if (!error && data.length > 0) {
+                        filesObject.studentsFile = JSON.parse(data);
+                        callback(null);
+                    }
+                    else {
+                        filesObject.studentsFile = "err";
+                        callback(null);
+                    }
+                });
+            },
+            function (callback: any) {
+                Helper.returnFile("teams.json", function (error: any, data: any) {
+                    if (!error && data.length > 0) {
+                        filesObject.teamsFile = JSON.parse(data);
+                        callback(null);
+                    }
+                    else {
+                        filesObject.teamsFile = "err";
+                        callback(null);
+                    }
+                });
+            },
+            function (callback: any) {
+                Helper.returnFile("deliverables.json", function (error: any, data: any) {
+                    if (!error && data.length > 0) {
+                        filesObject.deliverablesFile = JSON.parse(data);
+                        callback(null);
+                    }
+                    else {
+                        filesObject.deliverablesFile = "err";
+                        callback(null);
+                    }
+                });
+            }
+        ],    
+            function end (err: any, results: any) {
+                if (!err) {
+                    Log.trace("getFilesAdmin| Sending files..");
+                    return res.send(200, filesObject)
+                }
+                else {
+                    Log.trace("getFilesAdmin| Error getting files..");
+                    return res.send(500, "error getting files..");
+                }
+            }
+        );
+    }
+
+    /* functions below still need to be cleaned up */
+
     static registerStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
         /*
         //create new student with gitub username and githubtoken.
@@ -466,60 +550,5 @@ export default class RouteHandler {
                 return;
             }
         });
-    }
-
-
-
-
-
-
-
-    //send admins, students, teams, deliverables files back to admin portal
-    static getFilesAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
-        var filesObject = {
-            "admins": "",
-            "students": "",
-            "teams": "",
-            "deliverables": ""
-        }
-        
-        Helper.returnFile("admins.json", function (error: any, data: any) {
-            if (!error && data.length > 0) {
-                filesObject.admins = JSON.parse(data);
-            }
-            else {
-                filesObject.admins = "err";
-            }
-        });
-
-        Helper.returnFile("students.json", function (error: any, data: any) {
-            if (!error && data.length > 0) {
-                filesObject.students = JSON.parse(data);
-            }
-            else {
-                filesObject.students = "err";
-            }
-        });
-
-        Helper.returnFile("teams.json", function (error: any, data: any) {
-            if (!error && data.length > 0) {
-                filesObject.teams = JSON.parse(data);
-            }
-            else {
-                filesObject.teams = "err";
-            }
-        });
-
-        Helper.returnFile("deliverables.json", function (error: any, data: any) {
-            if (!error && data.length > 0) {
-                filesObject.deliverables = JSON.parse(data);
-            }
-            else {
-                filesObject.deliverables = "err";
-            }
-        });
-        
-        res.send(200, filesObject)
-        return;
     }
 }

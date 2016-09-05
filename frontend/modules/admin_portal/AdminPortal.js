@@ -7,7 +7,7 @@ import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'e
 export default React.createClass({
   getInitialState: function() {
     return {
-      adminFile: '',
+      adminObject: '',
       studentsFile: '',
       teamsFile: '',
       deliverablesFile: '',
@@ -18,11 +18,11 @@ export default React.createClass({
   getFilesAdmin: function () {
     Ajax.getFilesAdmin(
       function success(response) {
-        console.log("AdminPortal.js| Retrieved files!");
-        console.log("AdminPortal.js| admins.json: " + response.admins);
-        console.log("AdminPortal.js| students.json: " + response.students);
-        console.log("AdminPortal.js| teams.json: " + response.teams);
-        console.log("AdminPortal.js| deliverables.json: " + response.deliverables);
+        console.log("AdminPortal.js| Retrieved files.");
+        this.setState({ adminObject: response.adminObject });
+        this.setState({ studentsFile: response.studentsFile });
+        this.setState({ teamsFile: response.teamsFile });
+        this.setState({ deliverablesFile: response.deliverablesFile });
       }.bind(this),
       function error(xhr, status, error) {
         console.log("AdminPortal.js| Error getting files!");
@@ -49,6 +49,7 @@ export default React.createClass({
   },
   componentDidMount: function () {
     this.getFilesAdmin();
+    this.getClasslist();
   },
   render: function () {
     //todo: transition to .bind(this);
@@ -57,7 +58,7 @@ export default React.createClass({
     //Read more about passing props to this.props.children: http://stackoverflow.com/questions/32370994/how-to-pass-props-to-this-props-children
     var childrenWithProps = React.Children.map(this.props.children, function (child) {
       return React.cloneElement(child, {
-        "admin": that.state.adminFile,
+        "admin": that.state.adminObject,
         "students": that.state.studentsFile,
         "teams": that.state.teamsFile,
         "deliverables": that.state.deliverablesFile,
@@ -81,11 +82,8 @@ export default React.createClass({
             </Col>
           </Row>
         </div>
-
-        <Logout firstname={this.state.adminFile.firstname} sid={this.state.adminFile.prof ? "Prof" : "TA"} user={localStorage.user}/>
-
-        {childrenWithProps}
-
+        {!!this.state.adminObject && (<Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.prof ? "Prof" : "TA"} user={localStorage.user}/>) }
+        {!!this.state.adminObject && childrenWithProps}
       </div>
     )}
 })
