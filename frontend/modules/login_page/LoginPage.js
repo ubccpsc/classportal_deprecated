@@ -1,5 +1,6 @@
 import React from 'react'
 import GithubButton from './GithubButton'
+import RegisterButton from './RegisterButton'
 
 export default React.createClass({
   render() {
@@ -7,6 +8,7 @@ export default React.createClass({
       <div>
         <div className="module">
           <h3>Login</h3>
+          <RegisterButton/>
           <GithubButton/>
         </div>
 
@@ -28,8 +30,3 @@ export default React.createClass({
       </div>  
     )}
 })
-
-/*
-<br/><br/>Reid Holmes | <a href="https://www.cs.ubc.ca/people/reid-holmes" target="blank">https://www.cs.ubc.ca/people/reid-holmes</a>
-<br/>Michael Sargent | <a href="http://www.mksarge.io" target="blank">http://www.mksarge.io</a>
-*/

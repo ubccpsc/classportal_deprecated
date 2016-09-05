@@ -55,9 +55,6 @@ export default React.createClass({
         <h3>Register Account</h3>
         <p>Please confirm your student info below to continue.</p><br/><br/>
         <Form onSubmit={this.handleSubmit} className="form" type="horizontal">
-          <FormIconField label="GitHub Username" iconPosition="left" iconKey="mark-github">
-            <FormInput placeholder={this.state.github} name="supported-controls-input-disabled" disabled />
-          </FormIconField>
           <FormIconField label="UBC Student Number" iconPosition="left" iconKey="mortar-board">
             <FormInput placeholder="eg. 12345678"/>
           </FormIconField>
@@ -65,7 +62,7 @@ export default React.createClass({
             <FormInput placeholder="eg. a1b2"/>
           </FormIconField>
           <FormField offsetAbsentLabel>
-            <Button submit>Submit</Button>
+            <Button submit>Register with GitHub</Button>
           </FormField>
         </Form>
       </div>

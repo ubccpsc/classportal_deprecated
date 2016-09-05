@@ -16,10 +16,33 @@ import LoginController from '../controller/LoginController';
 import TeamController from '../controller/TeamController';
 import Helper from './Helper';
 
+var _ = require('lodash');
+
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
 var config = require(pathToRoot + 'config.json');
 
 export default class RouteHandler {
+    
+    static registerStudent(req: restify.Request, res: restify.Response, next: restify.Next) {
+        /*
+        //create new student with gitub username and githubtoken.
+        LoginController.createBlankStudent(username, githubtoken, function () {
+            //finally, send app to registration page.
+            //todo: double check this action
+            Log.trace("authenticateGithub| Redirecting to registration page.");
+            res.json(200, "/register~" + username + "~" + servertoken);
+        });
+
+        
+        else {
+        Log.trace("authenticateGithub| User has not completed registration. Redirecting to registration page.");
+        //TODO: what's stopping someone from manually entering the student portal from the registration screen?'
+        res.json(200, "/register~" + username + "~" + servertoken);
+        }
+
+        */
+    }
+    
     /*
         This function is called from the "post-login" page, after a successful Github login.
         Parameters: Github authcode 
@@ -45,7 +68,7 @@ export default class RouteHandler {
                         var obj = JSON.parse(body2);
                         var username = obj.login;
                         Log.trace("authenticateGithub| Successfully acquired username: " + username);
-                                    
+
                         //check if username matches list of admin usernames.
                         Helper.isAdmin(username, function (isAdmin: boolean) {
 
@@ -54,9 +77,7 @@ export default class RouteHandler {
                         
                                 //do if admin
                                 if (isAdmin) {
-
                                     //TODO: write github token to admin file!
-
                                     Log.trace("Authentication complete! Redirecting to admin portal..");
                                     res.send(200, "/admin~" + username + "~" + servertoken);
                                     return next();
@@ -64,37 +85,32 @@ export default class RouteHandler {
                                 //do if student
                                 else {
                                     //request student info from database by providing github username.
-                                    Helper.returnStudent(username, function (studentObject: any) {
-                                        
-                                        //if student does not exist in database, create new user.
-                                        //TODO: but what if it was becuase of file read error?
-                                        if (studentObject == null) {
-                                            //create new student with gitub username and githubtoken.
-                                            LoginController.createBlankStudent(username, githubtoken, function () {
-                                                //finally, send app to registration page.
-                                                //todo: double check this action
-                                                Log.trace("authenticateGithub| Redirecting to registration page.");
-                                                res.json(200, "/register~" + username + "~" + servertoken);
-                                            });
-                                        }
-                                        //student exists in database
-                                        else {
-                                            //update githubtoken
-                                            Helper.writeStudent(username, { "githubtoken": githubtoken }, function () {
-                                                Log.trace("authenticateGithub| Updated student's githubtoken.");
-
-                                                //check if they have the required info from registration.
-                                                if (!!studentObject.csid && !!studentObject.sid && !!studentObject.firstname) {
-                                                    Log.trace("authenticateGithub| Sending user to homepage..");
+                                    Log.trace("authenticateGithub| Username: " + username);
+                                    Helper.returnFile("students.json", function (error: any, data: any) {
+                                        if (!error && data.length > 0){
+                                            var studentFile = JSON.parse(data);
+                                            var student = _.find(studentFile, { 'github_name': username });
+                                            
+                                            if (!!student && student.csid && !!student.sid) {
+                                                //update githubtoken
+                                                Helper.writeStudent(username, { "github_token": githubtoken }, function () {
+                                                    Log.trace("authenticateGithub| Updated student's githubtoken. Sending user to homepage..");
                                                     res.json(200, "/~" + username + "~" + servertoken);
-                                                }
-                                        
-                                                else {
-                                                    Log.trace("authenticateGithub| User has not completed registration. Redirecting to registration page.");
-                                                    //TODO: what's stopping someone from manually entering the student portal from the registration screen?'
-                                                    res.json(200, "/register~" + username + "~" + servertoken);
-                                                }
-                                            });
+                                                    return next();
+                                                });
+                                            }
+                                            else {
+                                                //error: student not found in file
+                                                Log.trace("authenticateGithub| Error: Student not found!");
+                                                res.send(500, "error");
+                                                return;
+                                            }
+                                        }
+                                        else {
+                                            //error: file could not be read
+                                            Log.trace("authenticateGithub| Error: Student not found!");
+                                            res.send(500, "error");
+                                            return;
                                         }
                                     });
                                 }

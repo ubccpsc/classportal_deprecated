@@ -1,6 +1,7 @@
 import fs = require('fs');
 import Student from '../model/Student';
 import Log from '../Util';
+var _ = require('lodash');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
 var config = require(pathToRoot + 'config.json');
@@ -118,21 +119,23 @@ export default class Helper {
         });
     }
 
+    //implemented with lodash. test this!
     static writeStudent(username: string, paramsObject: any, callback: any) {
         Log.trace("writeStudent| Writing to user: " + username + " in students.json..");
         
         var filename = pathToRoot.concat(config.path_to_students);
         var file = require(filename);
-
+        var studentIndex:number = _.findIndex(file, { 'github_name': username });
+        
         //step 1: check if username exists
-        if (!!file[username]) {
+        if (studentIndex >= 0) {
             //step 2: update student object
             //TODO: do i need to worry about mapping to a new object instead of modifying the original object?
             var i = 0;
             for (var key in paramsObject) {
-                if (file[username].hasOwnProperty(key)) {
+                if (file[studentIndex].hasOwnProperty(key)) {
                     Log.trace('writeStudent| Writing to ' + key + ': ' + paramsObject[key]);
-                    file[username][key] = paramsObject[key];
+                    file[studentIndex][key] = paramsObject[key];
                     i++;
                 }
             }
@@ -225,6 +228,7 @@ export default class Helper {
         });
     }
 
+    //TODO: fix with lodash
     static returnStudent(username: string, callback: any) {
         Log.trace("returnStudent| Accessing students.json");
         var filename = pathToRoot.concat(config.path_to_students);
@@ -235,12 +239,15 @@ export default class Helper {
                 return;
             }
             else {
-                var file = JSON.parse(data);
                 Log.trace("returnStudent| Checking for user " + username);
-                
-                if (!!file[username]) {
+                var studentFile = JSON.parse(data);
+
+                //check if any index in studentFile has a sid that matches the supplied username
+                if (studentFile.some((studentObject: any) => username === studentObject.sid)) {
                     Log.trace("returnStudent| Successfully accessed " + username + ".");
-                    callback(file[username]);
+                    
+                    //needs fixing
+                    //callback(studentFile[username]);
                     return;
                 }
                 else {
