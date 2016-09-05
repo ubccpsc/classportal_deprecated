@@ -43,114 +43,31 @@ export default class RouteHandler {
         */
     }
     
-    /*
-        This function is called from the "post-login" page, after a successful Github login.
-        Parameters: Github authcode 
-        Actions:
-        1) request an access token from github.
-        2) use token to get user info from github.
-        3) check if username exists in database
-        4a) if yes, update the user's githubtoken and redirect app to the homepage.
-        4b) if no, create blank student and redirect app to registration page.
-    */
-    static authenticateGithub(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("authenticateGithub| Checking authcode..");
-        
-        //this callback is executed after a successful request to Github for access token.
-        function requestGithubTokenCallback(err1: any, res1: any, body1: any) {
-            if (!err1 && res1.statusCode == 200) {
-                var githubtoken = body1.access_token;
-                Log.trace("authenticateGithub| Successfully acquired github token.");
-                
-                //next, request github username using githubtoken.
-                LoginController.requestGithubInfo(githubtoken, function (err2: any, res2: any, body2: any) {
-                    if (!err2 && res2.statusCode == 200) {
-                        var obj = JSON.parse(body2);
-                        var username = obj.login;
-                        Log.trace("authenticateGithub| Successfully acquired username: " + username);
+    //input: Github authcode 
+    //response: object containing redirect path, username, and auth token
+    static userLogin(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace("userLogin| Checking authcode..");
+        var authcode = req.params.authcode;
 
-                        //check if username matches list of admin usernames.
-                        Helper.isAdmin(username, function (isAdmin: boolean) {
-
-                            //create servertoken with admin flag
-                            LoginController.createServerToken(username, isAdmin, function (servertoken: string) {
-                        
-                                //do if admin
-                                if (isAdmin) {
-                                    //TODO: write github token to admin file!
-                                    Log.trace("Authentication complete! Redirecting to admin portal..");
-                                    res.send(200, "/admin~" + username + "~" + servertoken);
-                                    return next();
-                                }
-                                //do if student
-                                else {
-                                    //request student info from database by providing github username.
-                                    Log.trace("authenticateGithub| Username: " + username);
-                                    Helper.returnFile("students.json", function (error: any, data: any) {
-                                        if (!error && data.length > 0){
-                                            var studentFile = JSON.parse(data);
-                                            var student = _.find(studentFile, { 'github_name': username });
-                                            
-                                            if (!!student && student.csid && !!student.sid) {
-                                                //update githubtoken
-                                                Helper.writeStudent(username, { "github_token": githubtoken }, function () {
-                                                    Log.trace("authenticateGithub| Updated student's githubtoken. Sending user to homepage..");
-                                                    res.json(200, "/~" + username + "~" + servertoken);
-                                                    return next();
-                                                });
-                                            }
-                                            else {
-                                                //error: student not found in file
-                                                Log.trace("authenticateGithub| Error: Student not found!");
-                                                res.send(500, "error");
-                                                return;
-                                            }
-                                        }
-                                        else {
-                                            //error: file could not be read
-                                            Log.trace("authenticateGithub| Error: Student not found!");
-                                            res.send(500, "error");
-                                            return;
-                                        }
-                                    });
-                                }
-                            });
-                        });
-                    }
-                    else {
-                        Log.trace("authenticateGithub| Error accessing public info from Github.");
-                        res.send(500, "error connecting to github");
-                    }
-                });
-            }
-            else {
-                Log.trace("authenticateGithub| Error requesting access token from github.com: " + err1.toString());
-                res.send(500, "error connecting to github");
-            }
-        }
-
-        //only continue if authcode is present.
-        if (!!req.params.authcode) {
-            //build the request options object
-            var options = {
-                method: 'post',
-                body: {
-                    client_id: config.client_id,
-                    client_secret: config.client_secret,
-                    code: req.params.authcode
-                },
-                json: true,
-                url: 'https://github.com/login/oauth/access_token',
-                headers: {}
-            };
-            
-            Log.trace("authenticateGithub| Requesting access token from Github..");
-            request(options, requestGithubTokenCallback);
-            return next();
+        //check for valid authcode format
+        if (typeof authcode === 'string' && authcode.length > 0) {
+            //perform login process
+            LoginController.login(authcode, function (error:any, data:any) {
+                if (!error) {
+                    Log.trace("userLogin| Login success. Response: " + JSON.stringify(data));
+                    res.send(200, data);
+                    return next();
+                }
+                else {
+                    Log.trace("userLogin| Error: " + error);
+                    res.send(500, error);
+                    return;
+                }
+            });
         }
         else {
-            Log.trace("authenticateGithub| Error: Missing authcode.");
-            res.send(500, "missing authcode");
+            Log.trace("userLogin| Error: Bad authcode.");
+            res.send(500, "bad authcode");
             return;
         }
     }

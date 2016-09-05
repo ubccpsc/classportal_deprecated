@@ -120,42 +120,43 @@ export default class Helper {
     }
 
     //implemented with lodash. test this!
-    static writeStudent(username: string, paramsObject: any, callback: any) {
-        Log.trace("writeStudent| Writing to user: " + username + " in students.json..");
+    static updateUser(userType:string, username: string, paramsObject: any, callback: any) {
+        Log.trace("updateUser| Writing to user: " + username + " in students.json..");
         
-        var filename = pathToRoot.concat(config.path_to_students);
+        var filename = pathToRoot.concat(config.private_folder, userType);
         var file = require(filename);
-        var studentIndex:number = _.findIndex(file, { 'github_name': username });
-        
-        //step 1: check if username exists
-        if (studentIndex >= 0) {
-            //step 2: update student object
-            //TODO: do i need to worry about mapping to a new object instead of modifying the original object?
-            var i = 0;
+
+        //check if username exists
+        var userIndex:number = _.findIndex(file, { 'github_name': username });
+        if (userIndex >= 0) {
+            //update file
+            var count = 0;
             for (var key in paramsObject) {
-                if (file[studentIndex].hasOwnProperty(key)) {
-                    Log.trace('writeStudent| Writing to ' + key + ': ' + paramsObject[key]);
-                    file[studentIndex][key] = paramsObject[key];
-                    i++;
+                if (file[userIndex].hasOwnProperty(key)) {
+                    Log.trace('updateStudentOrAdmin| Writing to ' + key + ': ' + paramsObject[key]);
+                    file[userIndex][key] = paramsObject[key];
+                    count++;
                 }
             }
-            Log.trace('writeStudent| Mapped ' + i + ' key(s).');
+            Log.trace('updateUser| Updated ' + count + ' key(s).');
 
-            //step 3: write to file
+            //write to file
             fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
                 if (err) {
-                    Log.trace("writeStudent| Write unsuccessful: " + err.toString());
+                    Log.trace("updateUser| Write unsuccessful: " + err.toString());
+                    callback(true, null);
                     return;
                 }
                 else {
-                    Log.trace("writeStudent| Write successful! Executing callback..");
-                    callback();
+                    Log.trace("updateUser| Write successful! Executing callback..");
+                    callback(null, true);
                     return;
                 }
             });
         }
         else {
-            Log.trace("writeStudent| Error: User was not found..");
+            Log.trace("updateUser| Error: User was not found..");
+            callback(true, null);
             return;
         }
     }
@@ -271,16 +272,10 @@ export default class Helper {
             }
             else {
                 var file = JSON.parse(data);
-                if (!!file[username]) {
-                    Log.trace("isAdmin| " + username + " is an admin! Executing callback..");
-                    callback(true);
-                    return;
-                }
-                else {
-                    Log.trace("isAdmin| " + username + " is an student! Executing callback..");
-                    callback(false);
-                    return;
-                }
+                var isAdmin: boolean = Boolean(_.findIndex(file, { 'github_name': username }));
+                Log.trace("isAdmin| " + username + ": " + isAdmin);
+                callback(isAdmin);
+                return;
             }
         });
     }

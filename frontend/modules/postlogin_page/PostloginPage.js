@@ -32,9 +32,10 @@ export default React.createClass({
       Ajax.authenticateAuthcode(
         authcode,
         function success(response) {
-          console.log("PostLogin.js| Authentication success! Response: " + response);
-          var fields = response.split('~');
-          var redirect = fields[0], user = fields[1], token = fields[2];
+          console.log("PostLogin.js| Authentication success! Response: " + JSON.stringify(response));
+          var redirect = response.redirect;
+          var user = response.user;
+          var token = response.token;
 
           if (redirect == "/register" || redirect == "/") {
             console.log("PostLogin.js| Student login! Redirecting..");
@@ -51,11 +52,15 @@ export default React.createClass({
           }
           else {
             //bad login, so send back to login page
-            browserHistory.push("/");
+            console.log("PostLogin.js| Error: Something went wrong! ", redirect, user, token);
+            setTimeout(function () {
+                  browserHistory.push("/");
+              }, 2000);
           }
         }.bind(this),
         function error(xhr, status, err) {
           console.log("PostLogin.js| Error: Bad authentication!");
+          console.log(xhr, status, err);
           that.setState({ error: true }, function () {
               console.log("PostLogin.js| Redirecting to login..");
               setTimeout(function () {
