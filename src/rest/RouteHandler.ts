@@ -110,10 +110,17 @@ export default class RouteHandler {
                                 Log.trace("registerAccount| SID Match! Updating student information..");
                                 
                                 //error: can't use "user" to identify
-                                Helper.updateStudentObject(sid, { github_name: user }, function () {
-                                    Log.trace("registerAccount| Account updated successfully. Sending user to homepage.");
-                                    res.json(200, "success");
-                                    return next();
+                                Helper.updateUser("students.json", sid, { github_name: user }, function (error:any, data:any) {
+                                    if (!error && data.length > 0) {
+                                        Log.trace("registerAccount| Account updated successfully. Sending user to homepage.");
+                                        res.json(200, "success");
+                                        return next();
+                                    }
+                                    else {
+                                        Log.trace("registerAccount| Error updating file!");
+                                        res.json(500, error);
+                                        return;
+                                    }
                                 });
                                 //Log.trace("Error: writeStudent failed");
                                 //????

@@ -167,49 +167,6 @@ export default class Helper {
         return (result);
     }
 
-    //update students in students.json
-    //todo: add error callback to this (and all other functions)    
-    static updateStudentObject(sid: string, paramsObject: any, callback: any) {
-        Log.trace("updateStudentObject| Updating student: " + sid);
-        var filename = pathToRoot.concat(config.path_to_students);
-        var file = require(filename);
-        var valuesUpdated: number = 0;
-
-        //step 1: check if sid exists
-        for (var index = 0; index < file.length; index++) {
-            if (file[index].sid == sid) {
-                for (var key in paramsObject) {
-                    if (file[index].hasOwnProperty(key)) {
-                        Log.trace("updateStudentObject| New value for key: " + key);
-                        Log.trace("updateStudentObject| Old: " + file[index][key] + " New: " + paramsObject[key]);
-                        file[index][key] = paramsObject[key];
-                        valuesUpdated++;
-                    }
-                }
-                //only update file if at least 1 value was updated.
-                if (valuesUpdated > 0) {
-                    //step 3: write to file
-                    fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
-                        if (err) {
-                            Log.trace("updateStudentObject| Write unsuccessful: " + err.toString());
-                            return;
-                        }
-                        else {
-                            Log.trace("updateStudentObject| Write successful! Executing callback..");
-                            callback();
-                            return;
-                        }
-                    });
-                }
-                else {
-                    //no values to be updated
-                    return;
-                }
-            }
-        }
-        return;
-    }
-
     //todo: returns bad data when reading empty (0-length) file. look into i/o streams    
     static returnFile(file: string, callback: any) {
         Log.trace("returnFile| Accessing: " + file);
