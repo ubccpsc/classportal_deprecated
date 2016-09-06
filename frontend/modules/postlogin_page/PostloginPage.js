@@ -27,49 +27,63 @@ export default React.createClass({
     }
   },
   sendAuthCode: function(){
-    var that = this;
     this.getAuthCode(window.location.href, function (authcode) {
       Ajax.login(
+        localStorage.csid ? localStorage.csid : "",
+        localStorage.sid ? localStorage.sid : "",
         authcode,
         function success(response) {
           console.log("PostLogin.js| Authentication success! Response: " + JSON.stringify(response));
-          var redirect = response.redirect;
-          var user = response.user;
+          var admin = response.admin;
+          var username = response.username;
           var token = response.token;
+          
+          //clear any previously saved values in localstorage
+          localStorage.clear();
 
-          if (redirect == "/register" || redirect == "/") {
-            console.log("PostLogin.js| Student login! Redirecting..");
-            localStorage.setItem('user', user);
-            localStorage.setItem('token', token);
-            browserHistory.push(redirect); 
-          }
-          else if (redirect == "/admin") {
-            console.log("PostLogin.js| Admin login! Redirecting..");
-            localStorage.setItem('user', user);
-            localStorage.setItem('token', token);
-            localStorage.setItem('admin', true);
-            browserHistory.push("/admin");
+          if (!!username & !!token) {
+            if (admin === true) {
+              console.log("PostLogin.js| Admin login! Redirecting..");
+              localStorage.setItem('username', username);
+              localStorage.setItem('token', token);
+              localStorage.setItem('admin', "true");
+              browserHistory.push("/admin");
+            }
+            else {
+              console.log("PostLogin.js| Student login! Redirecting..");
+              localStorage.setItem('username', username);
+              localStorage.setItem('token', token);
+              browserHistory.push("/");
+            }
           }
           else {
             //bad login, so send back to login page
-            console.log("PostLogin.js| Error: Something went wrong! ", redirect, user, token);
+            console.log("PostLogin.js| Error: Something went wrong! ", redirect, username, token);
             setTimeout(function () {
-                  browserHistory.push("/");
-              }, 2000);
+              browserHistory.push("/");
+            }, 2000);
           }
         }.bind(this),
         function error(xhr, status, err) {
-          console.log("PostLogin.js| Error: Bad authentication!");
-          console.log(xhr, status, err);
-          that.setState({ error: true }, function () {
-              console.log("PostLogin.js| Redirecting to login..");
-              setTimeout(function () {
-                  browserHistory.push("/");
-              }, 2000);
+          console.log("PostLogin.js| Error: " + err + status + xhr);
+          
+          //clear student info set by register process
+          localStorage.clear();
+          
+          //before redirect, let user know why they could not log in.
+          //todo: get error message from server response instead of hard-coding it
+          alert("Login error: not registered");
+
+          //display error message for 3 seconds before redirecting to login
+          this.setState({ error: true }, function () {  
+            console.log("PostLogin.js| Redirecting to login..");
+            setTimeout(function () {
+              browserHistory.push("/");
+            }, 3000);
           });
         }.bind(this)
       )
-    });
+    }.bind(this));
   },
   componentDidMount: function () {
     this.sendAuthCode();

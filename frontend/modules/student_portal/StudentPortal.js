@@ -11,86 +11,52 @@ import Ajax from '../shared_components/Ajax'
 export default React.createClass({
   getInitialState: function() {
     return {
-      studentObject: '',
-      deliverablesObject: '',
-      gradesObject: '',
+      myStudent: '',
+      myTeam: '',
+      myGrades:'',
+      deliverablesFile: '',
       classlist: ''
-    };
+    }
   },
-  //TODO: DON'T RETURN ALL INFO on student. Make public and private keys in students.json  
-  getStudent: function () {
-    Ajax.getStudent(
+  loadStudentPortal: function () {
+    Ajax.loadStudentPortal(
       function success(response) {
-        console.log("StudentPortal.js| Retrieved student: \n" + JSON.stringify(response));
-        this.setState({ studentObject: response }, function () {
-          this.getDeliverables();
-        });
-      }.bind(this),
-      function error(xhr, status, err) {
-        console.error("StudentPortal.js| Error retrieving student file!", status, err.toString());
-      }.bind(this)
-    )
-  },
-  getDeliverables: function () {
-    Ajax.getDeliverables(
-      function success (response) {
-        console.log("StudentPortal.js| Retrieved "+response.length+" deliverables");
-        this.setState({ deliverablesObject: response }, function () {
-          this.getGrades();
-        });
-      }.bind(this),
-      function error (xhr, status, err) {
-        console.log("StudentPortal.js| Error retrieving deliverables!");
-      }.bind(this)
-    )
-  },
-  getGrades: function () {
-    Ajax.getGrades(
-      { "sid": this.state.studentObject.sid },
-      function success (response) {
-        console.log("StudentPortal.js| Retrieved grades: " + response);
-        this.setState({ gradesObject: response });
-      }.bind(this),
-      function error (xhr, status, err) {
-        console.log("StudentPortal.js| Error getting grades!");
-      }.bind(this)
-    )
-  },
-  getClasslist: function () {
-    Ajax.getClasslist(
-      function success(response) {
-        console.log("StudentPortal.js| Retrieved class list:" + response);
+        console.log("StudentPortal.js| Retrieved files.");
+        console.log(JSON.stringify(response, null, 2));
+
+        this.setState({ myStudent: response.myStudent });
+        this.setState({ myTeam: response.myTeam });
+        this.setState({ myGrades: response.myGrades });
+        this.setState({ deliverablesFile: response.deliverablesFile });
         
         //convert classlist into format useable by Elemental Form-Select
-        var classlistWithLabels = []
-        for (var index = 0; index < response.length; index++){
-          classlistWithLabels[index] = { "label": response[index] };
+        var unformattedClasslist = response.classlist;
+        var formattedClasslist = [];
+        for (var index = 0; index < unformattedClasslist.length; index++) {
+          formattedClasslist[index] = { "label": unformattedClasslist[index] };
         }
-        
-        this.setState({ classlist: classlistWithLabels });
+        this.setState({ classlist: formattedClasslist });
+
       }.bind(this),
       function error(xhr, status, error) {
-        console.log("StudentPortal.js| Error getting classlist!");
+        console.log("StudentPortal.js| Error getting files!");
       }.bind(this)
     )
   },
   componentDidMount: function () {
-    this.getStudent();
-    this.getClasslist();
+    this.loadStudentPortal();
   },
   render: function () {
     return (
       <div>
-        <Logout firstname={this.state.studentObject.firstname} sid={this.state.studentObject.sid} user={localStorage.user}/>
+        <Logout firstname={this.state.myStudent.firstname} sid={this.state.myStudent.sid} username={localStorage.username}/>
 
-        {!!this.state.studentObject.team ?
-          (<DisplayTeam teamNumber={this.state.studentObject.team}/>) :
-            !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} studentName={this.state.studentObject.firstname + " " + this.state.studentObject.lastname} />) }
+        {!!this.state.myStudent.hasTeam ?
+          (<DisplayTeam teamNumber={this.state.myTeam.id}/>) :
+            !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} studentName={this.state.myStudent.firstname + " " + this.state.myStudent.lastname} />) }
             
-        <Deliverables deliverables={this.state.deliverablesObject}/>
+        <Deliverables deliverables={this.state.deliverablesFile}/>
         
       </div>
     )}
 })
-
-//<Grades grades={this.state.gradesObject} deliverables={this.state.deliverablesObject}/>

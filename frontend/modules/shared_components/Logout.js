@@ -15,7 +15,7 @@ export default React.createClass({
       }.bind(this),
       function error (xhr, status, err) {
         //Design: For any reason, if the logout process fails, we still log the
-        //user out as normal instead of leaving them stuck in the course portal.
+        //username out as normal instead of leaving them stuck in the course portal.
         console.log("Logout.js| Error: " + status + err);
         localStorage.clear();
         console.log("Logout.js| Logged out!");
@@ -32,7 +32,7 @@ export default React.createClass({
             <FormInput placeholder={" "+this.props.sid} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
           </FormIconField>
           <FormIconField id="logout-formfield" iconPosition="left" iconKey="mark-github" >
-            <FormInput placeholder={" "+this.props.user} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
+            <FormInput placeholder={" "+this.props.username} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
           </FormIconField>
           <FormField id="logout-formfield">
             <Button size="sm" submit><Glyph icon="sign-out"/>&nbsp; Log out</Button>

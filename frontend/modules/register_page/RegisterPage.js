@@ -1,59 +1,62 @@
 import React from 'react'
 import {browserHistory } from 'react-router'
-import {Row,Col,Form,FormField,Button,FormInput,FormIconField,Glyph} from 'elemental'
+import {Form,FormField,Button,FormInput,FormIconField,Glyph} from 'elemental'
 import Ajax from '../shared_components/Ajax'
+import config from 'config'
 
 const sidRegex = /^([0-9]){8}$/;
 const csidRegex = /^[a-z][0-9][a-z][0-9]$/;
 
 export default React.createClass({
-  getInitialState: function() {
-    return { github: 'Error: not logged in' };
-  },
   handleSubmit: function (event) {
     event.preventDefault();
-    var sid = event.target.elements[1].value;
-    var csid = event.target.elements[2].value;
+    var sid = event.target.elements[0].value;
+    var csid = event.target.elements[1].value;
     
-    if (sidRegex.test(sid) && csidRegex.test(csid)) {
-      Ajax.register(sid, csid,
+    console.log("Register.js| Submitting csid:" + csid + ", sid:" + sid);
+    if (csidRegex.test(csid) && sidRegex.test(sid)) {
+      Ajax.register(
+        csid,
+        sid,
         function success(response) {
-          console.log("Register.js| Success: " + response);
-          var fields = response.split('~');
-          var redirect = fields[0];
-              
-          if (redirect == "success") {
-            //TODO: need something here to "unlock" the student portal.
-            console.log("Register.js| Successful registration. Redirecting to portal..");
-            browserHistory.push("/");
+          //clear any previously set values in localstorage
+          localStorage.clear();
+          
+          if (response === true) {
+            //set sid and csid for later use by postlogin
+            localStorage.setItem('sid', sid);
+            localStorage.setItem('csid', csid);
+            
+            //login with github
+            var client_id = config.client_id;
+            var redirect_uri = "http://" + config.host + ":" + config.port + "/postlogin";
+            window.location = "https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=" + redirect_uri;
           }
           else {
-            console.log("Register.js| Invalid entry.");
-            alert("Invalid entry. Please try again.");
+            //bad info
+            alert("Error: student does not exist in database");
           }
         }.bind(this),
         function error(xhr, status, err) {
-          console.log("Register.js| Error: Invalid info.");
-          alert("Invalid entry. Please try again.");
+          //bad info
+          alert("Error: student does not exist in database");
         }.bind(this)
-      );
+      )
     }
     else {
+      //clear any previously set values in localstorage
+      localStorage.clear();
+
       console.log("Register.js| Error: Invalid input.");
       alert("Invalid entry. Please try again.");
       return;
     }
   },
-  componentDidMount: function () {
-    if (!!localStorage.user) {
-      this.setState({ github: localStorage.user });
-    }
-  },
   render: function () {
     return (
       <div className="module">
-        <h3>Register Account</h3>
-        <p>Please confirm your student info below to continue.</p><br/><br/>
+        <h3>Register</h3>
+        <p>Please confirm your student identity to continue registration.</p><br/><br/>
         <Form onSubmit={this.handleSubmit} className="form" type="horizontal">
           <FormIconField label="UBC Student Number" iconPosition="left" iconKey="mortar-board">
             <FormInput placeholder="eg. 12345678"/>
@@ -62,7 +65,10 @@ export default React.createClass({
             <FormInput placeholder="eg. a1b2"/>
           </FormIconField>
           <FormField offsetAbsentLabel>
-            <Button submit>Register with GitHub</Button>
+            <Button submit>
+              <Glyph icon="mark-github"/>
+              &nbsp; Continue to GitHub
+            </Button>    
           </FormField>
         </Form>
       </div>

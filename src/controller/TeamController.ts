@@ -4,16 +4,18 @@
 
 import Team from '../model/Team'
 import Log from '../Util';
-import Helper from '../rest/Helper';
+import {Helper} from '../Util';
 import fs = require('fs');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
 var config = require(pathToRoot + 'config.json');
 
 export default class TeamController {
-    /*public createTeam():Team {
-        return new Team();
-    }*/
+    static createTeam(callback:any) {
+        
+    }
+    
+    /* todo: edit these functions */
     
     //input: array with team member names
     //output: array team member sids
@@ -21,7 +23,7 @@ export default class TeamController {
         Log.trace("teamNameToSid| Converting member names to sid..");
 
         if (!!nameArray) {
-            Helper.returnFile("students.json", function (error: any, data: any) {
+            Helper.readFile("students.json", function (error: any, data: any) {
                 if (!error && data.length > 0) {
                     var students = JSON.parse(data);
                     var sidArray: any[] = [];
@@ -58,7 +60,7 @@ export default class TeamController {
     static updateHasTeamStatus(sidArray: any[], hasTeam: boolean, callback: any) {
         Log.trace("updateHasTeamStatus| Updating hasTeam status of the new team members..");
 
-        Helper.returnFile("students.json", function (error: any, data: any) {
+        Helper.readFile("students.json", function (error: any, data: any) {
             if (!error && data.length > 0) {
                 var filename = pathToRoot.concat(config.path_to_students);
                 var studentsFile = JSON.parse(data);
@@ -94,4 +96,5 @@ export default class TeamController {
             }
         });
     }
+
 }

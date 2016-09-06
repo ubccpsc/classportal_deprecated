@@ -1,6 +1,7 @@
 import React from 'react'
 import GithubButton from './GithubButton'
 import RegisterButton from './RegisterButton'
+import { Form, FormRow, FormField} from 'elemental'
 
 export default React.createClass({
   render() {
@@ -8,8 +9,8 @@ export default React.createClass({
       <div>
         <div className="module">
           <h3>Login</h3>
-          <RegisterButton/>
-          <GithubButton/>
+          <RegisterButton id="register-button"/>
+          <GithubButton id="github-button"/>
         </div>
 
         <div className="module">

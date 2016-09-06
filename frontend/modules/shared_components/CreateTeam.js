@@ -6,38 +6,36 @@ import config from 'config'
 
 export default React.createClass({
   getInitialState: function () {
-    return { newTeam: [] };
+    return { newTeamArray: [] };
   },
   handleSubmit: function (e) {
     e.preventDefault();
-    var newTeam = this.state.newTeam;
+    var newTeamArray = this.state.newTeamArray;
     var alertMessage = "Forming team with students: ";
 
     //check for valid students
     for (var i = 0; i < config.team_size; i++) {
       //check that there actually is a selected student at this index 
-      if (!!newTeam[i] && typeof newTeam[i] === 'string') {
+      if (!!newTeamArray[i] && typeof newTeamArray[i] === 'string') {
         
         //check that this student was not previously selected
         for (var j = 0; j < i; j++){
-          if (newTeam[i] === newTeam[j]) {
+          if (newTeamArray[i] === newTeamArray[j]) {
             alert("Error: Invalid team.");
             return;
           }
         }
-
-        alertMessage += newTeam[i] + " ";
+        alertMessage += newTeamArray[i] + " ";
       }
       else {
         alert("Error: Invalid team.");
         return;
       }
-      
     }
 
     alert(alertMessage);
     Ajax.createTeam(
-      newTeam,
+      newTeamArray,
       function success (response) {
         console.log("CreateTeam.js| Success: " + response);
         alert("Success: Team " + response + " created!")
@@ -49,12 +47,12 @@ export default React.createClass({
       }.bind(this)
     )
   },
-  handleSelect: function (that, value) {
+  handleSelect: function (index, value) {
     if (!!value) {
       //this.state is immutable, so setState a new array 
-      var temp = this.state.newTeam;
-      temp[that] = value;
-      this.setState({ newTeam: temp });
+      var temp = this.state.newTeamArray;
+      temp[index] = value;
+      this.setState({ newTeamArray: temp });
     }
     else {
       alert("Error: Bad selection");
@@ -88,7 +86,7 @@ export default React.createClass({
   render: function () {
     return (
       <ContentModule id="create-team" title="Create Team" initialHideContent={false}>
-        {this.renderForm() }
+        {!!this.props.classlist ? this.renderForm() : (<div><h4>Error: No classlist provided.</h4><br/></div>) }
       </ContentModule>
   )}
 })

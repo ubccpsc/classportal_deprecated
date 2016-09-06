@@ -7,7 +7,7 @@ import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'e
 export default React.createClass({
   getInitialState: function() {
     return {
-      adminObject: '',
+      myAdmin: '',
       studentsFile: '',
       teamsFile: '',
       deliverablesFile: '',
@@ -15,47 +15,40 @@ export default React.createClass({
       classlist: ''
     };
   },
-  getFilesAdmin: function () {
-    Ajax.getFilesAdmin(
+  loadAdminPortal: function () {
+    Ajax.loadAdminPortal(
       function success(response) {
         console.log("AdminPortal.js| Retrieved files.");
-        this.setState({ adminObject: response.adminObject });
+        console.log(JSON.stringify(response, null, 2));
+
+        this.setState({ myAdmin: response.myAdmin });
         this.setState({ studentsFile: response.studentsFile });
         this.setState({ teamsFile: response.teamsFile });
         this.setState({ deliverablesFile: response.deliverablesFile });
+        this.setState({ gradesFile: response.gradesFile });
+        
+        //convert classlist into format useable by Elemental Form-Select
+        var unformattedClasslist = response.classlist;
+        var formattedClasslist = [];
+        for (var index = 0; index < unformattedClasslist.length; index++) {
+          formattedClasslist[index] = { "label": unformattedClasslist[index] };
+        }
+        this.setState({ classlist: formattedClasslist });
+
       }.bind(this),
       function error(xhr, status, error) {
         console.log("AdminPortal.js| Error getting files!");
       }.bind(this)
     )
   },
-  getClasslist: function () {
-    Ajax.getClasslist(
-      function success(response) {
-        console.log("AdminPortal.js| Retrieved class list:" + response);
-        
-        //convert classlist into format useable by Elemental Form-Select
-        var classlistWithLabels = [];
-        for (var index = 0; index < response.length; index++) {
-          classlistWithLabels[index] = { "label": response[index] };
-        }
-        
-        this.setState({ classlist: classlistWithLabels });
-      }.bind(this),
-      function error(xhr, status, error) {
-        console.log("AdminPortal.js| Error getting classlist!");
-      }.bind(this)
-    );
-  },
   componentDidMount: function () {
-    this.getFilesAdmin();
-    this.getClasslist();
+    this.loadAdminPortal();
   },
   render: function () {
     //more info: http://stackoverflow.com/questions/32370994/how-to-pass-props-to-this-props-children
     var childrenWithProps = React.Children.map(this.props.children, function (child) {
       return React.cloneElement(child, {
-        "admin": this.state.adminObject,
+        "admin": this.state.myAdmin,
         "students": this.state.studentsFile,
         "teams": this.state.teamsFile,
         "deliverables": this.state.deliverablesFile,
@@ -69,18 +62,18 @@ export default React.createClass({
         <div id="NavLinks">
           <Row>
             <Col sm="1/3">
-              <NavLink to="/admin/teams" onlyActiveOnIndex={true}>Teams View</NavLink>
+              <NavLink to="/admin/teams" onlyActiveOnIndex={true}>Teams</NavLink>
             </Col>
             <Col sm="1/3">
-              <NavLink to="/admin/students">Students View</NavLink>
+              <NavLink to="/admin/students">Students</NavLink>
             </Col>
             <Col sm="1/3">
-              <NavLink to="/admin/deliverables">Deliverables View</NavLink>
+              <NavLink to="/admin/deliverables">Deliverables</NavLink>
             </Col>
           </Row>
         </div>
-        {!!this.state.adminObject && (<Logout firstname={this.state.adminObject.firstname} sid={this.state.adminObject.prof ? "Prof" : "TA"} user={localStorage.user}/>) }
-        {!!this.state.adminObject && childrenWithProps}
+        <Logout firstname={this.state.myAdmin.firstname} sid={this.state.myAdmin.prof ? "Prof" : "TA"} username={localStorage.username}/>
+        {!!this.state.myAdmin && childrenWithProps}
       </div>
     )}
 })
