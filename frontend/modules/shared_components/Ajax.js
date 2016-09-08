@@ -3,7 +3,7 @@ import config from 'config';
 
 module.exports = {
     login: function (csid, sid, authcode, successCallback, errorCallback) {
-        console.log("Ajax.js| Authenticating authcode..");
+        // console.log("Ajax.js| Authenticating authcode..");
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/login",
@@ -24,7 +24,7 @@ module.exports = {
         });
     },
     register: function(csid, sid, successCallback, errorCallback) {
-        console.log("Ajax.js| Checking if student exists in database..");
+        // console.log("Ajax.js| Checking if student exists in database..");
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/register",
@@ -45,7 +45,7 @@ module.exports = {
     },
     //delete server token of the current username.
     logout: function (successCallback, errorCallback) {
-        console.log("Ajax.js| Logging out..");
+        // console.log("Ajax.js| Logging out..");
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/logout",
@@ -62,7 +62,7 @@ module.exports = {
         });
     },
     loadStudentPortal: function(successCallback, errorCallback) {
-        console.log("Ajax.js| Getting all files for admin portal..");
+        // console.log("Ajax.js| Getting all files for admin portal..");
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/loadStudentPortal",
@@ -79,7 +79,7 @@ module.exports = {
     },
     //submit new team to be created
     createTeam: function (namesArray, successCallback, errorCallback) {
-        console.log("Ajax.js| Creating team..");
+        // console.log("Ajax.js| Creating team..");
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/createTeam",
@@ -99,7 +99,7 @@ module.exports = {
     },
     //admin portal: gets all files upon login    
     loadAdminPortal: function(successCallback, errorCallback) {
-        console.log("Ajax.js| Getting all files for admin portal..");
+        // console.log("Ajax.js| Getting all files for admin portal..");
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/loadAdminPortal",
@@ -116,7 +116,7 @@ module.exports = {
     },
     //admin portal: send new classlist.csv to server 
     submitClasslist: function (formData, successCallback, errorCallback) {
-        console.log("Ajax.js| Submitting new class list..");
+        // console.log("Ajax.js| Submitting new class list..");
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/submitClasslist",

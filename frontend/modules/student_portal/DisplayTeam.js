@@ -6,13 +6,13 @@ export default React.createClass({
     return (
       <Form type="inline" >
         <FormIconField iconPosition="left" iconKey="mortar-board" >
-          <FormInput placeholder={" " + this.props.team} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
+          <FormInput placeholder={" " + this.props.team.members} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
         </FormIconField>
         <FormIconField iconPosition="left" iconKey="mortar-board" >
-          <FormInput placeholder={" " + this.props.team} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
+          <FormInput placeholder={" " + this.props.team.members} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
         </FormIconField>
         <FormIconField iconPosition="left" iconKey="mortar-board" >
-          <FormInput placeholder={" " + this.props.team} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
+          <FormInput placeholder={" " + this.props.team.members} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
         </FormIconField>
       </Form>
     );
@@ -20,7 +20,7 @@ export default React.createClass({
   render: function () {
     return (
       <div className="module">
-        <h3>Team { this.props.teamNumber }</h3>
+        <h3>Team { this.props.team.id }</h3>
         {this.renderMembers()}
       </div>
     )}

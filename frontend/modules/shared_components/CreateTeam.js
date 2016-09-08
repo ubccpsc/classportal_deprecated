@@ -17,9 +17,9 @@ export default React.createClass({
     for (var i = 0; i < config.team_size; i++) {
       //check that there actually is a selected student at this index 
       if (!!newTeamArray[i] && typeof newTeamArray[i] === 'string') {
-        
+
         //check that this student was not previously selected
-        for (var j = 0; j < i; j++){
+        for (var j = 0; j < i; j++) {
           if (newTeamArray[i] === newTeamArray[j]) {
             alert("Error: Invalid team.");
             return;
@@ -36,12 +36,12 @@ export default React.createClass({
     alert(alertMessage);
     Ajax.createTeam(
       newTeamArray,
-      function success (response) {
+      function success(response) {
         console.log("CreateTeam.js| Success: " + response);
         alert("Success: Team " + response + " created!")
-        //window.location.reload(true);
+        window.location.reload(true);
       }.bind(this),
-      function error (xhr, status, err) {
+      function error(xhr, status, err) {
         console.log("CreateTeam.js| Error: " + status + err);
         alert("Error: Could not create team.")
       }.bind(this)
@@ -49,7 +49,7 @@ export default React.createClass({
   },
   handleSelect: function (index, value) {
     if (!!value) {
-      //this.state is immutable, so setState a new array 
+      // this.state is immutable, so setState a new array 
       var temp = this.state.newTeamArray;
       temp[index] = value;
       this.setState({ newTeamArray: temp });
@@ -58,12 +58,17 @@ export default React.createClass({
       alert("Error: Bad selection");
     }
   },
-  renderForm: function() {
+  renderForm: function () {
     var oneOrMoreDropdowns = [];
 
     //build array of dropdown menus depending on specified team size
-    for (var index = 0; index < config.team_size; index++){
-      oneOrMoreDropdowns[index] = this.renderDropdown(index);
+    for (var index = 0; index < config.team_size; index++) {
+      if (index == 0 && this.props.isAdmin !== "true") {
+        oneOrMoreDropdowns[index] = this.renderFirstDropdown();
+      }
+      else {
+        oneOrMoreDropdowns[index] = this.renderDropdown(index);
+      }
     }
 
     return (
@@ -71,16 +76,25 @@ export default React.createClass({
         <FormField id="text-center">
           {oneOrMoreDropdowns}
           <Button size="sm" submit>Form Team</Button>
-        </FormField>  
+        </FormField>
       </Form>);
   },
-  renderDropdown: function(index) {
+  renderDropdown: function (index) {
     return (
       <FormSelect
-        key={index.toString()}
+        key={index.toString() }
         options={this.props.classlist}
         firstOption="Select"
-        onChange={this.handleSelect.bind(this, index)}
+        onChange={this.handleSelect.bind(this, index) }
+        />);
+  },
+  renderFirstDropdown: function () {
+    return (
+      <FormSelect
+        key="first"
+        options={[{ "label": this.props.studentName }]}
+        firstOption="Select"
+        onChange={this.handleSelect.bind(this, 0) }
         />);
   },
   render: function () {
@@ -88,15 +102,6 @@ export default React.createClass({
       <ContentModule id="create-team" title="Create Team" initialHideContent={false}>
         {!!this.props.classlist ? this.renderForm() : (<div><h4>Error: No classlist provided.</h4><br/></div>) }
       </ContentModule>
-  )}
+    )
+  }
 })
-
-/*
- onChange={this.handleChange}
-
-<FormSelect id="select1"
-        options={!!this.props.studentName ? [] : this.props.classList}
-        firstOption={!!this.props.studentName ? this.props.studentName : "Select"}
-        onChange={ function doNothing() { } } />);
-
-*/

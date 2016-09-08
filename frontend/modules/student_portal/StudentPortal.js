@@ -21,8 +21,8 @@ export default React.createClass({
   loadStudentPortal: function () {
     Ajax.loadStudentPortal(
       function success(response) {
-        console.log("StudentPortal.js| Retrieved files.");
-        console.log(JSON.stringify(response, null, 2));
+        // console.log("StudentPortal.js| Retrieved files.");
+        // console.log(JSON.stringify(response, null, 2));
 
         this.setState({ myStudentFile: response.myStudentFile });
         this.setState({ myTeamFile: response.myTeamFile });
@@ -39,7 +39,7 @@ export default React.createClass({
 
       }.bind(this),
       function error(xhr, status, error) {
-        console.log("StudentPortal.js| Error getting files!");
+        // console.log("StudentPortal.js| Error getting files!");
       }.bind(this)
     )
   },
@@ -52,8 +52,8 @@ export default React.createClass({
         <Logout firstname={this.state.myStudentFile.firstname} sid={this.state.myStudentFile.sid} username={localStorage.username}/>
 
         {!!this.state.myStudentFile.hasTeam ?
-          (<DisplayTeam teamNumber={this.state.myTeamFile.id}/>) :
-            !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname} />) }
+          (<DisplayTeam team={this.state.myTeamFile} />) :
+            !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} isAdmin="false" studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname} />) }
             
         <Deliverables deliverables={this.state.deliverablesFile}/>
         
