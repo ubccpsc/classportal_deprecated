@@ -80,10 +80,15 @@ export default React.createClass({
       </Form>);
   },
   renderDropdown: function (index) {
+    var original_classlist = this.props.classlist;
+    
+    // remove the students who already are in a team
+    // var editted_classlist;
+
     return (
       <FormSelect
         key={index.toString() }
-        options={this.props.classlist}
+        options={original_classlist}
         firstOption="Select"
         onChange={this.handleSelect.bind(this, index) }
         />);

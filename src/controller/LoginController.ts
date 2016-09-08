@@ -382,8 +382,12 @@ export default class LoginController {
                         var namesArray: any[] = [];
 
                         for (var index = 0; index < studentsObject.length; index++) {
-                            var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
-                            namesArray.push(name);
+                            
+                            // NEW: only add to array if student 'hasTeam' is false
+                            if (studentsObject[index].hasTeam === false) {
+                                var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
+                                namesArray.push(name);
+                            }
                         }
 
                         studentPortalFiles.classlist = namesArray;
@@ -516,8 +520,12 @@ export default class LoginController {
                         var namesArray: any[] = [];
 
                         for (var index = 0; index < studentsObject.length; index++) {
-                            var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
-                            namesArray.push(name);
+                            
+                            // NEW: only add to array if student 'hasTeam' is false
+                            if (studentsObject[index].hasTeam === false) {
+                                var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
+                                namesArray.push(name);
+                            }
                         }
 
                         adminPortalFiles.classlist = namesArray;

@@ -15,7 +15,8 @@ export default React.createClass({
       myTeamFile: '',
       myGradesFile: '',
       deliverablesFile: '',
-      classlist: ''
+      classlist: '',
+      studentsFile: ''
     }
   },
   loadStudentPortal: function () {
@@ -28,6 +29,9 @@ export default React.createClass({
         this.setState({ myTeamFile: response.myTeamFile });
         this.setState({ myGradesFile: response.myGradesFile });
         this.setState({ deliverablesFile: response.deliverablesFile });
+
+        // double check that this is okay
+        this.setState({ studentsFile: response.studentsFile });
 
         //convert classlist into format useable by Elemental Form-Select
         var unformattedClasslist = response.classlist;
@@ -51,9 +55,15 @@ export default React.createClass({
       <div>
         <Logout firstname={this.state.myStudentFile.firstname} sid={this.state.myStudentFile.sid} username={localStorage.username}/>
 
-        {!!this.state.myStudentFile.hasTeam ?
-          (<DisplayTeam myTeamFile={this.state.myTeamFile} />) :
-          !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} isAdmin="false" studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname} />) }
+        {
+          !!this.state.myStudentFile.hasTeam ?
+            (<DisplayTeam myTeamFile={this.state.myTeamFile} />) :
+            !!this.state.classlist && (
+              <CreateTeam classlist={this.state.classlist}
+                isAdmin="false"
+                studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname}
+                students={this.props.studentsFile} />)
+        }
 
         <Deliverables deliverables={this.state.deliverablesFile}/>
 

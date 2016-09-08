@@ -130,7 +130,7 @@ export default class TeamController {
             },
             function update_second_hasTeam(callback: any) {
                 Log.trace("TeamController::updateHasTeamStatus| update_first_hasTeam");
-                Helper.updateEntry("students.json", { 'sid': sidArray[0] }, { 'hasTeam': true }, function (error: any) {
+                Helper.updateEntry("students.json", { 'sid': sidArray[1] }, { 'hasTeam': true }, function (error: any) {
                     if (!error) {
                         callback(null);
                     }
