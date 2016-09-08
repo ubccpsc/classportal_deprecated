@@ -1,9 +1,8 @@
 [
   {
+    "username": "rtholmes",
     "firstname": "Reid",
     "lastname": "Holmes",
-    "github_name": "",
-    "github_token": "",
     "prof": true,
     "teams": [
       "1",

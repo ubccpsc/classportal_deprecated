@@ -51,11 +51,11 @@ export default React.createClass({
     var childrenWithProps = React.Children.map(this.props.children, function (child) {
       return React.cloneElement(child, {
         "myAdmin": this.state.myAdmin,
-        "admin": this.state.adminsFile,
-        "students": this.state.studentsFile,
-        "teams": this.state.teamsFile,
-        "deliverables": this.state.deliverablesFile,
-        "grades": this.state.gradesFile,
+        "adminsFile": this.state.adminsFile,
+        "studentsFile": this.state.studentsFile,
+        "teamsFile": this.state.teamsFile,
+        "deliverablesFile": this.state.deliverablesFile,
+        "gradesFile": this.state.gradesFile,
         "classlist": this.state.classlist
       });
     }.bind(this));

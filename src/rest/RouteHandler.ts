@@ -17,21 +17,21 @@ export default class RouteHandler {
      * @param authcode
      * @param csid (optional)
      * @param sid (optional)
-     * @returns send response: {path, username, token}
+     * @returns server response: {path, username, token}
      */
     static login(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("RouteHandler::userLogin| Checking authcode");
+        Log.trace("RouteHandler::userLogin| Logging student in");
         var authcode: string = req.params.authcode;
         var csid: string = req.params.csid;
         var sid: string = req.params.sid;
 
         LoginController.login(csid, sid, authcode, function (error: any, data: any) {
             if (!error) {
-                Log.trace("RouteHandler::userLogin| Login success. Response: " + JSON.stringify(data));
+                Log.trace("RouteHandler::userLogin| Succcess!");
                 return res.send(200, data);
             }
             else {
-                Log.trace("RouteHandler::userLogin| Failed to login. Returning");
+                Log.trace("RouteHandler::userLogin| Error!");
                 return res.send(500, "user not found");
             }
         });
@@ -43,20 +43,20 @@ export default class RouteHandler {
      *
      * @param csid
      * @param sid
-     * @returns send response: {boolean}
+     * @returns server response: {boolean}
      */
     static checkRegistration(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("RouteHandler::checkRegistration| Checking valid ID");
+        Log.trace("RouteHandler::checkRegistration| Checking for valid student info");
         var csid: string = req.params.csid;
         var sid: string = req.params.sid;
 
         LoginController.checkRegistration(csid, sid, function (error: any, success: boolean) {
             if (!error && success) {
-                Log.trace("checkRegistration| Success. Continue to login");
+                Log.trace("checkRegistration| Success!");
                 return res.send(200, "success");
             }
             else {
-                Log.trace("checkRegistration| Error: Bad info");
+                Log.trace("checkRegistration| Error!");
                 return res.send(500, "invalid info");
             }
         });
@@ -67,19 +67,19 @@ export default class RouteHandler {
      * Handled by LoginController
      *
      * @param username
-     * @returns send response: {boolean}
+     * @returns server response: {boolean}
      */
     static logout(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("RouteHandler::userLogout| Logging out user: " + username);
+        Log.trace("RouteHandler::userLogout| Logging user out");
         var username: string = req.header("username");
 
         LoginController.logout(username, function (error: any, success: boolean) {
             if (!error && success) {
-                Log.trace("RouteHandler::userLogout| Log out successful.");
+                Log.trace("RouteHandler::userLogout| Success!");
                 return res.send(200, "success");
             }
             else {
-                Log.trace("RouteHandler::userLogout| Log out unsuccessful.");
+                Log.trace("RouteHandler::userLogout| Error!");
                 return res.send(500, "error");
             }
         });
@@ -90,7 +90,7 @@ export default class RouteHandler {
      * Handled by LoginController
      *
      * @param username
-     * @returns send response: object containing files needed for student portal
+     * @returns server response: object containing files needed for student portal
      */
     static loadStudentPortal(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("RouteHandler::loadStudentPortal| Getting files for student portal");
@@ -98,11 +98,11 @@ export default class RouteHandler {
 
         LoginController.loadStudentPortal(username, function end(error: any, data: any) {
             if (!error) {
-                Log.trace("RouteHandler::loadStudentPortal| Sending files.");
+                Log.trace("RouteHandler::loadStudentPortal| Success!");
                 return res.send(200, data);
             }
             else {
-                Log.trace("RouteHandler::loadStudentPortal| Error getting files.");
+                Log.trace("RouteHandler::loadStudentPortal| Error!");
                 return res.send(500, "error");
             }
         });
@@ -115,7 +115,7 @@ export default class RouteHandler {
      * (admin check done in previous middleware functions)
      *
      * @param username 
-     * @returns send response: {admin object, students file, teams file, deliverables file}
+     * @returns server response: {admin object, students file, teams file, deliverables file}
      */
     static loadAdminPortal(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("RouteHandler::loadAdminPortal| Getting files for admin portal");
@@ -123,11 +123,11 @@ export default class RouteHandler {
 
         LoginController.loadAdminPortal(username, function end(error: any, data: any) {
             if (!error) {
-                Log.trace("RouteHandler::loadAdminPortal| Sending files.");
+                Log.trace("RouteHandler::loadAdminPortal| Success!");
                 return res.send(200, data);
             }
             else {
-                Log.trace("RouteHandler::loadAdminPortal| Error getting files.");
+                Log.trace("RouteHandler::loadAdminPortal| Error!");
                 return res.send(500, "error");
             }
         });
@@ -138,17 +138,19 @@ export default class RouteHandler {
      * Handled by AdminController
      *
      * @param csv
-     * @returns send response: 
+     * @returns server response: {boolean}
      */
     static updateClasslist(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("RouteHandler::updateClasslist| Received new classlist.");
-        var csv = require(req.files[0].path);
+        Log.trace("RouteHandler::updateClasslist| Updating database with new classlist");
+        var csv_path = req.files[0].path;
 
-        AdminController.updateClasslist(csv, function (error: any, data: any) {
+        AdminController.updateClasslist(csv_path, function (error: any, data: any) {
             if (!error) {
+                Log.trace("RouteHandler::updateClasslist| Success!");
                 return res.send(200, "success");
             }
             else {
+                Log.trace("RouteHandler::updateClasslist| Error!");
                 return res.send(500, "error");
             }
         });
@@ -159,7 +161,7 @@ export default class RouteHandler {
      * Handled by TeamController
      *
      * @param 
-     * @returns send response
+     * @returns server response
      */
     static createTeam(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("createTeam| Creating new team");
@@ -170,11 +172,11 @@ export default class RouteHandler {
         // todo: what is admin used for?
         TeamController.createTeam(username, admin, nameArray, function (error: any, data: any) {
             if (!error) {
-                Log.trace("createTeam| Success! New team id: " + data);
+                Log.trace("RouteHandler::createTeam| Success!");
                 return res.send(200, "success");
             }
             else {
-                Log.trace("createTeam| Error");
+                Log.trace("RouteHandler::createTeam| Error");
                 return res.send(500, "error");
             }
         });

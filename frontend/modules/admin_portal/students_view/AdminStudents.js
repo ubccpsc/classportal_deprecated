@@ -40,9 +40,9 @@ export default React.createClass({
         <td className="tg-yw4l">
           {!!student.hasTeam ? "#": "No team" }</td>
         <td className="tg-yw4l">
-          {!!student.github_name ?
-            <a href={"http://github.com/" + student.github_name} target="blank" >
-              {student.github_name}
+          {!!student.usernamename ?
+            <a href={"http://github.com/" + student.user} target="blank" >
+              {student.usernamename}
             </a>
             : "Not registered" }</td>
         <td className="tg-yw4l">

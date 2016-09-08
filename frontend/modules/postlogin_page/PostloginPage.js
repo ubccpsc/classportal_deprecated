@@ -72,7 +72,7 @@ export default React.createClass({
           
           //before redirect, let user know why they could not log in.
           //todo: get error message from server response instead of hard-coding it
-          alert("Login error: not registered");
+          alert("Error: User is not registered");
 
           //display error message for 3 seconds before redirecting to login
           this.setState({ error: true }, function () {  

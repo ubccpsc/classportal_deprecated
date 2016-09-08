@@ -37,11 +37,11 @@ export default class LoginController {
                 request(options, function (err: any, res: any, body: any) {
                     if (!err && res.statusCode == 200) {
                         persistGithubToken = body.access_token;
-                        Log.trace("LoginController::login| Successfully acquired github token:");
+                        Log.trace("LoginController::login| request_access_token: success");
                         return callback(null);
                     }
                     else {
-                        Log.trace("LoginController::login| Error: " + err);
+                        Log.trace("LoginController::login| request_access_token: error");
                         return callback("error");
                     }
                 });
@@ -60,11 +60,11 @@ export default class LoginController {
                 request(options, function (err: any, res: any, body: any) {
                     if (!err && res.statusCode == 200) {
                         persistUsername = body.login;
-                        Log.trace("LoginController::login| Successfully acquired username: " + persistUsername);
+                        Log.trace("LoginController::login| request_github_name: success (value:" + persistUsername + ")");
                         return callback(null);
                     }
                     else {
-                        Log.trace("LoginController::login| Error: " + err);
+                        Log.trace("LoginController::login| request_github_name: error");
                         return callback("error", null);
                     }
                 });
@@ -74,9 +74,11 @@ export default class LoginController {
                 Helper.isAdmin(persistUsername, function (error: any, response: boolean) {
                     if (!error) {
                         persistAdmin = response;
+                        Log.trace("LoginController::login| check_if_admin: success (value:" + persistAdmin + ")");
                         return callback(null);
                     }
                     else {
+                        Log.trace("LoginController::login| check_if_admin: error");
                         return callback("error");
                     }
                 });
@@ -91,38 +93,40 @@ export default class LoginController {
 
                         // user found, continue to write githubtoken
                         if (userIndex >= 0) {
-                            Log.trace("LoginController::login| User found!");
+                            Log.trace("LoginController::login| check_user_exists: success");
                             return callback(null);
                         }
                         // user not found. If valid csid and sid supplied, register student.
                         else {
                             if (persistAdmin) {
-                                Log.trace("LoginController::login| Error: Admin not found!");
+                                Log.trace("LoginController::login| check_user_exists: error");
                                 return callback("error");
                             }
                             else {
                                 Log.trace("LoginController::login| Student not found. Checking for first-time login");
                                 var newUserIndex = _.findIndex(file, { 'csid': csid, 'sid': sid });
                                 if (newUserIndex >= 0) {
-                                    Log.trace("LoginController::login| First time login: Updating student file");
+                                    Log.trace("LoginController::login| First time login! Updating student file");
                                     Helper.updateEntry("students.json", { 'csid': csid, 'sid': sid }, { "username": persistUsername }, function (error: any) {
                                         if (!error) {
+
                                             return callback(null);
                                         }
                                         else {
-                                            return callback(null);
+                                            Log.trace("LoginController::login| create_user: success");
+                                            return callback("error");
                                         }
                                     });
                                 }
                                 else {
-                                    Log.trace("LoginController::login| Error: User not found!");
+                                    Log.trace("LoginController::login| check_user_exists: error");
                                     return callback("error");
                                 }
                             }
                         }
                     }
                     else {
-                        Log.trace("LoginController::login| Error: User not found!");
+                        Log.trace("LoginController::login| check_user_exists: error");
                         return callback("error", null);
                     }
                 });
@@ -131,6 +135,7 @@ export default class LoginController {
                 Log.trace("LoginController::login| store_github_token");
                 Helper.updateEntry("tokens.json", { 'username': persistUsername }, { "githubtoken": persistGithubToken }, function (error: any) {
                     if (!error) {
+                        Log.trace("LoginController::login| store_githubtoken: success");
                         return callback(null);
                     }
                     else {
@@ -142,9 +147,11 @@ export default class LoginController {
 
                         Helper.addEntry("tokens.json", newEntry, function (error: any) {
                             if (!error) {
+                                Log.trace("LoginController::login| store_githubtoken: success");
                                 return callback(null);
                             }
                             else {
+                                Log.trace("LoginController::login| store_githubtoken: error");
                                 return callback("error");
                             }
                         });
@@ -159,9 +166,11 @@ export default class LoginController {
 
                 Helper.updateEntry("tokens.json", { 'username': persistUsername }, { "servertoken": servertoken }, function (error: any) {
                     if (!error) {
+                        Log.trace("LoginController::login| generate_and_store_servertoken: success");
                         return callback(null, servertoken);
                     }
                     else {
+                        Log.trace("LoginController::login| generate_and_store_servertoken: error");
                         return callback("error", null);
                     }
                 });
@@ -174,11 +183,11 @@ export default class LoginController {
                         "username": persistUsername,
                         "token": result
                     };
-                    Log.trace("LoginController::login| end_async: success.");
+                    Log.trace("LoginController::login| end_async: success! Response: " + response);
                     return parentCallback(null, response);
                 }
                 else {
-                    Log.trace("LoginController::login| end_async: error");
+                    Log.trace("LoginController::login| end_async: error!");
                     return parentCallback("error", null);
                 }
             }
@@ -220,7 +229,7 @@ export default class LoginController {
                     Helper.checkEntry("students.json", { 'csid': csid, 'sid': sid }, function (error: any, result: boolean) {
                         if (!error && result === true) {
                             Log.trace("LoginController::checkRegistration| Valid student.");
-                            return parentCallback(null, true); 
+                            return parentCallback(null, true);
                         }
                         else {
                             Log.trace("LoginController::checkRegistration| Error: Student is not registered.");

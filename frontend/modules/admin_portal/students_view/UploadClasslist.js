@@ -35,7 +35,8 @@ export default React.createClass({
         window.location.reload(true);
       },
       function error() {
-        console.log("error");
+        alert("Error updating classlist!");
+        window.location.reload(true);
       }
     )
   },
