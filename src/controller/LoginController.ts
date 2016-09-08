@@ -12,14 +12,14 @@ const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserv
 var config = require(pathToRoot + 'config.json');
 
 export default class LoginController {
-    
+
     static login(csid: string, sid: string, authcode: string, parentCallback: any) {
-        //save these variables in the outer function, for easy access from any inner function in the waterfall.
+        // save these variables in the outer function, for easy access from any inner function in the waterfall.
         var persistUsername: string;
         var persistAdmin: boolean;
         var persistGithubToken: string;
-        
-        //login process, executed step-by-step with help of async module.
+
+        // login process, executed step-by-step with help of async module.
         async.waterfall([
             function request_access_token(callback: any) {
                 Log.trace("LoginController::login| request_access_token");
@@ -31,12 +31,12 @@ export default class LoginController {
                         code: authcode
                     },
                     json: true,
-                    url: 'https://github.com/login/oauth/access_token'
+                    url: 'https:// github.com/login/oauth/access_token'
                 };
-                
+
                 request(options, function (err: any, res: any, body: any) {
-                    if (!err && res.statusCode == 200) {
-                        //var github_token: string = body.access_token;
+                    if (!err && res.statusCode === 200) {
+                        // var github_token: string = body.access_token;
                         persistGithubToken = body.access_token;
 
                         Log.trace("LoginController::login| Successfully acquired github token.");
@@ -50,12 +50,12 @@ export default class LoginController {
             function request_github_name(callback: any) {
                 Log.trace("LoginController::login| request_github_name");
                 LoginController.requestGithubInfo(persistGithubToken, function (err: any, res: any, body: any) {
-                    if (!err && res.statusCode == 200) {
+                    if (!err && res.statusCode === 200) {
                         var obj = JSON.parse(body);
                         persistUsername = obj.login;
-                        
+
                         Log.trace("LoginController::login| Successfully acquired username: " + persistUsername);
-                        return callback(null)
+                        return callback(null);
                     }
                     else {
                         return callback("error", null);
@@ -82,12 +82,12 @@ export default class LoginController {
                         var file = JSON.parse(data);
                         var userIndex: number = _.findIndex(file, { 'username': persistUsername });
 
-                        //user found, continue to write githubtoken
+                        // user found, continue to write githubtoken
                         if (userIndex >= 0) {
                             Log.trace("LoginController::login| User found!");
                             return callback(null);
                         }
-                        //user not found. If valid csid and sid supplied, register student.
+                        // user not found. If valid csid and sid supplied, register student.
                         else {
                             if (persistAdmin) {
                                 Log.trace("LoginController::login| Error: Admin not found!");
@@ -131,7 +131,7 @@ export default class LoginController {
                             "username": persistUsername,
                             "githubtoken": persistGithubToken,
                             "servertoken": ""
-                        }
+                        };
 
                         Helper.addEntry("tokens.json", newEntry, function (error: any) {
                             if (!error) {
@@ -146,8 +146,8 @@ export default class LoginController {
             },
             function generate_and_store_servertoken(callback: any) {
                 Log.trace("LoginController::createServerToken| Generating new servertoken for user " + persistUsername);
-                
-                //generate unique string
+
+                // generate unique string
                 var servertoken: string = Math.random().toString(36).slice(2);
 
                 Helper.updateEntry("tokens.json", { 'username': persistUsername }, { "servertoken": servertoken }, function (error: any) {
@@ -176,7 +176,7 @@ export default class LoginController {
             }
         );
     }
-    
+
     static logout(username: string, callback: any) {
         Helper.updateEntry("tokens.json", { 'username': username }, { "servertoken": "" }, function (error: any) {
             if (!error) {
@@ -190,17 +190,17 @@ export default class LoginController {
 
     static requestGithubInfo(githubtoken: string, callback: any) {
         var options = {
-            url: 'https://api.github.com/user',
+            url: 'https:// api.github.com/user',
             headers: {
                 "User-Agent": "ClasslistPortal-Student",
                 "Authorization": "token " + githubtoken
             }
         };
-        
+
         Log.trace("LoginController::requestGithubInfo| Requesting public info from Github");
         request(options, callback);
     }
-    
+
     static checkRegistration(csid: string, sid: string, parentCallback: any) {
         Log.trace("LoginController::checkRegistration| Checking valid regex");
         async.parallel([
@@ -254,7 +254,7 @@ export default class LoginController {
      * @param username
      * @returns object containing files
      */
-    //todo: figure out how to find my team
+    // todo: figure out how to find my team
     static loadStudentPortal(username: string, parentCallback: any) {
         Log.trace("LoginController::loadStudentPortal| Loading files required by student portal");
         var studentPortalFiles = {
@@ -263,9 +263,9 @@ export default class LoginController {
             "myGradesFile": {},
             "deliverablesFile": {},
             "classlist": ['']
-        }
+        };
 
-        //synchronously load files into studentPortalFiles object
+        // synchronously load files into studentPortalFiles object
         async.parallel([
             function get_my_student_file(callback: any) {
                 Log.trace("LoginController::loadStudentPortal| get_my_student_file");
@@ -274,7 +274,7 @@ export default class LoginController {
                         var allStudents = JSON.parse(data);
                         var myStudentFile = _.find(allStudents, { "username": username });
 
-                        if (typeof myStudentFile != 'undefined') {
+                        if (typeof myStudentFile !== 'undefined') {
                             studentPortalFiles.myStudentFile = myStudentFile;
                             return callback(null);
                         }
@@ -294,10 +294,11 @@ export default class LoginController {
                 Helper.readFile("teams.json", function (error: any, data: any) {
                     if (!error) {
                         var allTeams = JSON.parse(data);
-                        //todo: figure out how to find my team
-                        var myTeamFile = _.find(allTeams, function (teamsFile: any) { return teamsFile.members == username });
-                        
-                        if (typeof myTeamFile != 'undefined') {
+                        var myTeamFile = _.find(allTeams, function (teamsFile: any) {
+                            return teamsFile.members === username;
+                        });
+
+                        if (typeof myTeamFile !== 'undefined') {
                             studentPortalFiles.myTeamFile = myTeamFile;
                             return callback(null);
                         }
@@ -318,7 +319,7 @@ export default class LoginController {
                     if (!error) {
                         var allGrades = JSON.parse(data);
                         var myGradesFile = _.find(allGrades, { "username": username });
-                        
+
                         if (myGradesFile !== undefined) {
                             studentPortalFiles.myGradesFile = myGradesFile;
                             return callback(null);
@@ -347,14 +348,14 @@ export default class LoginController {
                     }
                 });
             },
-            
-            function get_classlist(callback:any) {
+
+            function get_classlist(callback: any) {
                 Log.trace("LoginController::loadStudentPortal| get_classlist");
                 Helper.readFile("students.json", function (error: any, data: any) {
                     if (!error) {
                         var studentsObject = JSON.parse(data);
                         var namesArray: any[] = [];
-                        
+
                         for (var index = 0; index < studentsObject.length; index++) {
                             var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
                             namesArray.push(name);
@@ -369,7 +370,7 @@ export default class LoginController {
                     }
                 });
             }
-        ],    
+        ],
             function async_end(error: any, results: any) {
                 if (!error) {
                     Log.trace("LoginController::loadStudentPortal| async_end: Sending files.");
@@ -408,10 +409,10 @@ export default class LoginController {
             "teamsFile": {},
             "gradesFile": {},
             "deliverablesFile": {},
-            "classlist":['']
-        }
-        
-        //synchronously load files into adminPortalFiles object
+            "classlist": ['']
+        };
+
+        // synchronously load files into adminPortalFiles object
         async.parallel([
             function get_admins_file(callback: any) {
                 Log.trace("LoginController::loadAdminPortal| get_admin_file");
@@ -419,7 +420,7 @@ export default class LoginController {
                     if (!error) {
                         var allAdmins = JSON.parse(data);
                         var myAdmin = _.find(allAdmins, { "username": username });
-                        
+
                         adminPortalFiles.adminsFile = allAdmins;
                         adminPortalFiles.myAdmin = myAdmin;
                         return callback(null);
@@ -482,13 +483,13 @@ export default class LoginController {
                     }
                 });
             },
-            function get_classlist(callback:any) {
+            function get_classlist(callback: any) {
                 Log.trace("LoginController::loadAdminPortal| get_classlist");
                 Helper.readFile("students.json", function (error: any, data: any) {
                     if (!error) {
                         var studentsObject = JSON.parse(data);
                         var namesArray: any[] = [];
-                        
+
                         for (var index = 0; index < studentsObject.length; index++) {
                             var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
                             namesArray.push(name);
@@ -516,5 +517,5 @@ export default class LoginController {
             }
         );
     }
-        
+
 }

@@ -15,23 +15,23 @@ var config = require(pathToRoot + 'config.json');
  */
 export default class Log {
 
-    public static trace(msg:string) {
+    public static trace(msg: string) {
         console.log("<T> " + new Date().toLocaleString() + ": " + msg);
     }
 
-    public static info(msg:string) {
+    public static info(msg: string) {
         console.log("<I> " + new Date().toLocaleString() + ": " + msg);
     }
 
-    public static warn(msg:string) {
+    public static warn(msg: string) {
         console.error("<W> " + new Date().toLocaleString() + ": " + msg);
     }
 
-    public static error(msg:string) {
+    public static error(msg: string) {
         console.error("<E> " + new Date().toLocaleString() + ": " + msg);
     }
 
-    public static test(msg:string) {
+    public static test(msg: string) {
         console.log("<X> " + new Date().toLocaleString() + ": " + msg);
     }
 
@@ -42,8 +42,8 @@ export default class Log {
  */
 export class Helper {
 
-    //encapsulates fs.readFile
-    //todo: error handling - if data.length = 0, fill file with empty array instead? 
+    // encapsulates fs.readFile
+    // todo: error handling - if data.length = 0, fill file with empty array instead? 
     static readFile(filename: string, callback: any) {
         Log.trace("Helper::readFile| Getting file: " + filename);
         var path = pathToRoot.concat(config.private_folder, filename);
@@ -55,8 +55,8 @@ export class Helper {
                     return callback(null, data);
                 }
                 else {
-                    //todo: if data.length = 0, fill with square brackets []
-                    //quick fix: just return error for now
+                    // todo: if data.length = 0, fill with square brackets []
+                    // quick fix: just return error for now
                     Log.trace("Helper::readFile| File read error.");
                     return callback(true, null);
                 }
@@ -68,13 +68,13 @@ export class Helper {
         });
     }
 
-    //write new value to existing object in json array (students/admins/teams/tokens/grades.json)
-    static updateEntry(filename:string, identifierObject: any, newValuesObject: any, callback: any) {
+    // write new value to existing object in json array (students/admins/teams/tokens/grades.json)
+    static updateEntry(filename: string, identifierObject: any, newValuesObject: any, callback: any) {
         Log.trace("Helper::updateEntry| filename: " + filename + " identifier: " + JSON.stringify(identifierObject));
         var path = pathToRoot.concat(config.private_folder, filename);
         var file = require(path);
-        var userIndex:number = _.findIndex(file, identifierObject);
-        
+        var userIndex: number = _.findIndex(file, identifierObject);
+
         if (userIndex >= 0) {
             Log.trace("Helper::updateEntry| Username found.");
             var count = 0;
@@ -86,16 +86,16 @@ export class Helper {
                     count++;
                 }
             }
-            
+
             Log.trace("Helper::updateEntry| Updated " + count + " key(s).");
             fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
                 if (err) {
                     Log.trace("Helper::updateEntry| Write error: " + err.toString());
-                    return callback(true);                    
+                    return callback(true);
                 }
                 else {
                     Log.trace("Helper::updateEntry| Write successful!");
-                    return callback(null);                    
+                    return callback(null);
                 }
             });
         }
@@ -105,31 +105,31 @@ export class Helper {
         }
     }
 
-    //write new object json array (students/admins/teams/tokens/grades.json)
-    static addEntry(filename:string, newEntry: any, callback: any) {
+    // write new object json array (students/admins/teams/tokens/grades.json)
+    static addEntry(filename: string, newEntry: any, callback: any) {
         Log.trace("Helper::addEntry| filename: " + filename);
         var path = pathToRoot.concat(config.private_folder, filename);
         var file = require(path);
-        
-        //add new entry to end of file
+
+        // add new entry to end of file
         file[file.length] = newEntry;
-        
+
         Log.trace("Helper::addEntry| New entry added: " + JSON.stringify(newEntry));
         fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
             if (err) {
                 Log.trace("Helper::addEntry| Write error: " + err.toString());
-                return callback(true);                    
+                return callback(true);
             }
             else {
                 Log.trace("Helper::addEntry| Write successful!");
-                return callback(null);                    
+                return callback(null);
             }
         });
     }
 
-    //check if any entry in the json array contains the key/values in checkedObject.
-    //TODO: migrate other code to this function!
-    static checkEntry(filename:string, checkedObject: any, callback: any) {
+    // check if any entry in the json array contains the key/values in checkedObject.
+    // TODO: migrate other code to this function!
+    static checkEntry(filename: string, checkedObject: any, callback: any) {
         Log.trace("Helper::checkEntry| Checking " + filename + " for values: " + JSON.stringify(checkedObject));
         var path = pathToRoot.concat(config.private_folder, filename);
 
@@ -149,7 +149,7 @@ export class Helper {
         });
     }
 
-    //check if supplied username exists in admins.json    
+    // check if supplied username exists in admins.json    
     static isAdmin(username: string, callback: any) {
         Log.trace("Helper::isAdmin| Checking admin status..");
         var path = pathToRoot.concat(config.path_to_admins);
@@ -161,8 +161,8 @@ export class Helper {
             }
             else {
                 var file = JSON.parse(data);
-                var userIndex:number = _.findIndex(file, { "username": username });
-                var isAdmin: boolean = userIndex >= 0; 
+                var userIndex: number = _.findIndex(file, { "username": username });
+                var isAdmin: boolean = userIndex >= 0;
                 Log.trace("Helper::isAdmin| isAdmin: " + isAdmin);
                 return callback(null, isAdmin);
             }

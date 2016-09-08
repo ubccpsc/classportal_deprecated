@@ -3,7 +3,7 @@ import async = require('async');
 import Log from '../Util';
 
 export default class AdminController {
-    
+
     /**
      * Update database according to new classlist.csv.
      * Expects csv format with 4 columns: (sid, csid, lastname, firstname)
@@ -18,13 +18,13 @@ export default class AdminController {
      * @param csv file
      * @returns response message containing files
      */
-    static updateClasslist(csv:any, parentCallback:any) {
+    static updateClasslist(csv: any, parentCallback: any) {
         var lines = csv.toString().split(/\n/);
         async.waterfall([
             function getSidArray(callback: any) {
                 var sidArray: any[];
                 if (1) {
-                    return callback(null, sidArray)
+                    return callback(null, sidArray);
                 }
                 else {
                     Log.trace("updateClasslist| Error reading classlist! Returning");
@@ -37,7 +37,7 @@ export default class AdminController {
                     Log.trace("updateClasslist| Got sid array: " + sidArray);
 
                     async.parallel([
-                        //todo: edit this
+                        // todo: edit this
                         function editClasslist(callback: any) {
                             Log.trace("RouteHandler::updateClasslist| editClasslist");
                             fs.readFile(csv, function read(err: any, data: any) {
@@ -62,11 +62,11 @@ export default class AdminController {
                         },
                         function editStudentsFile(callback: any) {
                             Log.trace("RouteHandler::updateClasslist| editStudentsFile");
-                            //the contents of this json array will be written to students.json later.
+                            // the contents of this json array will be written to students.json later.
                             var studentsFile: any[] = [];
                             var studentsAdded: number = 0;
 
-                            // sort values into objects and push to studentFile array
+                            //  sort values into objects and push to studentFile array
                             for (var index = 1; index < lines.length; index++) {
                                 Log.trace("Creating student: " + index);
                                 var values = lines[index].split(',');
@@ -74,7 +74,7 @@ export default class AdminController {
                                     "csid": values[0],
                                     "sid": values[1],
                                     "lastname": values[2],
-                                    "firstname": values[3],                        
+                                    "firstname": values[3],
                                     "username": "",
                                     "hasTeam": false
                                 };
@@ -92,7 +92,7 @@ export default class AdminController {
                             Log.trace("RouteHandler::updateClasslist| editTokensFile");
                         }
                     ],
-                        function  end(error: any, response: any) {
+                        function end(error: any, response: any) {
                             if (!error) {
                                 Log.trace("RouteHandler::updateClasslist| Updated all the files!");
                                 return parentCallback(true, null);
@@ -113,5 +113,5 @@ export default class AdminController {
     }
 
 
-    
+
 }
