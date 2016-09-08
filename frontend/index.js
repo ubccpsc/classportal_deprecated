@@ -14,49 +14,70 @@ import PostloginPage from './modules/postlogin_page/PostloginPage'
 //require here instead of <link> in index.html, so we can hot reload css in dev.
 require("./public/index.css");
 
-function requireAuth(nextState, replace) {
-  if (!localStorage.token) {
-    console.log("Index.js| Not logged in: redirecting to login page. localStorage: " + JSON.stringify(localStorage));
-    replace({
-      pathname: '/login',
-      state: { nextPathname: nextState.location.pathname }
-    })
-  }
-}
+render((
+  <Router history={browserHistory}>
+    <Route path="/" component={App}>
+      <IndexRoute component={StudentPortal} onEnter={requireStudentAuth}/>
+      <Route path="login" component={LoginPage} onEnter={requireNoAuth} />
+      <Route path="postlogin" component={PostloginPage} onEnter={requireNoAuth} />
+      <Route path="register" component={RegisterPage} onEnter={requireNoAuth} />
+      <Route path="admin" component={AdminPortal} onEnter={requireAdminAuth} >
+        <IndexRedirect to="teams" />
+        <Route path="teams" component={AdminTeamsView} onEnter={requireAdminAuth} />
+        <Route path="students" component={AdminStudentsView} onEnter={requireAdminAuth} />
+        <Route path="deliverables" component={AdminDeliverablesView} onEnter={requireAdminAuth} />
+      </Route>
+    </Route>
+  </Router>
+), document.getElementById('app'))
 
-function requireAdminAuth(nextState, replace) {
-  if (!localStorage.admin) {
-    console.log("Index.js| Admin not logged in: redirecting to login page. localStorage: " + JSON.stringify(localStorage));
-    replace({
-      pathname: '/login',
-      state: { nextPathname: nextState.location.pathname }
-    })
-  }
-}
-
-function requireNotAuth(nextState, replace) {
+// If token exists, redirect to either '/' or '/admin'.
+function requireNoAuth(nextState, replace) {
   if (!!localStorage.token) {
-    console.log("Index.js| Logged in: redirecting to homepage. localStorage: " + JSON.stringify(localStorage));
+    console.log("Index.js::requireNoAuth| Logged in: redirecting to portal..\nlocalStorage: " + JSON.stringify(localStorage));
+    replace({
+      pathname: localStorage.admin === "true" ? 'admin/' : '/',
+      state: { nextPathname: nextState.location.pathname }
+    })
+  }
+}
+
+// If token doesn't exist, redirect to '/login'.
+// If admin, redirect to '/admin'.
+function requireStudentAuth(nextState, replace) {
+  if (!localStorage.token) {
+    console.log("Index.js::requireStudentAuth| Not logged in: redirecting to login page..\nlocalStorage: " + JSON.stringify(localStorage));
+    replace({
+      pathname: '/login',
+      state: { nextPathname: nextState.location.pathname }
+    })
+  }
+
+  if (localStorage.admin === "true") {
+    console.log("Index.js::requireStudentAuth| Not a student! Redirecting..\nlocalStorage: " + JSON.stringify(localStorage));
+    replace({
+      pathname: '/admin',
+      state: { nextPathname: nextState.location.pathname }
+    })
+  }
+}
+
+// If token doesn't exist, redirect to '/login'.
+// If student, redirect to '/'.
+function requireAdminAuth(nextState, replace) {
+  if (!localStorage.token) {
+    console.log("Index.js::requireAdminAuth| Not logged in: redirecting to login page..\nlocalStorage: " + JSON.stringify(localStorage));
+    replace({
+      pathname: '/login',
+      state: { nextPathname: nextState.location.pathname }
+    })
+  }
+
+  if (localStorage.admin !== "true") {
+    console.log("Index.js::requireAdminAuth| Not an admin! Redirecting..\nlocalStorage: " + JSON.stringify(localStorage));
     replace({
       pathname: '/',
       state: { nextPathname: nextState.location.pathname }
     })
   }
 }
-
-render((
-  <Router history={browserHistory}>
-    <Route path="/" component={App}>
-      <IndexRoute component={StudentPortal} onEnter={requireAuth}/>
-      <Route path="login" component={LoginPage} onEnter={requireNotAuth} />
-      <Route path="postlogin" component={PostloginPage} onEnter={requireNotAuth} />
-      <Route path="register" component={RegisterPage} onEnter={requireNotAuth} />
-      <Route path="admin" component={AdminPortal} >
-        <IndexRedirect to="teams" />
-        <Route path="teams" component={AdminTeamsView} />
-        <Route path="students" component={AdminStudentsView} />
-        <Route path="deliverables" component={AdminDeliverablesView} />
-      </Route>
-    </Route>
-  </Router>
-), document.getElementById('app'))
