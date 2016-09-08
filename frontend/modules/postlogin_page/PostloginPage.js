@@ -8,16 +8,16 @@ export default React.createClass({
     return { error: false };
   },
   getAuthCode: function (url, callback) {
-    console.log("PostLogin.js| Extracting authcode from url..");
+    // console.log("PostLogin.js| Extracting authcode from url..");
     
     var validAuthCode = /[?]code=([\w\/\-]+)/;
     if (validAuthCode.test(url)) {
       var authcode = url.split("code=")[1];
-      console.log("PostLogin.js| Obtained authcode: " + authcode)
+      // console.log("PostLogin.js| Obtained authcode: " + authcode)
       callback(authcode); 
     }
     else {
-      console.log('PostLogin.js| Error getting authcode from ' + url.toString());
+      // console.log('PostLogin.js| Error getting authcode from ' + url.toString());
       this.setState({ error: true }, function(){
         console.log("PostLogin.js| Redirecting to login..");
         setTimeout(function () {
@@ -33,7 +33,7 @@ export default React.createClass({
         localStorage.sid ? localStorage.sid : "",
         authcode,
         function success(response) {
-          console.log("PostLogin.js| Authentication success! Response: " + JSON.stringify(response));
+          // console.log("PostLogin.js| Authentication success! Response: " + JSON.stringify(response));
           var admin = response.admin;
           var username = response.username;
           var token = response.token;
@@ -58,10 +58,11 @@ export default React.createClass({
           }
           else {
             //bad login, so send back to login page
-            console.log("PostLogin.js| Error: Something went wrong! ", redirect, username, token);
+            console.log("PostLogin.js| Error: Something went wrong!");
+            // console.log(redirect, username, token);
             setTimeout(function () {
               browserHistory.push("/");
-            }, 2000);
+            }, 2500);
           }
         }.bind(this),
         function error(xhr, status, err) {
@@ -72,14 +73,14 @@ export default React.createClass({
           
           //before redirect, let user know why they could not log in.
           //todo: get error message from server response instead of hard-coding it
-          alert("Error: User is not registered");
+          alert("Error: not registered");
 
           //display error message for 3 seconds before redirecting to login
           this.setState({ error: true }, function () {  
             console.log("PostLogin.js| Redirecting to login..");
             setTimeout(function () {
               browserHistory.push("/");
-            }, 3000);
+            }, 2500);
           });
         }.bind(this)
       )

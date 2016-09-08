@@ -55,8 +55,7 @@ export default React.createClass({
           <a href="" target="blank">{returnName(team.members[0])}</a>,&nbsp;
           <a href="" target="blank">{returnName(team.members[1])}</a>
         </td>
-        <td className="tg-yw4l">No TAs
-        </td>
+        <td className="tg-yw4l">-</td>
         <td className="tg-yw4l">
           <Button size="sm" className="button-text" type="link-text">View/Edit</Button>
         </td>

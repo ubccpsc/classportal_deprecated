@@ -9,11 +9,11 @@ import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'e
 import Ajax from '../shared_components/Ajax'
 
 export default React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       myStudentFile: '',
       myTeamFile: '',
-      myGradesFile:'',
+      myGradesFile: '',
       deliverablesFile: '',
       classlist: ''
     }
@@ -28,7 +28,7 @@ export default React.createClass({
         this.setState({ myTeamFile: response.myTeamFile });
         this.setState({ myGradesFile: response.myGradesFile });
         this.setState({ deliverablesFile: response.deliverablesFile });
-        
+
         //convert classlist into format useable by Elemental Form-Select
         var unformattedClasslist = response.classlist;
         var formattedClasslist = [];
@@ -52,11 +52,12 @@ export default React.createClass({
         <Logout firstname={this.state.myStudentFile.firstname} sid={this.state.myStudentFile.sid} username={localStorage.username}/>
 
         {!!this.state.myStudentFile.hasTeam ?
-          (<DisplayTeam team={this.state.myTeamFile} />) :
-            !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} isAdmin="false" studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname} />) }
-            
+          (<DisplayTeam myTeamFile={this.state.myTeamFile} />) :
+          !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} isAdmin="false" studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname} />) }
+
         <Deliverables deliverables={this.state.deliverablesFile}/>
-        
+
       </div>
-    )}
+    )
+  }
 })

@@ -166,11 +166,9 @@ export default class RouteHandler {
     static createTeam(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("createTeam| Creating new team");
         var username: string = req.header('username');
-        var admin: string = req.header('admin');
         var nameArray: any[] = req.params.newTeam;
 
-        // todo: what is admin used for?
-        TeamController.createTeam(username, admin, nameArray, function (error: any, data: any) {
+        TeamController.createTeam(username, nameArray, function (error: any, data: any) {
             if (!error) {
                 Log.trace("RouteHandler::createTeam| Success!");
                 return res.send(200, "success");

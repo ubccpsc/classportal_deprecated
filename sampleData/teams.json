@@ -3,8 +3,8 @@
     "id": 1,
     "url": "",
     "members": [
-      "student1_username",
-      "student2_username"
+      "student1_sid",
+      "student2_sid"
     ]
   }
 ]

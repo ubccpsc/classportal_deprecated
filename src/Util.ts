@@ -73,8 +73,9 @@ export class Helper {
         Log.trace("Helper::updateEntry| filename: " + filename + " identifier: " + JSON.stringify(identifierObject));
         var path = pathToRoot.concat(config.private_folder, filename);
         var file = require(path);
+        // Log.trace("Helper::updateEntry| File: " + JSON.stringify(file));
+        
         var userIndex: number = _.findIndex(file, identifierObject);
-
         if (userIndex >= 0) {
             Log.trace("Helper::updateEntry| Username found.");
             var count = 0;

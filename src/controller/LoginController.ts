@@ -109,11 +109,22 @@ export default class LoginController {
                                     Log.trace("LoginController::login| First time login! Updating student file");
                                     Helper.updateEntry("students.json", { 'csid': csid, 'sid': sid }, { "username": persistUsername }, function (error: any) {
                                         if (!error) {
+                                            Log.trace("LoginController::login| create_user: success");
 
-                                            return callback(null);
+                                            //next, update_grades_entry
+                                            Helper.updateEntry("grades.json", { 'sid': sid }, { "username": persistUsername }, function (error: any) {
+                                                if (!error) {
+                                                    Log.trace("LoginController::login| update_grades_entry: success");
+                                                    return callback(null);
+                                                }
+                                                else {
+                                                    Log.trace("LoginController::login| update_grades_entry: error");
+                                                    return callback(null);
+                                                }
+                                            });
                                         }
                                         else {
-                                            Log.trace("LoginController::login| create_user: success");
+                                            Log.trace("LoginController::login| create_user: error");
                                             return callback("error");
                                         }
                                     });
@@ -262,6 +273,10 @@ export default class LoginController {
      */
     static loadStudentPortal(username: string, parentCallback: any) {
         Log.trace("LoginController::loadStudentPortal| Loading files required by student portal");
+
+        // store sid here for now
+        var persistMySid: number;
+
         var studentPortalFiles = {
             "myStudentFile": {},
             "myTeamFile": {},
@@ -271,15 +286,16 @@ export default class LoginController {
         };
 
         // synchronously load files into studentPortalFiles object
-        async.parallel([
+        async.waterfall([
             function get_my_student_file(callback: any) {
                 Log.trace("LoginController::loadStudentPortal| get_my_student_file");
                 Helper.readFile("students.json", function (error: any, data: any) {
                     if (!error) {
                         var allStudents = JSON.parse(data);
-                        var myStudentFile = _.find(allStudents, { "username": username });
+                        var myStudentFile: any = _.find(allStudents, { "username": username });
 
                         if (typeof myStudentFile !== 'undefined') {
+                            persistMySid = myStudentFile.sid;
                             studentPortalFiles.myStudentFile = myStudentFile;
                             return callback(null);
                         }
@@ -299,15 +315,19 @@ export default class LoginController {
                 Helper.readFile("teams.json", function (error: any, data: any) {
                     if (!error) {
                         var allTeams = JSON.parse(data);
-                        var myTeamFile = _.find(allTeams, function (teamsFile: any) {
-                            return teamsFile.members === username;
+                        var myTeamFile = _.find(allTeams, function (team: any) {
+                            return _.some(team.members, function (index: any) {
+                                return index === persistMySid;
+                            });
                         });
 
                         if (typeof myTeamFile !== 'undefined') {
+                            Log.trace("LoginController::loadStudentPortal| get_my_team_file: success");
                             studentPortalFiles.myTeamFile = myTeamFile;
                             return callback(null);
                         }
                         else {
+                            Log.trace("LoginController::loadStudentPortal| Error: " + myTeamFile);
                             studentPortalFiles.myTeamFile = "err";
                             return callback(null);
                         }
@@ -325,7 +345,7 @@ export default class LoginController {
                         var allGrades = JSON.parse(data);
                         var myGradesFile = _.find(allGrades, { "username": username });
 
-                        if (myGradesFile !== undefined) {
+                        if (myGradesFile !== 'undefined') {
                             studentPortalFiles.myGradesFile = myGradesFile;
                             return callback(null);
                         }
