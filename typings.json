@@ -6,7 +6,7 @@
     "form-data": "registry:dt/form-data#0.0.0+20160724024111",
     "mocha": "registry:dt/mocha#2.2.5+20160720003353",
     "moment": "registry:dt/moment#2.11.1+20160829143156",
-    "node": "registry:dt/node#6.0.0+20160907103612",
+    "node": "registry:dt/node#6.0.0+20160907173219",
     "request": "registry:dt/request#0.0.0+20160726020908",
     "request-promise": "registry:dt/request-promise#3.0.0+20160906190103",
     "restify": "registry:dt/restify#2.0.0+20160726153409"
