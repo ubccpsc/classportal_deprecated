@@ -111,7 +111,7 @@ export default class LoginController {
                                         if (!error) {
                                             Log.trace("LoginController::login| create_user: success");
 
-                                            //next, update_grades_entry
+                                            // next, update_grades_entry
                                             Helper.updateEntry("grades.json", { 'sid': sid }, { "username": persistUsername }, function (error: any) {
                                                 if (!error) {
                                                     Log.trace("LoginController::login| update_grades_entry: success");
@@ -382,7 +382,7 @@ export default class LoginController {
                         var namesArray: any[] = [];
 
                         for (var index = 0; index < studentsObject.length; index++) {
-                            
+
                             // NEW: only add to array if student 'hasTeam' is false
                             if (studentsObject[index].hasTeam === false) {
                                 var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
@@ -442,7 +442,7 @@ export default class LoginController {
         };
 
         // synchronously load files into adminPortalFiles object
-        async.parallel([
+        async.waterfall([
             function get_admins_file(callback: any) {
                 Log.trace("LoginController::loadAdminPortal| get_admin_file");
                 Helper.readFile("admins.json", function (error: any, data: any) {
@@ -520,7 +520,7 @@ export default class LoginController {
                         var namesArray: any[] = [];
 
                         for (var index = 0; index < studentsObject.length; index++) {
-                            
+
                             // NEW: only add to array if student 'hasTeam' is false
                             if (studentsObject[index].hasTeam === false) {
                                 var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;

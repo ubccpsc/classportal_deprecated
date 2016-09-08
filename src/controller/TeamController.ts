@@ -49,7 +49,7 @@ export default class TeamController {
                         else {
                             // finally, set hasTeam=true in student file for each student
                             TeamController.updateHasTeamStatus(sidArray, true, function (error: any) {
-                                if (!error){
+                                if (!error) {
                                     Log.trace("TeamController::createTeam| Finished - Success!");
                                     return parentCallback(null, true);
                                 }
@@ -113,9 +113,9 @@ export default class TeamController {
     }
 
     // helper to update students to hasTeam
-    static updateHasTeamStatus(sidArray: any[], hasTeam: boolean, parentCallback:any) {
+    static updateHasTeamStatus(sidArray: any[], hasTeam: boolean, parentCallback: any) {
         Log.trace("TeamController::updateHasTeamStatus| Updating..");
-        
+
         async.waterfall([
             function update_first_hasTeam(callback: any) {
                 Log.trace("TeamController::updateHasTeamStatus| update_first_hasTeam");
