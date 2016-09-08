@@ -250,3 +250,8 @@ h5{
 #register-button{
 
 }
+
+.button-text{
+  padding:0px;
+  margin:0px;
+} 

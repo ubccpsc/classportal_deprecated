@@ -55,9 +55,15 @@ export default React.createClass({
           <a href="" target="blank">{returnName(team.members[0])}</a>,&nbsp;
           <a href="" target="blank">{returnName(team.members[1])}</a>
         </td>
-        <td className="tg-yw4l">
-          <a href="" target="blank">View / Submit</a>
+        <td className="tg-yw4l">No TAs
         </td>
+        <td className="tg-yw4l">
+          <Button size="sm" className="button-text" type="link-text">View/Edit</Button>
+        </td>
+        <td className="tg-yw4l">
+          <Button size="sm" className="button-text" type="link-text">Edit</Button>
+        </td>
+        
       </tr>
     );
   },
@@ -76,7 +82,10 @@ export default React.createClass({
               <th className="tg-yw4l">Team ID</th>
               <th className="tg-yw4l">GitHub</th>
               <th className="tg-yw4l">Members</th>
+              <th className="tg-yw4l">TA</th>
               <th className="tg-yw4l">Grades</th>
+              <th className="tg-yw4l">Edit Team</th>
+              
             </tr>
             {!!this.props.teams && this.renderTeams() }
           </tbody>

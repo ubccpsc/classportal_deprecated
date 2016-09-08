@@ -38,15 +38,15 @@ export default React.createClass({
         <td className="tg-yw4l">{student.lastname}</td>
         <td className="tg-yw4l">{student.firstname}</td>
         <td className="tg-yw4l">
-          {!!student.hasTeam ? "#": "No team" }</td>
+          {!!student.hasTeam ? "True": "No team" }</td>
         <td className="tg-yw4l">
-          {!!student.usernamename ?
-            <a href={"http://github.com/" + student.user} target="blank" >
-              {student.usernamename}
+          {!!student.username ?
+            <a href={"http://github.com/" + student.username} target="blank" >
+              {student.username}
             </a>
             : "Not registered" }</td>
         <td className="tg-yw4l">
-          <a>View/Edit</a>
+          <Button size="sm" className="button-text" type="link-text">View/Edit</Button>
         </td>
       </tr>
     )
