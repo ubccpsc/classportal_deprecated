@@ -45,7 +45,7 @@ export class Helper {
     // encapsulates fs.readFile
     // todo: error handling - if data.length = 0, fill file with empty array instead? 
     static readFile(filename: string, callback: any) {
-        Log.trace("Helper::readFile| Getting file: " + filename);
+        Log.trace("Helper::readFile| Reading file: " + filename);
         var path = pathToRoot.concat(config.private_folder, filename);
 
         fs.readFile(path, function (err: any, data: any) {

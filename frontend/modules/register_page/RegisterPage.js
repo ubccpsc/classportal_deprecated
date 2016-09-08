@@ -1,6 +1,6 @@
 import React from 'react'
 import {browserHistory } from 'react-router'
-import {Form,FormField,Button,FormInput,FormIconField,Glyph} from 'elemental'
+import {Form, FormField, Button, FormInput, FormIconField, Glyph} from 'elemental'
 import Ajax from '../shared_components/Ajax'
 import config from 'config'
 
@@ -12,7 +12,7 @@ export default React.createClass({
     event.preventDefault();
     var sid = event.target.elements[0].value;
     var csid = event.target.elements[1].value;
-    
+
     console.log("Register.js| Submitting csid:" + csid + ", sid:" + sid);
     if (csidRegex.test(csid) && sidRegex.test(sid)) {
       Ajax.register(
@@ -21,12 +21,12 @@ export default React.createClass({
         function success(response) {
           //clear any previously set values in localstorage
           localStorage.clear();
-          
-          if (response === true) {
+
+          if (response === "success") {
             //set sid and csid for later use by postlogin
             localStorage.setItem('sid', sid);
             localStorage.setItem('csid', csid);
-            
+
             //login with github
             var client_id = config.client_id;
             var redirect_uri = "http://" + config.host + ":" + config.port + "/postlogin";
@@ -68,9 +68,10 @@ export default React.createClass({
             <Button submit>
               <Glyph icon="mark-github"/>
               &nbsp; Continue to GitHub
-            </Button>    
+            </Button>
           </FormField>
         </Form>
       </div>
-    )}
+    )
+  }
 })

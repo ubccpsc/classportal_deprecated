@@ -24,40 +24,47 @@ export default class LoginController {
             function request_access_token(callback: any) {
                 Log.trace("LoginController::login| request_access_token");
                 var options = {
+                    url: 'https://github.com/login/oauth/access_token',
                     method: 'post',
                     body: {
                         client_id: config.client_id,
                         client_secret: config.client_secret,
                         code: authcode
                     },
-                    json: true,
-                    url: 'https:// github.com/login/oauth/access_token'
+                    json: true
                 };
 
                 request(options, function (err: any, res: any, body: any) {
-                    if (!err && res.statusCode === 200) {
-                        // var github_token: string = body.access_token;
+                    if (!err && res.statusCode == 200) {
                         persistGithubToken = body.access_token;
-
-                        Log.trace("LoginController::login| Successfully acquired github token.");
+                        Log.trace("LoginController::login| Successfully acquired github token:");
                         return callback(null);
                     }
                     else {
+                        Log.trace("LoginController::login| Error: " + err);
                         return callback("error");
                     }
                 });
             },
             function request_github_name(callback: any) {
                 Log.trace("LoginController::login| request_github_name");
-                LoginController.requestGithubInfo(persistGithubToken, function (err: any, res: any, body: any) {
-                    if (!err && res.statusCode === 200) {
-                        var obj = JSON.parse(body);
-                        persistUsername = obj.login;
+                var options = {
+                    url: 'https://api.github.com/user',
+                    headers: {
+                        "User-Agent": "ClasslistPortal-Student",
+                        "Authorization": "token " + persistGithubToken
+                    },
+                    json: true
+                };
 
+                request(options, function (err: any, res: any, body: any) {
+                    if (!err && res.statusCode == 200) {
+                        persistUsername = body.login;
                         Log.trace("LoginController::login| Successfully acquired username: " + persistUsername);
                         return callback(null);
                     }
                     else {
+                        Log.trace("LoginController::login| Error: " + err);
                         return callback("error", null);
                     }
                 });
@@ -161,16 +168,17 @@ export default class LoginController {
             }
         ],
             function end_async(error: any, result: any) {
-                Log.trace("LoginController::login| end_async");
                 if (!error) {
                     var response = {
                         "admin": persistAdmin,
                         "username": persistUsername,
                         "token": result
                     };
+                    Log.trace("LoginController::login| end_async: success.");
                     return parentCallback(null, response);
                 }
                 else {
+                    Log.trace("LoginController::login| end_async: error");
                     return parentCallback("error", null);
                 }
             }
@@ -180,25 +188,14 @@ export default class LoginController {
     static logout(username: string, callback: any) {
         Helper.updateEntry("tokens.json", { 'username': username }, { "servertoken": "" }, function (error: any) {
             if (!error) {
+                Log.trace("LoginController::logout| Success");
                 return callback(null, true);
             }
             else {
+                Log.trace("LoginController::logout| Error");
                 return callback(true, null);
             }
         });
-    }
-
-    static requestGithubInfo(githubtoken: string, callback: any) {
-        var options = {
-            url: 'https:// api.github.com/user',
-            headers: {
-                "User-Agent": "ClasslistPortal-Student",
-                "Authorization": "token " + githubtoken
-            }
-        };
-
-        Log.trace("LoginController::requestGithubInfo| Requesting public info from Github");
-        request(options, callback);
     }
 
     static checkRegistration(csid: string, sid: string, parentCallback: any) {
@@ -222,18 +219,18 @@ export default class LoginController {
                     Log.trace("LoginController::checkRegistration| Valid regex. Checking for registration status");
                     Helper.checkEntry("students.json", { 'csid': csid, 'sid': sid }, function (error: any, result: boolean) {
                         if (!error && result === true) {
-                            Log.trace("LoginController::checkRegistration| Success: Student is registered!");
-                            return parentCallback(true);
+                            Log.trace("LoginController::checkRegistration| Valid student.");
+                            return parentCallback(null, true); 
                         }
                         else {
-                            Log.trace("LoginController::checkRegistration| Error: Student is not registered in the course!");
-                            return parentCallback(false);
+                            Log.trace("LoginController::checkRegistration| Error: Student is not registered.");
+                            return parentCallback(true, null);
                         }
                     });
                 }
                 else {
                     Log.trace("LoginController::checkRegistration| Invalid id regex.");
-                    return parentCallback(false);
+                    return parentCallback(true, null);
                 }
             }
         );
@@ -254,7 +251,6 @@ export default class LoginController {
      * @param username
      * @returns object containing files
      */
-    // todo: figure out how to find my team
     static loadStudentPortal(username: string, parentCallback: any) {
         Log.trace("LoginController::loadStudentPortal| Loading files required by student portal");
         var studentPortalFiles = {
