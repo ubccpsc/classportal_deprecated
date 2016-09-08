@@ -11,9 +11,9 @@ import Ajax from '../shared_components/Ajax'
 export default React.createClass({
   getInitialState: function() {
     return {
-      myStudent: '',
-      myTeam: '',
-      myGrades:'',
+      myStudentFile: '',
+      myTeamFile: '',
+      myGradesFile:'',
       deliverablesFile: '',
       classlist: ''
     }
@@ -24,9 +24,9 @@ export default React.createClass({
         console.log("StudentPortal.js| Retrieved files.");
         console.log(JSON.stringify(response, null, 2));
 
-        this.setState({ myStudent: response.myStudent });
-        this.setState({ myTeam: response.myTeam });
-        this.setState({ myGrades: response.myGrades });
+        this.setState({ myStudentFile: response.myStudentFile });
+        this.setState({ myTeamFile: response.myTeamFile });
+        this.setState({ myGradesFile: response.myGradesFile });
         this.setState({ deliverablesFile: response.deliverablesFile });
         
         //convert classlist into format useable by Elemental Form-Select
@@ -49,11 +49,11 @@ export default React.createClass({
   render: function () {
     return (
       <div>
-        <Logout firstname={this.state.myStudent.firstname} sid={this.state.myStudent.sid} username={localStorage.username}/>
+        <Logout firstname={this.state.myStudentFile.firstname} sid={this.state.myStudentFile.sid} username={localStorage.username}/>
 
-        {!!this.state.myStudent.hasTeam ?
-          (<DisplayTeam teamNumber={this.state.myTeam.id}/>) :
-            !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} studentName={this.state.myStudent.firstname + " " + this.state.myStudent.lastname} />) }
+        {!!this.state.myStudentFile.hasTeam ?
+          (<DisplayTeam teamNumber={this.state.myTeamFile.id}/>) :
+            !!this.state.classlist && (<CreateTeam classlist={this.state.classlist} studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname} />) }
             
         <Deliverables deliverables={this.state.deliverablesFile}/>
         

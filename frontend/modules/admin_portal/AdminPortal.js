@@ -8,6 +8,7 @@ export default React.createClass({
   getInitialState: function() {
     return {
       myAdmin: '',
+      adminsFile: '',
       studentsFile: '',
       teamsFile: '',
       deliverablesFile: '',
@@ -20,8 +21,9 @@ export default React.createClass({
       function success(response) {
         console.log("AdminPortal.js| Retrieved files.");
         console.log(JSON.stringify(response, null, 2));
-
+        
         this.setState({ myAdmin: response.myAdmin });
+        this.setState({ adminsFile: response.adminsFile });
         this.setState({ studentsFile: response.studentsFile });
         this.setState({ teamsFile: response.teamsFile });
         this.setState({ deliverablesFile: response.deliverablesFile });
@@ -48,7 +50,8 @@ export default React.createClass({
     //more info: http://stackoverflow.com/questions/32370994/how-to-pass-props-to-this-props-children
     var childrenWithProps = React.Children.map(this.props.children, function (child) {
       return React.cloneElement(child, {
-        "admin": this.state.myAdmin,
+        "myAdmin": this.state.myAdmin,
+        "admin": this.state.adminsFile,
         "students": this.state.studentsFile,
         "teams": this.state.teamsFile,
         "deliverables": this.state.deliverablesFile,
@@ -73,7 +76,7 @@ export default React.createClass({
           </Row>
         </div>
         <Logout firstname={this.state.myAdmin.firstname} sid={this.state.myAdmin.prof ? "Prof" : "TA"} username={localStorage.username}/>
-        {!!this.state.myAdmin && childrenWithProps}
+        {!!this.state.adminsFile && childrenWithProps}
       </div>
     )}
 })

@@ -3,7 +3,7 @@
  */
 
 import fs = require('fs');
-var _ = require('lodash');
+import _ = require('lodash');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
 var config = require(pathToRoot + 'config.json');
@@ -37,7 +37,9 @@ export default class Log {
 
 }
 
-//helper methods for common actions like read/writing to files in /priv 
+/**
+ * Helper methods for common read/write actions.
+ */
 export class Helper {
 
     //encapsulates fs.readFile

@@ -30,7 +30,7 @@ export default React.createClass({
         <table className="tg">
           <tbody>
             <tr>
-              <th className="tg-yw4l">Name</th>
+              <th className="tg-yw4l">Deliverable</th>
               <th className="tg-yw4l">Link</th>
               <th className="tg-yw4l">Open</th>
               <th className="tg-yw4l">Due</th>

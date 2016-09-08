@@ -6,7 +6,7 @@ import restify = require('restify');
 import Log from "../Util";
 import {Helper} from "../Util";
 import RouteHandler from './RouteHandler';
-var _ = require('lodash');
+import _ = require('lodash');
 const path = require('path');
 
 export default class Server {
@@ -65,11 +65,11 @@ export default class Server {
                 
                 /* Routes acccessible by TEMP users only */
                 //called upon login
-                that.rest.post('/api/login', requireTempToken, RouteHandler.userLogin);
+                that.rest.post('/api/login', requireTempToken, RouteHandler.login);
                 that.rest.post('/api/register', requireTempToken, RouteHandler.checkRegistration);
 
                 /* Routes acccessible by STUDENT or ADMIN users */
-                that.rest.post('/api/logout', requireToken, RouteHandler.userLogout);
+                that.rest.post('/api/logout', requireToken, RouteHandler.logout);
                 that.rest.post('/api/loadStudentPortal', requireToken, RouteHandler.loadStudentPortal);
                 that.rest.post('/api/createTeam', requireToken, RouteHandler.createTeam);
 
@@ -152,6 +152,7 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
 }
 
 //calls next middleware only if valid admin field is supplied
+//todo: verify username as well?
 function requireAdmin(req: restify.Request, res: restify.Response, next: restify.Next) {
     Log.trace("requireAdmin| Checking admin status..");  
     var admin: string = req.header('admin')
