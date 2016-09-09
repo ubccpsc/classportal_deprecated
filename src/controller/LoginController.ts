@@ -8,7 +8,7 @@ import async = require('async');
 import Log from '../Util';
 import {Helper} from '../Util';
 
-const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
+const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
 var config = require(pathToRoot + 'config.json');
 
 export default class LoginController {

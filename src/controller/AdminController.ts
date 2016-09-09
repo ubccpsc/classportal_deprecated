@@ -3,7 +3,7 @@ import async = require('async');
 import Log from '../Util';
 import {Helper} from '../Util';
 
-const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
+const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
 var config = require(pathToRoot + 'config.json');
 
 export default class AdminController {
@@ -61,7 +61,7 @@ export default class AdminController {
             function update_classlist_file(callback: any) {
                 Log.trace("AdminController::updateClasslist| update_classlist_file");
 
-                var filename = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/priv/classlist.csv';
+                var filename = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/priv/classlist.csv';
                 fs.writeFile(filename, persistCSV, function (err: any) {
                     if (err) {
                         Log.trace("AdminController::updateClasslist| write_classlist_file: error");

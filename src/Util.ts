@@ -5,7 +5,7 @@
 import fs = require('fs');
 import _ = require('lodash');
 
-const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportalserver/')) + 'classportalserver/';
+const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
 var config = require(pathToRoot + 'config.json');
 
 /**
