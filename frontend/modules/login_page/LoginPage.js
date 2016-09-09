@@ -1,17 +1,12 @@
 import React from 'react'
-import GithubButton from './GithubButton'
-import RegisterButton from './RegisterButton'
-import { Form, FormRow, FormField} from 'elemental'
+import LoginModule from './LoginModule'
+import { Form, FormRow, FormField, Button, Glyph, ButtonGroup } from 'elemental'
 
 export default React.createClass({
   render() {
     return (
       <div>
-        <div className="module">
-          <h3>Login</h3>
-          <RegisterButton id="register-button"/>
-          <GithubButton id="github-button"/>
-        </div>
+        <LoginModule/>
 
         <div className="module">
           <h3>Privacy Policy</h3>
