@@ -74,7 +74,7 @@ export class Helper {
         var path = pathToRoot.concat(config.private_folder, filename);
         var file = require(path);
         // Log.trace("Helper::updateEntry| File: " + JSON.stringify(file));
-        
+
         var userIndex: number = _.findIndex(file, identifierObject);
         if (userIndex >= 0) {
             Log.trace("Helper::updateEntry| Username found.");
@@ -129,6 +129,7 @@ export class Helper {
     }
 
     // check if any entry in the json array contains the key/values in checkedObject.
+    // if true, return object.
     // TODO: migrate other code to this function!
     static checkEntry(filename: string, checkedObject: any, callback: any) {
         Log.trace("Helper::checkEntry| Checking " + filename + " for values: " + JSON.stringify(checkedObject));
@@ -137,11 +138,16 @@ export class Helper {
         fs.readFile(path, function (err: any, data: any) {
             if (!err && data.length > 0) {
                 var file = JSON.parse(data);
-                var index: number = _.findIndex(file, checkedObject);
-                var result: boolean = index >= 0;
+                var entry = _.find(file, checkedObject);
 
-                Log.trace("Helper::checkEntry| Result: " + result);
-                return callback(null, result);
+                if (entry !== undefined) {
+                    Log.trace("Helper::checkEntry| Entry found: " + JSON.stringify(entry));
+                    return callback(null, entry);
+                }
+                else {
+                    Log.trace("Helper::checkEntry| Error: entry not found!");
+                    return callback(true, null);
+                }
             }
             else {
                 Log.trace("Helper::checkEntry| File read error.");

@@ -237,20 +237,27 @@ export default class LoginController {
             function end_async(err: any, result: any) {
                 if (!err && result[0] === true && result[1] === true) {
                     Log.trace("LoginController::checkRegistration| Valid regex. Checking for registration status");
-                    Helper.checkEntry("students.json", { 'csid': csid, 'sid': sid }, function (error: any, result: boolean) {
-                        if (!error && result === true) {
-                            Log.trace("LoginController::checkRegistration| Valid student.");
-                            return parentCallback(null, true);
+                    Helper.checkEntry("students.json", { 'csid': csid, 'sid': sid }, function (error: any, response: any) {
+                        if (!error) {
+                            // only allow registration if student is not already registered.
+                            if (!response.username) {
+                                Log.trace("LoginController::checkRegistration| Valid student. Continue to registration");
+                                return parentCallback(null, true);
+                            }
+                            else {
+                                Log.trace("LoginController::checkRegistration| Error: Student is already registered!");
+                                return parentCallback("Student is already registered.", null);
+                            }
                         }
                         else {
                             Log.trace("LoginController::checkRegistration| Error: Student is not registered.");
-                            return parentCallback(true, null);
+                            return parentCallback("Invalid csid or sid.", null);
                         }
                     });
                 }
                 else {
                     Log.trace("LoginController::checkRegistration| Invalid id regex.");
-                    return parentCallback(true, null);
+                    return parentCallback("Invalid csid or sid.", null);
                 }
             }
         );

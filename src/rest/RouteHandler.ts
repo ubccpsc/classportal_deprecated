@@ -57,7 +57,7 @@ export default class RouteHandler {
             }
             else {
                 Log.trace("checkRegistration| Error!");
-                return res.send(500, "invalid info");
+                return res.send(500, error);
             }
         });
     }

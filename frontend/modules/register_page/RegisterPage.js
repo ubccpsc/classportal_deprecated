@@ -13,7 +13,7 @@ export default React.createClass({
     var sid = event.target.elements[0].value;
     var csid = event.target.elements[1].value;
 
-    console.log("Register.js| Submitting csid:" + csid + ", sid:" + sid);
+    // console.log("Register.js| Submitting csid:" + csid + ", sid:" + sid);
     if (csidRegex.test(csid) && sidRegex.test(sid)) {
       Ajax.register(
         csid,
@@ -38,8 +38,8 @@ export default React.createClass({
           }
         }.bind(this),
         function error(xhr, status, err) {
-          //bad info
-          alert("Error: student does not exist in database");
+          var err_msg = JSON.parse(xhr.responseText);
+          alert("Error: " + err_msg);
         }.bind(this)
       )
     }
@@ -47,7 +47,7 @@ export default React.createClass({
       //clear any previously set values in localstorage
       localStorage.clear();
 
-      console.log("Register.js| Error: Invalid input.");
+      // console.log("Register.js| Error: Invalid input.");
       alert("Invalid entry. Please try again.");
       return;
     }
