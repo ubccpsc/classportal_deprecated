@@ -34,7 +34,7 @@ render((
 // If token exists, redirect to either '/' or '/admin'.
 function requireNoAuth(nextState, replace) {
   if (!!localStorage.token) {
-    console.log("Index.js::requireNoAuth| Logged in: redirecting to portal..\nlocalStorage: " + JSON.stringify(localStorage));
+    // console.log("Index.js::requireNoAuth| Logged in: redirecting to portal..\nlocalStorage: " + JSON.stringify(localStorage));
     replace({
       pathname: localStorage.admin === "true" ? 'admin/' : '/',
       state: { nextPathname: nextState.location.pathname }
@@ -46,7 +46,7 @@ function requireNoAuth(nextState, replace) {
 // If admin, redirect to '/admin'.
 function requireStudentAuth(nextState, replace) {
   if (!localStorage.token) {
-    console.log("Index.js::requireStudentAuth| Not logged in: redirecting to login page..\nlocalStorage: " + JSON.stringify(localStorage));
+    // console.log("Index.js::requireStudentAuth| Not logged in: redirecting to login page..\nlocalStorage: " + JSON.stringify(localStorage));
     replace({
       pathname: '/login',
       state: { nextPathname: nextState.location.pathname }
@@ -54,7 +54,7 @@ function requireStudentAuth(nextState, replace) {
   }
 
   if (localStorage.admin === "true") {
-    console.log("Index.js::requireStudentAuth| Not a student! Redirecting..\nlocalStorage: " + JSON.stringify(localStorage));
+    // console.log("Index.js::requireStudentAuth| Not a student! Redirecting..\nlocalStorage: " + JSON.stringify(localStorage));
     replace({
       pathname: '/admin',
       state: { nextPathname: nextState.location.pathname }
@@ -66,7 +66,7 @@ function requireStudentAuth(nextState, replace) {
 // If student, redirect to '/'.
 function requireAdminAuth(nextState, replace) {
   if (!localStorage.token) {
-    console.log("Index.js::requireAdminAuth| Not logged in: redirecting to login page..\nlocalStorage: " + JSON.stringify(localStorage));
+    // console.log("Index.js::requireAdminAuth| Not logged in: redirecting to login page..\nlocalStorage: " + JSON.stringify(localStorage));
     replace({
       pathname: '/login',
       state: { nextPathname: nextState.location.pathname }
@@ -74,7 +74,7 @@ function requireAdminAuth(nextState, replace) {
   }
 
   if (localStorage.admin !== "true") {
-    console.log("Index.js::requireAdminAuth| Not an admin! Redirecting..\nlocalStorage: " + JSON.stringify(localStorage));
+    // console.log("Index.js::requireAdminAuth| Not an admin! Redirecting..\nlocalStorage: " + JSON.stringify(localStorage));
     replace({
       pathname: '/',
       state: { nextPathname: nextState.location.pathname }
