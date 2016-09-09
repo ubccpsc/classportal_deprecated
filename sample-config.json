@@ -5,6 +5,7 @@
     "client_secret":     "",
     "host":              "",
     "port":              "",
+    "team_size":         "",
     "private_folder":    "priv/",
     "path_to_classlist": "priv/classlist.csv",
     "path_to_admins":    "priv/admins.json",
