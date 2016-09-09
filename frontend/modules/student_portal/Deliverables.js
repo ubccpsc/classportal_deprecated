@@ -3,7 +3,7 @@ import {Modal, ModalHeader, ModalFooter, ModalBody, Button, Card, Row, Col} from
 import ContentModule from '../shared_components/ContentModule'
 
 export default React.createClass({
-  renderDeliverables: function() {
+  renderDeliverables: function () {
     var that = this;
     var delivs = [];
     for (var index = 0; index < this.props.deliverables.length; index++) {
@@ -39,5 +39,6 @@ export default React.createClass({
           </tbody>
         </table>
       </ContentModule>
-  )}
+    )
+  }
 })

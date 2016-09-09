@@ -9,12 +9,12 @@ export default React.createClass({
   toggleView: function (e) {
     e.preventDefault();
     this.setState({ "viewAll": !this.state.viewAll }, function () {
-      console.log("AdminTeams.js| viewAll: " + this.state.viewAll);
+      // console.log("AdminTeams.js| viewAll: " + this.state.viewAll);
     });
   },
   include: function (arr, obj) {
     var result = (arr.indexOf(obj) != -1);
-    console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
+    // console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
     return (result);
   },
   renderTeams: function () {
@@ -31,7 +31,7 @@ export default React.createClass({
   renderOneTeam: function (index) {
     var team = this.props.teams[index];
     var students = this.props.students;
-    
+
     function returnName(studentNum) {
       //search students file for matching sid
       for (var index = 0; index < students.length; index++) {
@@ -52,8 +52,8 @@ export default React.createClass({
             </a>
             : "Not set" }</td>
         <td className="tg-edam">
-          <a href="" target="blank">{returnName(team.members[0])}</a>,&nbsp;
-          <a href="" target="blank">{returnName(team.members[1])}</a>
+          <a href="" target="blank">{returnName(team.members[0]) }</a>, &nbsp;
+          <a href="" target="blank">{returnName(team.members[1]) }</a>
         </td>
         <td className="tg-yw4l">-</td>
         <td className="tg-yw4l">
@@ -62,7 +62,7 @@ export default React.createClass({
         <td className="tg-yw4l">
           <Button size="sm" className="button-text" type="link-text">Edit</Button>
         </td>
-        
+
       </tr>
     );
   },
@@ -84,11 +84,12 @@ export default React.createClass({
               <th className="tg-yw4l">TA</th>
               <th className="tg-yw4l">Grades</th>
               <th className="tg-yw4l">Edit Team</th>
-              
+
             </tr>
             {!!this.props.teams && this.renderTeams() }
           </tbody>
         </table>
       </ContentModule>
-  )}
+    )
+  }
 })

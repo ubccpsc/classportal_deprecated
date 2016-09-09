@@ -9,15 +9,15 @@ export default React.createClass({
   toggleView: function (e) {
     e.preventDefault();
     this.setState({ "viewAll": !this.state.viewAll }, function () {
-      console.log("AdminStudents.js| viewAll: " + this.state.viewAll);
+      // console.log("AdminStudents.js| viewAll: " + this.state.viewAll);
     });
   },
-  include: function(arr, obj) {
-      var result = (arr.indexOf(obj) != -1);
-      console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
-      return (result);
+  include: function (arr, obj) {
+    var result = (arr.indexOf(obj) != -1);
+    // console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
+    return (result);
   },
-  renderStudents: function() {
+  renderStudents: function () {
     var that = this;
     //todo: decide how to display myStudents properly
     var myStudents = this.props.myTeams;
@@ -38,7 +38,7 @@ export default React.createClass({
         <td className="tg-yw4l">{student.lastname}</td>
         <td className="tg-yw4l">{student.firstname}</td>
         <td className="tg-yw4l">
-          {!!student.hasTeam ? "True": "-" }</td>
+          {!!student.hasTeam ? "True" : "-" }</td>
         <td className="tg-yw4l">
           {!!student.username ?
             <a href={"http://github.com/" + student.username} target="blank" >
@@ -55,11 +55,11 @@ export default React.createClass({
     return (
       <ContentModule id="admin-students-module" title={this.state.viewAll ? "All Students" : "My Students"} initialHideContent={false}>
         <Form id="text-center" onSubmit={this.toggleView} >
-          <FormField>    
+          <FormField>
             <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle View</Button>&nbsp;
           </FormField>
         </Form>
-        
+
         <table className="tg">
           <tbody>
             <tr>
@@ -74,5 +74,6 @@ export default React.createClass({
           </tbody>
         </table>
       </ContentModule>
-    )}
+    )
+  }
 })

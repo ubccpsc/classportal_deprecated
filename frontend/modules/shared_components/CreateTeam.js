@@ -42,7 +42,6 @@ export default React.createClass({
         window.location.reload(true);
       }.bind(this),
       function error(xhr, status, err) {
-        console.log("CreateTeam.js| Error: " + status + err);
         alert("Error: Could not create team.")
       }.bind(this)
     )
@@ -81,7 +80,7 @@ export default React.createClass({
   },
   renderDropdown: function (index) {
     var original_classlist = this.props.classlist;
-    
+
     // remove the students who already are in a team
     // var editted_classlist;
 

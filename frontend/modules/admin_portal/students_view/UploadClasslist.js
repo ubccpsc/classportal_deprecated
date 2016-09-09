@@ -5,29 +5,26 @@ import Ajax from '../../shared_components/Ajax'
 
 export default React.createClass({
   getInitialState: function () {
-    return ({files: []})
+    return ({ files: [] })
   },
   createProjects: function (event) {
     event.preventDefault();
   },
   handleChange: function (event) {
-    this.setState({ files: event.target.files }, function () {
-      console.log("this.state.files = " + JSON.stringify(this.state.files));
-    });
+    this.setState({ files: event.target.files });
   },
   submitCSV: function (event) {
     event.preventDefault();
     console.log("Submitting..");
-    
+
     //grab all form data  
     var files = new FormData();
-    $.each(this.state.files, function(key, value)
-    {
-        files.append(key, value);
+    $.each(this.state.files, function (key, value) {
+      files.append(key, value);
     });
 
-    console.log("files: " + JSON.stringify(files));
-    
+    // console.log("files: " + JSON.stringify(files));
+
     Ajax.submitClasslist(
       files,
       function success() {
@@ -50,5 +47,6 @@ export default React.createClass({
           </FormField>
         </Form>
       </ContentModule>
-    )}        
+    )
+  }
 })

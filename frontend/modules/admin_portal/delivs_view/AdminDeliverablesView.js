@@ -6,6 +6,7 @@ export default React.createClass({
     return (
       <div>
         <AdminDeliverables deliverables={this.props.deliverablesFile}/>
-      </div>  
-    )}
+      </div>
+    )
+  }
 })

@@ -6,7 +6,6 @@ export default React.createClass({
   createProjects: function (e) {
     e.preventDefault();
     alert("Not yet implemented..");
-    console.log("Created the projects!");
   },
   render: function () {
     return (
@@ -17,5 +16,6 @@ export default React.createClass({
           </FormField>
         </Form>
       </ContentModule>
-    )}
+    )
+  }
 })

@@ -13,5 +13,6 @@ export default React.createClass({
         <CreateTeam classlist={this.props.classlist} isAdmin="true" studentName="null" students={this.props.studentsFile}/>
         {this.props.myAdmin.prof === true && (<CreateProjects />) }
       </div>
-    )}
+    )
+  }
 })

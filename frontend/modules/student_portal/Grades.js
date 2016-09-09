@@ -8,7 +8,7 @@ export default React.createClass({
     var grades = this.props.grades;
     var deliverables = this.props.deliverables;
 
-    for (var index = 0; index < deliverables.length; index++){
+    for (var index = 0; index < deliverables.length; index++) {
       block[index] = (
         <tr key={index}>
           <td className="tg-edam">{deliverables[index].name}</td>
@@ -17,15 +17,15 @@ export default React.createClass({
         </tr>);
     }
 
-    console.log("Grades.js| Rendering grades");    
+    // console.log("Grades.js| Rendering grades");    
     return (<tbody>{block}</tbody>)
   },
   render: function () {
     return (
       <ContentModule id="gradesModule" title="Grades" initialHideContent={false}>
-        
+
         <div className="tg-wrap">
-          <table className="tg">    
+          <table className="tg">
             <tbody>
               <tr>
                 <th className="tg-yw4l">Assignment</th>
@@ -33,10 +33,11 @@ export default React.createClass({
                 <th className="tg-yw4l">Class Average</th>
               </tr>
             </tbody>
-            {!!this.props.grades && !!this.props.deliverables && this.renderGrades()}
+            {!!this.props.grades && !!this.props.deliverables && this.renderGrades() }
           </table>
         </div>
 
       </ContentModule>
-    )}
+    )
+  }
 })

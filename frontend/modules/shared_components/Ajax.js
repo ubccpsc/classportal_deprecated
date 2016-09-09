@@ -23,7 +23,7 @@ module.exports = {
             error: errorCallback
         });
     },
-    register: function(csid, sid, successCallback, errorCallback) {
+    register: function (csid, sid, successCallback, errorCallback) {
         // console.log("Ajax.js| Checking if student exists in database..");
         $.ajax({
             type: "POST",
@@ -61,7 +61,7 @@ module.exports = {
             error: errorCallback
         });
     },
-    loadStudentPortal: function(successCallback, errorCallback) {
+    loadStudentPortal: function (successCallback, errorCallback) {
         // console.log("Ajax.js| Getting all files for admin portal..");
         $.ajax({
             type: "POST",
@@ -98,7 +98,7 @@ module.exports = {
         });
     },
     //admin portal: gets all files upon login    
-    loadAdminPortal: function(successCallback, errorCallback) {
+    loadAdminPortal: function (successCallback, errorCallback) {
         // console.log("Ajax.js| Getting all files for admin portal..");
         $.ajax({
             type: "POST",

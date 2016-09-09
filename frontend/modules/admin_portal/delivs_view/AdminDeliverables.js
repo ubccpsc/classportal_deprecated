@@ -3,7 +3,7 @@ import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, 
 import ContentModule from '../../shared_components/ContentModule'
 
 export default React.createClass({
-  renderDeliverables: function() {
+  renderDeliverables: function () {
     var that = this;
     var delivs = [];
     for (var index = 0; index < this.props.deliverables.length; index++) {
@@ -39,5 +39,6 @@ export default React.createClass({
           </tbody>
         </table>
       </ContentModule>
-  )}
+    )
+  }
 })

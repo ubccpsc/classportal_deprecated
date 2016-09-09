@@ -5,7 +5,7 @@ import Ajax from '../shared_components/Ajax'
 import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
 
 export default React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       myAdmin: '',
       adminsFile: '',
@@ -21,14 +21,14 @@ export default React.createClass({
       function success(response) {
         console.log("AdminPortal.js| Retrieved files.");
         console.log(JSON.stringify(response, null, 2));
-        
+
         this.setState({ myAdmin: response.myAdmin });
         this.setState({ adminsFile: response.adminsFile });
         this.setState({ studentsFile: response.studentsFile });
         this.setState({ teamsFile: response.teamsFile });
         this.setState({ deliverablesFile: response.deliverablesFile });
         this.setState({ gradesFile: response.gradesFile });
-        
+
         //convert classlist into format useable by Elemental Form-Select
         var unformattedClasslist = response.classlist;
         var formattedClasslist = [];
@@ -59,7 +59,7 @@ export default React.createClass({
         "classlist": this.state.classlist
       });
     }.bind(this));
-    
+
     return (
       <div>
         <div id="NavLinks">
@@ -78,5 +78,6 @@ export default React.createClass({
         <Logout firstname={this.state.myAdmin.firstname} sid={this.state.myAdmin.prof ? "Prof" : "TA"} username={localStorage.username}/>
         {!!this.state.adminsFile && childrenWithProps}
       </div>
-    )}
+    )
+  }
 })
