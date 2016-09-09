@@ -64,12 +64,11 @@ export default React.createClass({
           }
         }.bind(this),
         function error(xhr, status, err) {
+          var err_msg = JSON.parse(xhr.responseText);
+          alert("Error: " + err_msg);
+
           //clear student info set by register process
           localStorage.clear();
-
-          //before redirect, let user know why they could not log in.
-          //todo: get error message from server response instead of hard-coding it
-          alert("Error: ");
 
           //display error message for 3 seconds before redirecting to login
           this.setState({ error: true }, function () {

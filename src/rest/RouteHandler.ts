@@ -32,7 +32,7 @@ export default class RouteHandler {
             }
             else {
                 Log.trace("RouteHandler::userLogin| Error!");
-                return res.send(500, "user not found");
+                return res.send(500, "Login failed. (Students must first register before logging in.)");
             }
         });
     }
