@@ -2,7 +2,7 @@ import React from 'react'
 import NavLink from '../shared_components/NavLink'
 import Logout from '../shared_components/Logout'
 import Ajax from '../shared_components/Ajax'
-import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
+import { Row, Col } from 'elemental'
 
 export default React.createClass({
   getInitialState: function () {

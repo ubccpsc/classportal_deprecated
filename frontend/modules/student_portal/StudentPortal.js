@@ -1,11 +1,9 @@
 import React from 'react'
 import Deliverables from './Deliverables'
 import Grades from './Grades'
-import Info from './Info'
 import Logout from '../shared_components/Logout'
 import CreateTeam from '../shared_components/CreateTeam'
 import DisplayTeam from './DisplayTeam'
-import { Row, Col, Form, FormField, FormInput, Button, Checkbox, Glyph } from 'elemental'
 import Ajax from '../shared_components/Ajax'
 
 export default React.createClass({
