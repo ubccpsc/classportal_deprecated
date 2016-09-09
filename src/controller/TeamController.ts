@@ -51,7 +51,7 @@ export default class TeamController {
                             TeamController.updateHasTeamStatus(sidArray, true, function (error: any) {
                                 if (!error) {
                                     Log.trace("TeamController::createTeam| Finished - Success!");
-                                    return parentCallback(null, true);
+                                    return parentCallback(null, newTeam.id);
                                 }
                                 else {
                                     Log.trace("TeamController::createTeam| Finished - Error!");
