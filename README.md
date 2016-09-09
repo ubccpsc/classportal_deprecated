@@ -14,8 +14,14 @@ NPM run scripts have been set up for most common tasks:
 * Run webpack-dev-server (allows live reloading of front-end code): `npm run start:dev`
 * Run production server: `npm run build` then `npm run start:prod`
 
+If you encounter an error during `configure` you might need to install typings globally (`sudo npm install -g typings`).
+
 ## Configuring the install
 In the project's root directory, a configuration file `/config.json` is needed. A sample file `/sample-config.json` is provided to expose the structure. To fully populate this file you will need to create a new Github OAuth application. You can do this here: https://github.com/settings/applications/ While creating the application, set the callback url to be  ```SERVERNAME/postlogin``` In ```/config.json``` set ```client_id``` and ```client_secret``` to the values from the OAuth page on Github.
+
+If you're configuring the data for the first time; in `/priv':
+
+echo [] > tokens.json; echo [] > grades.json; echo [] > teams.json; echo [] > students.json; cp ../sampleData/deliverables.json .
 
 ## Storing data
 

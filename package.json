@@ -1,6 +1,6 @@
 {
-  "name": "classportalserver",
-  "description": "Class portal for Reid Holmes",
+  "name": "classportal",
+  "description": "Class Portal",
   "homepage": "https://cs.ubc.ca",
   "author": "Reid Holmes",
   "contributors": [
@@ -33,6 +33,7 @@
     "request-promise": "^4.1.1",
     "request-promise-native": "^1.0.3",
     "restify": "^4.0.3",
+    "typings": "^1.3.3",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.15.1"
   },
