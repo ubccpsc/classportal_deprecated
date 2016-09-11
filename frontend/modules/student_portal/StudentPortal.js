@@ -13,31 +13,33 @@ export default React.createClass({
       myTeamFile: '',
       myGradesFile: '',
       deliverablesFile: '',
-      classlist: '',
-      studentsFile: ''
+      namesArray: []
     }
   },
   loadStudentPortal: function () {
     Ajax.loadStudentPortal(
       function success(response) {
         // console.log("StudentPortal.js| Retrieved files.");
-        // console.log(JSON.stringify(response, null, 2));
+        console.log(JSON.stringify(response, null, 2));
 
         this.setState({ myStudentFile: response.myStudentFile });
         this.setState({ myTeamFile: response.myTeamFile });
         this.setState({ myGradesFile: response.myGradesFile });
         this.setState({ deliverablesFile: response.deliverablesFile });
 
-        // double check that this is okay
-        this.setState({ studentsFile: response.studentsFile });
-
-        //convert classlist into format useable by Elemental Form-Select
-        var unformattedClasslist = response.classlist;
-        var formattedClasslist = [];
-        for (var index = 0; index < unformattedClasslist.length; index++) {
-          formattedClasslist[index] = { "label": unformattedClasslist[index] };
+        // if student has team, do nothing to the namesArray.
+        if (response.myStudentFile.hasTeam === true) {
+          this.setState({ namesArray: response.namesArray });
         }
-        this.setState({ classlist: formattedClasslist });
+        // else, convert the namesArray into a format useable by Elemental Form-Select.
+        else {
+          var unformattedArray = response.namesArray;
+          var formattedArray = [];
+          for (var index = 0; index < unformattedArray.length; index++) {
+            formattedArray[index] = { "label": unformattedArray[index] };
+          }
+          this.setState({ namesArray: formattedArray });
+        }
 
       }.bind(this),
       function error(xhr, status, error) {
@@ -53,15 +55,12 @@ export default React.createClass({
       <div>
         <Logout firstname={this.state.myStudentFile.firstname} sid={this.state.myStudentFile.sid} username={localStorage.username}/>
 
-        {
-          !!this.state.myStudentFile.hasTeam ?
-            (<DisplayTeam myTeamFile={this.state.myTeamFile} />) :
-            !!this.state.classlist && (
-              <CreateTeam classlist={this.state.classlist}
-                isAdmin="false"
-                studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname}
-                students={this.props.studentsFile} />)
-        }
+        {this.state.myStudentFile.hasTeam === true ?
+          (<DisplayTeam myTeamFile={this.state.myTeamFile} teammateNames={this.state.namesArray} />) :
+          !!this.state.namesArray &&
+          (<CreateTeam classlist={this.state.namesArray}
+            isAdmin="false"
+            studentName={this.state.myStudentFile.firstname + " " + this.state.myStudentFile.lastname} />) }
 
         <Deliverables deliverables={this.state.deliverablesFile}/>
 

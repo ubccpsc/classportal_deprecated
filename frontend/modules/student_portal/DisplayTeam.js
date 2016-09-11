@@ -19,13 +19,13 @@ export default React.createClass({
     return members;
   },
   renderOneMember: function (index) {
-    var members = this.props.myTeamFile.members;
-    var sid = members[index];
+    var teammateNames = this.props.teammateNames;
+    var name = teammateNames[index];
 
     return (
       <FormIconField iconPosition="left" iconKey="mortar-board" key={index} >
         <FormInput
-          placeholder={" " + sid}
+          placeholder={" " + name}
           name="supported-controls-input-sm" size="sm"
           name="supported-controls-input-disabled" disabled />
       </FormIconField>
@@ -35,7 +35,7 @@ export default React.createClass({
     return (
       <div className="module">
         <h3>Team { this.props.myTeamFile.id }</h3>
-        {!!this.props.myTeamFile && this.renderTeam() }
+        {this.renderTeam() }
       </div>
     )
   }

@@ -264,16 +264,12 @@ export default class LoginController {
     }
 
     /**
-     * Retrieve files needed by student portal:
-     * - students.json (only own entry)
-     * - teams.json (only own entry)
-     * - grades.json (only own entry)
-     * - deliverables.json
-     * - classlist (array of all student names for team creation form)
-     *
-     * Note: For the async functions, we purposely return 'callback(null)' instead of 'callback(true)'
-     * on error branches. This allows us to send the successfully retrieved files even if some files
-     * can't be retrieved.
+     * Retrieve the files needed by the student portal:
+     * student file
+     * teams file
+     * grades file
+     * deliverables file
+     * an array of names for used for team display or team creation
      *
      * @param username
      * @returns object containing files
@@ -281,139 +277,154 @@ export default class LoginController {
     static loadStudentPortal(username: string, parentCallback: any) {
         Log.trace("LoginController::loadStudentPortal| Loading files required by student portal");
 
-        // store sid here for now
-        var persistMySid: number;
+        // for efficiency, we load and save each file in its entirety just once, here
+        var studentsFile: any;
+        var teamsFile: any;
+        var gradesFile: any;
+        var deliverablesFile: any;
 
-        var studentPortalFiles = {
-            "myStudentFile": {},
-            "myTeamFile": {},
-            "myGradesFile": {},
-            "deliverablesFile": {},
-            "classlist": ['']
-        };
+        var myStudentIndex: number;
+        var myTeamIndex: number;
+        var myGradesIndex: number;
+        var namesArray: string[] = [];
 
-        // synchronously load files into studentPortalFiles object
         async.waterfall([
-            function get_my_student_file(callback: any) {
-                Log.trace("LoginController::loadStudentPortal| get_my_student_file");
+            function get_student_file_and_index(callback: any) {
+                Log.trace("LoginController::loadStudentPortal| get_student_file_and_index");
+
                 Helper.readFile("students.json", function (error: any, data: any) {
                     if (!error) {
-                        var allStudents = JSON.parse(data);
-                        var myStudentFile: any = _.find(allStudents, { "username": username });
+                        studentsFile = JSON.parse(data);
+                        myStudentIndex = _.findIndex(studentsFile, { "username": username });
 
-                        if (typeof myStudentFile !== 'undefined') {
-                            persistMySid = myStudentFile.sid;
-                            studentPortalFiles.myStudentFile = myStudentFile;
-                            return callback(null);
+                        if (myStudentIndex < 0) {
+                            return callback("could not load my student file");
                         }
                         else {
-                            studentPortalFiles.myStudentFile = "err";
                             return callback(null);
                         }
                     }
                     else {
-                        studentPortalFiles.myStudentFile = "err";
-                        return callback(null);
+                        return callback("could not load student file");
                     }
                 });
             },
-            function get_my_team_file(callback: any) {
-                Log.trace("LoginController::loadStudentPortal| get_my_team_file");
-                Helper.readFile("teams.json", function (error: any, data: any) {
-                    if (!error) {
-                        var allTeams = JSON.parse(data);
-                        var myTeamFile = _.find(allTeams, function (team: any) {
-                            return _.some(team.members, function (index: any) {
-                                return index === persistMySid;
-                            });
-                        });
+            function get_team_file_and_index(callback: any) {
+                Log.trace("LoginController::loadStudentPortal| get_team_file_and_index");
 
-                        if (typeof myTeamFile !== 'undefined') {
-                            Log.trace("LoginController::loadStudentPortal| get_my_team_file: success");
-                            studentPortalFiles.myTeamFile = myTeamFile;
-                            return callback(null);
+                // only get file if student has team
+                if (studentsFile[myStudentIndex].hasTeam === true) {
+                    Helper.readFile("teams.json", function (error: any, data: any) {
+                        if (!error) {
+                            teamsFile = JSON.parse(data);
+                            myTeamIndex = _.findIndex(teamsFile, function (team: any) {
+                                return _.some(team.members, function (index: any) {
+                                    return index === studentsFile[myStudentIndex].sid;
+                                });
+                            });
+
+                            if (myTeamIndex < 0) {
+                                return callback("could not load my team file");
+                            }
+                            else {
+                                return callback(null);
+                            }
                         }
                         else {
-                            Log.trace("LoginController::loadStudentPortal| Error: " + myTeamFile);
-                            studentPortalFiles.myTeamFile = "err";
-                            return callback(null);
+                            return callback("could not load student file");
                         }
-                    }
-                    else {
-                        studentPortalFiles.myTeamFile = "err";
-                        return callback(null);
-                    }
-                });
+                    });
+                }
+                else {
+                    return callback(null);
+                }
             },
             function get_my_grades_file(callback: any) {
                 Log.trace("LoginController::loadStudentPortal| get_my_grades_file");
+
                 Helper.readFile("grades.json", function (error: any, data: any) {
                     if (!error) {
-                        var allGrades = JSON.parse(data);
-                        var myGradesFile = _.find(allGrades, { "username": username });
+                        gradesFile = JSON.parse(data);
+                        myGradesIndex = _.findIndex(gradesFile, { "username": username });
 
-                        if (myGradesFile !== 'undefined') {
-                            studentPortalFiles.myGradesFile = myGradesFile;
-                            return callback(null);
+                        if (myGradesIndex < 0) {
+                            return callback("could not load my grades file");
                         }
                         else {
-                            studentPortalFiles.myGradesFile = "err";
                             return callback(null);
                         }
                     }
                     else {
-                        studentPortalFiles.myGradesFile = "err";
-                        return callback(null);
+                        return callback("could not load grades file");
                     }
                 });
             },
             function get_deliverables_file(callback: any) {
                 Log.trace("LoginController::loadStudentPortal| get_deliverables_file");
+
                 Helper.readFile("deliverables.json", function (error: any, data: any) {
                     if (!error) {
-                        studentPortalFiles.deliverablesFile = JSON.parse(data);
+                        deliverablesFile = JSON.parse(data);
                         return callback(null);
                     }
                     else {
-                        studentPortalFiles.deliverablesFile = "err";
-                        return callback(null);
+                        return callback("could not load deliverables file");
                     }
                 });
             },
+            function get_names_array(callback: any) {
+                Log.trace("LoginController::loadStudentPortal| get_names_array");
 
-            function get_classlist(callback: any) {
-                Log.trace("LoginController::loadStudentPortal| get_classlist");
-                Helper.readFile("students.json", function (error: any, data: any) {
-                    if (!error) {
-                        var studentsObject = JSON.parse(data);
-                        var namesArray: any[] = [];
+                // if student has a team, populate array with teammate names
+                if (studentsFile[myStudentIndex].hasTeam === true) {
+                    for (var index = 0; index < teamsFile[myTeamIndex].members.length; index++) {
+                        Log.trace("loop: " + index);
+                        var sid = teamsFile[myTeamIndex].members[index];
+                        Log.trace("sid: " + sid);
+                        var teammateStudentIndex: number = _.findIndex(studentsFile, { "sid": sid });
 
-                        for (var index = 0; index < studentsObject.length; index++) {
-
-                            // NEW: only add to array if student 'hasTeam' is false
-                            if (studentsObject[index].hasTeam === false) {
-                                var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
-                                namesArray.push(name);
-                            }
+                        if (teammateStudentIndex < 0) {
+                            teammateStudentFile[index] = "null";
                         }
-
-                        studentPortalFiles.classlist = namesArray;
-                        return callback(null);
+                        else {
+                            var teammateStudentFile: any = studentsFile[teammateStudentIndex];
+                            var name: string = teammateStudentFile.firstname + " " + teammateStudentFile.lastname;
+                            Log.trace("name:" + name);
+                            namesArray[index] = name;
+                        }
                     }
-                    else {
-                        studentPortalFiles.classlist = ["err"];
-                        return callback(null);
+                    return callback(null);
+                }
+                // else, populate array with student names who don't yet have a team
+                else {
+                    // for each student, add to array if 'hasTeam' is false
+                    for (var index = 0; index < studentsFile.length; index++) {
+                        Log.trace("loop: " + index);
+                        if (studentsFile[index].hasTeam === false) {
+                            var studentName: string = studentsFile[index].firstname + " " + studentsFile[index].lastname;
+                            namesArray.push(studentName);
+                        }
                     }
-                });
+                    return callback(null);
+                }
             }
         ],
             function async_end(error: any, results: any) {
+                Log.trace("LoginController::loadStudentPortal| async_end");
                 if (!error) {
-                    Log.trace("LoginController::loadStudentPortal| async_end: Sending files.");
-                    return parentCallback(null, studentPortalFiles);
+                    // wrap files in response object
+                    var response = {
+                        "myStudentFile": studentsFile[myStudentIndex],
+                        "myTeamFile": studentsFile[myStudentIndex].hasTeam ? teamsFile[myTeamIndex] : "no team",
+                        "myGradesFile": gradesFile[myGradesIndex],
+                        "deliverablesFile": deliverablesFile,
+                        "namesArray": namesArray
+                    };
+                    Log.trace("LoginController::loadStudentPortal| Success! Sending files: " + JSON.stringify(response, null, 2));
+                    return parentCallback(null, response);
                 }
                 else {
-                    Log.trace("LoginController::loadStudentPortal| async_end: Error getting files.");
+                    Log.trace("LoginController::loadStudentPortal| Error: " + error);
                     return parentCallback(true, null);
                 }
             }
