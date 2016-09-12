@@ -432,62 +432,61 @@ export default class LoginController {
     }
 
     /**
-     * Retrieve files needed by admin portal:
-     * - admins.json
-     * - students.json
-     * - teams.json
-     * - grades.json
-     * - deliverables.json
-     * - classlist (array of all student names for team creation form)
-    
-     * Note: For the async functions, we purposely return 'callback(null)' instead of 'callback(true)'
-     * on error branches. This allows us to send the successfully retrieved files even if some files
-     * can't be retrieved.
+     *
+     * Retrieve the files needed by the admin portal:
+     * admins file
+     * students file
+     * teams file
+     * grades file
+     * deliverables file
+     * an array of name labels formatted for team creation forms
      *
      * @param username
      * @returns object containing files
      */
     static loadAdminPortal(username: string, parentCallback: any) {
         Log.trace("LoginController::loadAdminPortal| Getting files admin portal");
-        var adminPortalFiles = {
-            "myAdmin": {},
-            "adminsFile": {},
-            "studentsFile": {},
-            "teamsFile": {},
-            "gradesFile": {},
-            "deliverablesFile": {},
-            "classlist": ['']
-        };
+
+        var adminsFile: any;
+        var myAdminIndex: number;
+        var studentsFile: any;
+        var teamsFile: any;
+        var gradesFile: any;
+        var deliverablesFile: any;
+        var namesArray: any[] = [];
 
         // synchronously load files into adminPortalFiles object
         async.waterfall([
-            function get_admins_file(callback: any) {
-                Log.trace("LoginController::loadAdminPortal| get_admin_file");
+            function get_admins_file_and_index(callback: any) {
+                Log.trace("LoginController::loadAdminPortal| get_admins_file_and_index");
+
                 Helper.readFile("admins.json", function (error: any, data: any) {
                     if (!error) {
-                        var allAdmins = JSON.parse(data);
-                        var myAdmin = _.find(allAdmins, { "username": username });
+                        adminsFile = JSON.parse(data);
+                        myAdminIndex = _.findIndex(adminsFile, { "username": username });
 
-                        adminPortalFiles.adminsFile = allAdmins;
-                        adminPortalFiles.myAdmin = myAdmin;
-                        return callback(null);
+                        if (myAdminIndex < 0) {
+                            return callback("could not load my admin file");
+                        }
+                        else {
+                            return callback(null);
+                        }
                     }
                     else {
-                        adminPortalFiles.adminsFile = "err";
-                        return callback(null);
+                        return callback("error loading admins file");
                     }
                 });
             },
             function get_students_file(callback: any) {
                 Log.trace("LoginController::loadAdminPortal| get_students_file");
+
                 Helper.readFile("students.json", function (error: any, data: any) {
                     if (!error) {
-                        adminPortalFiles.studentsFile = JSON.parse(data);
+                        studentsFile = JSON.parse(data);
                         return callback(null);
                     }
                     else {
-                        adminPortalFiles.studentsFile = "err";
-                        return callback(null);
+                        return callback("could not load students file");
                     }
                 });
             },
@@ -495,71 +494,70 @@ export default class LoginController {
                 Log.trace("LoginController::loadAdminPortal| get_teams_file");
                 Helper.readFile("teams.json", function (error: any, data: any) {
                     if (!error) {
-                        adminPortalFiles.teamsFile = JSON.parse(data);
+                        teamsFile = JSON.parse(data);
                         return callback(null);
                     }
                     else {
-                        adminPortalFiles.teamsFile = "err";
-                        return callback(null);
-                    }
-                });
-            },
-            function get_deliverables_file(callback: any) {
-                Log.trace("LoginController::loadAdminPortal| get_deliverables_file");
-                Helper.readFile("deliverables.json", function (error: any, data: any) {
-                    if (!error) {
-                        adminPortalFiles.deliverablesFile = JSON.parse(data);
-                        return callback(null);
-                    }
-                    else {
-                        adminPortalFiles.deliverablesFile = "err";
-                        return callback(null);
+                        return callback("could not load teams file");
                     }
                 });
             },
             function get_grades_file(callback: any) {
                 Log.trace("LoginController::loadAdminPortal| get_grades_file");
+
                 Helper.readFile("grades.json", function (error: any, data: any) {
                     if (!error) {
-                        adminPortalFiles.gradesFile = JSON.parse(data);
+                        gradesFile = JSON.parse(data);
                         return callback(null);
                     }
                     else {
-                        adminPortalFiles.gradesFile = "err";
-                        return callback(null);
+                        return callback("could not load grades file");
                     }
                 });
             },
-            function get_classlist(callback: any) {
-                Log.trace("LoginController::loadAdminPortal| get_classlist");
-                Helper.readFile("students.json", function (error: any, data: any) {
+            function get_deliverables_file(callback: any) {
+                Log.trace("LoginController::loadAdminPortal| get_deliverables_file");
+
+                Helper.readFile("deliverables.json", function (error: any, data: any) {
                     if (!error) {
-                        var studentsObject = JSON.parse(data);
-                        var namesArray: any[] = [];
-
-                        for (var index = 0; index < studentsObject.length; index++) {
-
-                            // NEW: only add to array if student 'hasTeam' is false
-                            if (studentsObject[index].hasTeam === false) {
-                                var name: string = studentsObject[index].firstname + " " + studentsObject[index].lastname;
-                                namesArray.push(name);
-                            }
-                        }
-
-                        adminPortalFiles.classlist = namesArray;
+                        deliverablesFile = JSON.parse(data);
                         return callback(null);
                     }
                     else {
-                        adminPortalFiles.classlist = ["err"];
-                        return callback(null);
+                        return callback("could not load deliverables file");
                     }
                 });
+            },
+            function get_names_array(callback: any) {
+                Log.trace("LoginController::loadAdminPortal| get_names_array");
+
+                // else, populate array with student names who don't yet have a team
+                // for each student, add to array if 'hasTeam' is false
+                for (var index = 0; index < studentsFile.length; index++) {
+                    Log.trace("loop: " + index);
+                    if (studentsFile[index].hasTeam === false) {
+                        var studentName: string = studentsFile[index].firstname + " " + studentsFile[index].lastname;
+                        namesArray.push({ "label": studentName });
+                    }
+                }
+                return callback(null);
             }
         ],
             function async_end(error: any, results: any) {
+                Log.trace("LoginController::loadAdminPortal| async_end");
                 if (!error) {
-                    Log.trace("LoginController::loadAdminPortal| async_end: Sending files.");
-                    return parentCallback(null, adminPortalFiles);
+                    // wrap files in response object
+                    var response = {
+                        "adminsFile": adminsFile,
+                        "myAdminIndex": myAdminIndex,
+                        "studentsFile": studentsFile,
+                        "teamsFile": teamsFile,
+                        "gradesFile": gradesFile,
+                        "deliverablesFile": deliverablesFile,
+                        "namesArray": namesArray
+                    };
+                    Log.trace("LoginController::loadAdminPortal| Success! Sending files: " + JSON.stringify(response, null, 2));
+                    return parentCallback(null, response);
                 }
                 else {
                     Log.trace("LoginController::loadAdminPortal| async_end: Error getting files.");

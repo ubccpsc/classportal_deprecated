@@ -7,41 +7,44 @@ import { Row, Col } from 'elemental'
 export default React.createClass({
   getInitialState: function () {
     return {
-      myAdmin: '',
-      adminsFile: '',
-      studentsFile: '',
-      teamsFile: '',
-      deliverablesFile: '',
-      gradesFile: '',
-      classlist: ''
+      loaded: false,
+      files: {
+        "adminsFile": {},
+        "myAdminIndex": 0,
+        "studentsFile": {},
+        "teamsFile": {},
+        "deliverablesFile": {},
+        "gradesFile": {},
+        "namesArray": []
+      }
     };
   },
   loadAdminPortal: function () {
     Ajax.loadAdminPortal(
       function success(response) {
-        console.log("AdminPortal.js| Retrieved files.");
-        console.log(JSON.stringify(response, null, 2));
-
-        this.setState({ myAdmin: response.myAdmin });
-        this.setState({ adminsFile: response.adminsFile });
-        this.setState({ studentsFile: response.studentsFile });
-        this.setState({ teamsFile: response.teamsFile });
-        this.setState({ deliverablesFile: response.deliverablesFile });
-        this.setState({ gradesFile: response.gradesFile });
-
-        //convert classlist into format useable by Elemental Form-Select
-        var unformattedClasslist = response.classlist;
-        var formattedClasslist = [];
-        for (var index = 0; index < unformattedClasslist.length; index++) {
-          formattedClasslist[index] = { "label": unformattedClasslist[index] };
-        }
-        this.setState({ classlist: formattedClasslist });
-
+        console.log("AdminPortal.js| Retrieved files: " + JSON.stringify(response, null, 2));
+        this.setState({ files: response }, function () {
+          this.setState({ loaded: true });
+        });
       }.bind(this),
       function error(xhr, status, error) {
         console.log("AdminPortal.js| Error getting files!");
       }.bind(this)
     )
+  },
+  renderLogout: function () {
+    var firstname = null;
+    var prof = null;
+
+    if (this.state.files.adminsFile.length >= 0) {
+      firstname = this.state.files.adminsFile[this.state.files.myAdminIndex].firstname;
+      prof = this.state.files.adminsFile[this.state.files.myAdminIndex].prof;
+    }
+
+    return (<Logout
+      firstname={firstname}
+      sid={prof ? "Prof" : "TA"}
+      username={localStorage.username}/>);
   },
   componentDidMount: function () {
     this.loadAdminPortal();
@@ -49,15 +52,7 @@ export default React.createClass({
   render: function () {
     //more info: http://stackoverflow.com/questions/32370994/how-to-pass-props-to-this-props-children
     var childrenWithProps = React.Children.map(this.props.children, function (child) {
-      return React.cloneElement(child, {
-        "myAdmin": this.state.myAdmin,
-        "adminsFile": this.state.adminsFile,
-        "studentsFile": this.state.studentsFile,
-        "teamsFile": this.state.teamsFile,
-        "deliverablesFile": this.state.deliverablesFile,
-        "gradesFile": this.state.gradesFile,
-        "classlist": this.state.classlist
-      });
+      return React.cloneElement(child, { "files": this.state.files });
     }.bind(this));
 
     return (
@@ -75,8 +70,9 @@ export default React.createClass({
             </Col>
           </Row>
         </div>
-        <Logout firstname={this.state.myAdmin.firstname} sid={this.state.myAdmin.prof ? "Prof" : "TA"} username={localStorage.username}/>
-        {!!this.state.adminsFile && childrenWithProps}
+
+        {this.renderLogout() }
+        {!!this.state.loaded && childrenWithProps}
       </div>
     )
   }

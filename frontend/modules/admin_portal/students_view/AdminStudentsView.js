@@ -9,8 +9,8 @@ export default React.createClass({
   render: function () {
     return (
       <div>
-        <AdminStudents students={this.props.studentsFile} myTeams={this.props.myAdmin.teams} />
-        {this.props.myAdmin.prof === true && (<UploadClasslist/>) }
+        <AdminStudents students={this.props.files.studentsFile} myTeams={this.props.files.adminsFile[this.props.files.myAdminIndex].teams} />
+        {this.props.files.adminsFile[this.props.files.myAdminIndex].prof === true && (<UploadClasslist/>) }
       </div>
     )
   }
