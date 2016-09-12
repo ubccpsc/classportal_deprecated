@@ -22,7 +22,7 @@ export default React.createClass({
   loadAdminPortal: function () {
     Ajax.loadAdminPortal(
       function success(response) {
-        console.log("AdminPortal.js| Retrieved files: " + JSON.stringify(response, null, 2));
+        // console.log("AdminPortal.js| Retrieved files: " + JSON.stringify(response, null, 2));
         this.setState({ files: response }, function () {
           this.setState({ loaded: true });
         });
@@ -72,7 +72,7 @@ export default React.createClass({
         </div>
 
         {this.renderLogout() }
-        {!!this.state.loaded && childrenWithProps}
+        {this.state.loaded && childrenWithProps}
       </div>
     )
   }

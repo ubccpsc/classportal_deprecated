@@ -82,7 +82,7 @@ export default React.createClass({
     return (
       <FormSelect
         key={index.toString() }
-        options={this.props.classlist}
+        options={this.props.namesArray}
         firstOption="Select"
         onChange={this.handleSelect.bind(this, index) }
         />);
@@ -99,7 +99,7 @@ export default React.createClass({
   render: function () {
     return (
       <ContentModule id="create-team" title="Create Team" initialHideContent={false}>
-        {!!this.props.classlist ? this.renderForm() : (<div><h4>Error: No classlist provided.</h4><br/></div>) }
+        {!!this.props.namesArray ? this.renderForm() : (<div><h4>Error: No classlist provided.</h4><br/></div>) }
       </ContentModule>
     )
   }

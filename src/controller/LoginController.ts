@@ -269,7 +269,8 @@ export default class LoginController {
      * teams file
      * grades file
      * deliverables file
-     * an array of names for used for team display or team creation
+     * an array of name labels formatted for the team creation form, or
+     * an array of names of the student's team (depending on hasTeam status)
      *
      * @param username
      * @returns object containing files
@@ -277,7 +278,7 @@ export default class LoginController {
     static loadStudentPortal(username: string, parentCallback: any) {
         Log.trace("LoginController::loadStudentPortal| Loading files required by student portal");
 
-        // for efficiency, we load and save each file in its entirety just once, here
+        // for efficiency, we load and save each file in its entirety just once, here.
         var studentsFile: any;
         var teamsFile: any;
         var gradesFile: any;
@@ -286,7 +287,7 @@ export default class LoginController {
         var myStudentIndex: number;
         var myTeamIndex: number;
         var myGradesIndex: number;
-        var namesArray: string[] = [];
+        var namesArray: any[] = [];
 
         async.waterfall([
             function get_student_file_and_index(callback: any) {
@@ -312,11 +313,16 @@ export default class LoginController {
             function get_team_file_and_index(callback: any) {
                 Log.trace("LoginController::loadStudentPortal| get_team_file_and_index");
 
-                // only get file if student has team
-                if (studentsFile[myStudentIndex].hasTeam === true) {
+                // if student not in team, continue to next function.
+                if (studentsFile[myStudentIndex].hasTeam === false) {
+                    return callback(null);
+                }
+                else {
                     Helper.readFile("teams.json", function (error: any, data: any) {
                         if (!error) {
                             teamsFile = JSON.parse(data);
+
+                            // find the index of the object with a field 'members' which contains the given sid
                             myTeamIndex = _.findIndex(teamsFile, function (team: any) {
                                 return _.some(team.members, function (index: any) {
                                     return index === studentsFile[myStudentIndex].sid;
@@ -334,9 +340,6 @@ export default class LoginController {
                             return callback("could not load student file");
                         }
                     });
-                }
-                else {
-                    return callback(null);
                 }
             },
             function get_my_grades_file(callback: any) {
@@ -378,9 +381,7 @@ export default class LoginController {
                 // if student has a team, populate array with teammate names
                 if (studentsFile[myStudentIndex].hasTeam === true) {
                     for (var index = 0; index < teamsFile[myTeamIndex].members.length; index++) {
-                        Log.trace("loop: " + index);
                         var sid = teamsFile[myTeamIndex].members[index];
-                        Log.trace("sid: " + sid);
                         var teammateStudentIndex: number = _.findIndex(studentsFile, { "sid": sid });
 
                         if (teammateStudentIndex < 0) {
@@ -389,20 +390,17 @@ export default class LoginController {
                         else {
                             var teammateStudentFile: any = studentsFile[teammateStudentIndex];
                             var name: string = teammateStudentFile.firstname + " " + teammateStudentFile.lastname;
-                            Log.trace("name:" + name);
                             namesArray[index] = name;
                         }
                     }
                     return callback(null);
                 }
-                // else, populate array with student names who don't yet have a team
+                // else, populate array with names of students who aren't in a team
                 else {
-                    // for each student, add to array if 'hasTeam' is false
                     for (var index = 0; index < studentsFile.length; index++) {
-                        Log.trace("loop: " + index);
                         if (studentsFile[index].hasTeam === false) {
                             var studentName: string = studentsFile[index].firstname + " " + studentsFile[index].lastname;
-                            namesArray.push(studentName);
+                            namesArray.push({ "label": studentName });
                         }
                     }
                     return callback(null);
@@ -420,7 +418,7 @@ export default class LoginController {
                         "deliverablesFile": deliverablesFile,
                         "namesArray": namesArray
                     };
-                    Log.trace("LoginController::loadStudentPortal| Success! Sending files: " + JSON.stringify(response, null, 2));
+                    Log.trace("LoginController::loadStudentPortal| Success! Sending files.");
                     return parentCallback(null, response);
                 }
                 else {
@@ -432,14 +430,13 @@ export default class LoginController {
     }
 
     /**
-     *
      * Retrieve the files needed by the admin portal:
      * admins file
      * students file
      * teams file
      * grades file
      * deliverables file
-     * an array of name labels formatted for team creation forms
+     * an array of name labels formatted for the team creation form
      *
      * @param username
      * @returns object containing files
@@ -455,7 +452,6 @@ export default class LoginController {
         var deliverablesFile: any;
         var namesArray: any[] = [];
 
-        // synchronously load files into adminPortalFiles object
         async.waterfall([
             function get_admins_file_and_index(callback: any) {
                 Log.trace("LoginController::loadAdminPortal| get_admins_file_and_index");
@@ -473,7 +469,7 @@ export default class LoginController {
                         }
                     }
                     else {
-                        return callback("error loading admins file");
+                        return callback("could not load admins file");
                     }
                 });
             },
@@ -531,10 +527,8 @@ export default class LoginController {
             function get_names_array(callback: any) {
                 Log.trace("LoginController::loadAdminPortal| get_names_array");
 
-                // else, populate array with student names who don't yet have a team
-                // for each student, add to array if 'hasTeam' is false
+                // populate array with names of students who aren't in a team
                 for (var index = 0; index < studentsFile.length; index++) {
-                    Log.trace("loop: " + index);
                     if (studentsFile[index].hasTeam === false) {
                         var studentName: string = studentsFile[index].firstname + " " + studentsFile[index].lastname;
                         namesArray.push({ "label": studentName });
@@ -556,7 +550,7 @@ export default class LoginController {
                         "deliverablesFile": deliverablesFile,
                         "namesArray": namesArray
                     };
-                    Log.trace("LoginController::loadAdminPortal| Success! Sending files: " + JSON.stringify(response, null, 2));
+                    Log.trace("LoginController::loadAdminPortal| Success! Sending files.");
                     return parentCallback(null, response);
                 }
                 else {
