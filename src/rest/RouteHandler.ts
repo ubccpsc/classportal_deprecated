@@ -166,15 +166,15 @@ export default class RouteHandler {
     static createTeam(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace("RouteHandler::createTeam| Creating new team");
         var username: string = req.header('username');
-        var nameArray: any[] = req.params.newTeam;
+        var namesArray: any[] = req.params.newTeam;
 
-        TeamController.createTeam(username, nameArray, function (error: any, newTeamId: number) {
+        TeamController.createTeam(username, namesArray, function (error: any, newTeamId: number) {
             if (!error) {
-                Log.trace("RouteHandler::createTeam| Success!");
+                Log.trace("RouteHandler::createTeam| Success: Created team " + newTeamId);
                 return res.send(200, newTeamId);
             }
             else {
-                Log.trace("RouteHandler::createTeam| Error");
+                Log.trace("RouteHandler::createTeam| Error: " + error);
                 return res.send(500, "error");
             }
         });
@@ -188,9 +188,8 @@ export default class RouteHandler {
      * @returns server response
      */
     static disbandTeam(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("RouteHandler::disbandTeam| Creating new team");
+        Log.trace("RouteHandler::disbandTeam| Disbanding team");
         var teamId: number = parseInt(req.params.teamId, 10);
-        // TODO: test with bad input
 
         TeamController.disbandTeam(teamId, function (error: any, response: boolean) {
             if (!error) {

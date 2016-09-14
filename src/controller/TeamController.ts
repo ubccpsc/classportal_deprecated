@@ -14,101 +14,109 @@ export default class TeamController {
 
     /**
      * add new entry to teams.json
-     * assign team in admins.json
-     * set "hasTeam":true in students.json
+     * set "hasTeam":true in students.json for each member
      *
      * @param 
      * @returns 
      */
-    static createTeam(username: string, nameArray: any[], parentCallback: any) {
-        Log.trace("TeamController::createTeam| Creating new team");
+    static createTeam(username: string, namesArray: any[], parentCallback: any) {
+        // store these variables here for repeated access in the async waterfall.
+        var studentsFile: any;
+        var teamsFile: any;
+        var sidArray: string[] = [];
+        var newTeamId: number;
 
-        // for each student name in array, convert to sid
-        TeamController.nameToSid(nameArray, function (error: any, data: any) {
-            if (!error && data.length > 0) {
-                var sidArray = data;
+        async.waterfall([
+            function get_student_file(callback: any) {
+                Log.trace("TeamController::createTeam| get_student_file");
+                Helper.readFile("students.json", function (error: any, data: any) {
+                    if (!error) {
+                        studentsFile = JSON.parse(data);
+                        return callback(null);
+                    }
+                    else {
+                        return callback("could not read students file");
+                    }
+                });
+            },
+            function get_teams_file(callback: any) {
+                Log.trace("TeamController::createTeam| get_teams_file");
+                Helper.readFile("teams.json", function (error: any, data: any) {
+                    if (!error) {
+                        teamsFile = JSON.parse(data);
 
-                // todo: check permissions. If not admin, can only set team with std1=user
-                if (1) {
-                    var filename = pathToRoot.concat(config.path_to_teams);
-                    var file = require(filename);
-                    var newTeam = {
-                        "id": file.length + 1,
-                        "url": "",
-                        "members": sidArray
-                    };
-                    file.push(newTeam);
-
-                    Log.trace("TeamController::createTeam| Adding new team: " + JSON.stringify(newTeam));
-                    fs.writeFile(filename, JSON.stringify(file, null, 2), function (err: any) {
-                        if (err) {
-                            Log.trace("TeamController::createTeam| Write error: " + err.toString());
-                            return parentCallback(true, null);
+                        // set newId to the 1 higher than the last entry in the array.
+                        if (teamsFile.length > 0) {
+                            var currentHighestId: number = teamsFile[teamsFile.length - 1].id;
+                            newTeamId = currentHighestId + 1;
+                            return callback(null);
                         }
+                        // if teams file is empty, set id to 1.
                         else {
-                            // finally, set hasTeam=true in student file for each student
-                            TeamController.updateHasTeamStatus(sidArray, true, function (error: any) {
-                                if (!error) {
-                                    Log.trace("TeamController::createTeam| Finished - Success!");
-                                    return parentCallback(null, newTeam.id);
-                                }
-                                else {
-                                    Log.trace("TeamController::createTeam| Finished - Error!");
-                                    return parentCallback(true, null);
-                                }
-                            });
-                        }
-                    });
-                }
-                else {
-                    Log.trace("TeamController::createTeam| Error: Bad permission");
-                    return parentCallback(true, null);
-                }
-            }
-            else {
-                Log.trace("TeamController::createTeam| Error: Bad team");
-                return parentCallback(true, null);
-            }
-        });
-    }
-
-    // input: array with team member names
-    // output: array team member sids
-    static nameToSid(nameArray: any[], callback: any) {
-        Log.trace("TeamController::nameToSid| Converting member names to sid");
-
-        if (!!nameArray) {
-            Helper.readFile("students.json", function (error: any, data: any) {
-                if (!error && data.length > 0) {
-                    var students = JSON.parse(data);
-                    var sidArray: any[] = [];
-
-                    // for each student in supplied array, check name against student file
-                    for (var i = 0; i < nameArray.length; i++) {
-                        for (var j = 0; j < students.length; j++) {
-                            if (nameArray[i] === students[j].firstname + " " + students[j].lastname) {
-                                sidArray[i] = students[j].sid;
-                                break;
-                            }
+                            newTeamId = 1;
+                            return callback(null);
                         }
                     }
-                    // if success, return result (todo: check this)
-                    callback(null, sidArray);
+                    else {
+                        return callback("could not read teams file");
+                    }
+                });
+            },
+            function convert_names_to_sids(callback: any) {
+                Log.trace("TeamController::createTeam| convert_names_to_sids");
+
+                // check each value in namesArray against student file
+                for (var i = 0; i < namesArray.length; i++) {
+                    for (var j = 0; j < studentsFile.length; j++) {
+                        if (namesArray[i] === studentsFile[j].firstname + " " + studentsFile[j].lastname) {
+                            sidArray[i] = studentsFile[j].sid;
+                            break;
+                        }
+                    }
+                }
+                return callback(null);
+            },
+            function add_team_entry(callback: any) {
+                Log.trace("TeamController::createTeam| add_team_entry");
+
+
+                var newTeam = {
+                    "id": newTeamId,
+                    "url": "",
+                    "members": sidArray
+                };
+
+                Helper.addEntry("teams.json", newTeam, function (error: any) {
+                    if (!error) {
+                        return callback(null);
+                    }
+                    else {
+                        return callback("could not add new team");
+                    }
+                });
+            },
+            function update_hasTeam_status(callback: any) {
+                Log.trace("TeamController::createTeam| update_hasTeam_status");
+                TeamController.updateHasTeamStatus(sidArray, true, function (error: any) {
+                    if (!error) {
+                        return callback(null);
+                    }
+                    else {
+                        return callback("could not update hasTeam statuses");
+                    }
+                });
+            }
+        ],
+            function async_end(error: any, data: any) {
+                Log.trace("TeamController::createTeam| end_async");
+                if (!error) {
+                    return parentCallback(null, newTeamId);
                 }
                 else {
-                    // error: file read error
-                    Log.trace("TeamController::nameToSid| File read error. Returning");
-                    callback(true, null);
-                    return;
+                    return parentCallback(error, null);
                 }
-            });
-        }
-        else {
-            // error: bad input
-            Log.trace("TeamController::nameToSid| Bad input. Returning");
-            callback(true, null);
-            return;
-        }
+            }
+        );
     }
 
     // helper to update students to hasTeam
@@ -120,21 +128,21 @@ export default class TeamController {
                 Log.trace("TeamController::updateHasTeamStatus| update_first_hasTeam");
                 Helper.updateEntry("students.json", { 'sid': sidArray[0] }, { 'hasTeam': newStatus }, function (error: any) {
                     if (!error) {
-                        callback(null);
+                        return callback(null);
                     }
                     else {
-                        callback("error");
+                        return callback("error");
                     }
                 });
             },
             function update_second_hasTeam(callback: any) {
-                Log.trace("TeamController::updateHasTeamStatus| update_first_hasTeam");
+                Log.trace("TeamController::updateHasTeamStatus| update_second_hasTeam");
                 Helper.updateEntry("students.json", { 'sid': sidArray[1] }, { 'hasTeam': newStatus }, function (error: any) {
                     if (!error) {
-                        callback(null);
+                        return callback(null);
                     }
                     else {
-                        callback("error");
+                        return callback("error");
                     }
                 });
             }
