@@ -198,7 +198,7 @@ export default class LoginController {
                     return parentCallback(null, response);
                 }
                 else {
-                    Log.trace("LoginController::login| end_async: error!");
+                    Log.trace("LoginController::login| end_async: error: " + error);
                     return parentCallback("error", null);
                 }
             }
@@ -222,20 +222,25 @@ export default class LoginController {
         Log.trace("LoginController::checkRegistration| Checking valid regex");
         async.parallel([
             function csidRegexTest(callback: any) {
-                var validCsidRegex = /^[a-z][0-9][a-z][0-9]$/;
-                var result: boolean = validCsidRegex.test(csid);
-                Log.trace("LoginController::checkRegistration| csidRegexTest: " + result.toString());
-                return callback(null, result);
+                /*
+                    var validCsidRegex = /^[a-z][0-9][a-z][0-9]$/;
+                    var result: boolean = validCsidRegex.test(csid);
+                    Log.trace("LoginController::checkRegistration| csidRegexTest: " + result.toString());
+                */
+                return callback(null);
             },
             function sidRegexTest(callback: any) {
                 var validSidRegex = /^\d{8}$/;
-                var result: boolean = validSidRegex.test(sid);
-                Log.trace("LoginController::checkRegistration| sidRegexTest: " + result.toString());
-                return callback(null, result);
+                if (validSidRegex.test(sid)) {
+                    return callback(null);
+                }
+                else {
+                    return callback("bad sid");
+                }
             }
         ],
-            function end_async(err: any, result: any) {
-                if (!err && result[0] === true && result[1] === true) {
+            function end_async(error: any) {
+                if (!error) {
                     Log.trace("LoginController::checkRegistration| Valid regex. Checking for registration status");
                     Helper.checkEntry("students.json", { 'csid': csid, 'sid': sid }, function (error: any, response: any) {
                         if (!error) {
@@ -246,18 +251,18 @@ export default class LoginController {
                             }
                             else {
                                 Log.trace("LoginController::checkRegistration| Error: Student is already registered!");
-                                return parentCallback("Student is already registered.", null);
+                                return parentCallback("student is already registered.", null);
                             }
                         }
                         else {
-                            Log.trace("LoginController::checkRegistration| Error: Student is not registered.");
-                            return parentCallback("Invalid csid or sid.", null);
+                            Log.trace("LoginController::checkRegistration| Error: Student is not enrolled.");
+                            return parentCallback("student is not enrolled", null);
                         }
                     });
                 }
                 else {
-                    Log.trace("LoginController::checkRegistration| Invalid id regex.");
-                    return parentCallback("Invalid csid or sid.", null);
+                    Log.trace("LoginController::checkRegistration| error: " + error);
+                    return parentCallback(error, null);
                 }
             }
         );
@@ -276,8 +281,6 @@ export default class LoginController {
      * @returns object containing files
      */
     static loadStudentPortal(username: string, parentCallback: any) {
-        Log.trace("LoginController::loadStudentPortal| Loading files required by student portal");
-
         // for efficiency, we load and save each file in its entirety just once, here.
         var studentsFile: any;
         var teamsFile: any;
@@ -442,8 +445,6 @@ export default class LoginController {
      * @returns object containing files
      */
     static loadAdminPortal(username: string, parentCallback: any) {
-        Log.trace("LoginController::loadAdminPortal| Getting files admin portal");
-
         var adminsFile: any;
         var myAdminIndex: number;
         var studentsFile: any;
@@ -554,7 +555,7 @@ export default class LoginController {
                     return parentCallback(null, response);
                 }
                 else {
-                    Log.trace("LoginController::loadAdminPortal| async_end: Error getting files.");
+                    Log.trace("LoginController::loadAdminPortal| Error: " + error);
                     return parentCallback(true, null);
                 }
             }

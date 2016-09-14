@@ -14,7 +14,8 @@ export default React.createClass({
     var csid = event.target.elements[1].value;
 
     // console.log("Register.js| Submitting csid:" + csid + ", sid:" + sid);
-    if (csidRegex.test(csid) && sidRegex.test(sid)) {
+    // incorrect csid regex test: csidRegex.test(csid)
+    if (sidRegex.test(sid)) {
       Ajax.register(
         csid,
         sid,

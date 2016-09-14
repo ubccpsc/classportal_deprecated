@@ -52,11 +52,11 @@ export default class RouteHandler {
 
         LoginController.checkRegistration(csid, sid, function (error: any, success: boolean) {
             if (!error && success) {
-                Log.trace("checkRegistration| Success!");
+                Log.trace("RouteHandler::checkRegistration| Success!");
                 return res.send(200, "success");
             }
             else {
-                Log.trace("checkRegistration| Error!");
+                Log.trace("RouteHandler::checkRegistration| Error: " + error);
                 return res.send(500, error);
             }
         });

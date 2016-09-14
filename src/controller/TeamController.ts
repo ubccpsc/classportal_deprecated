@@ -108,11 +108,12 @@ export default class TeamController {
             }
         ],
             function async_end(error: any, data: any) {
-                Log.trace("TeamController::createTeam| end_async");
                 if (!error) {
+                    Log.trace("TeamController::createTeam| Success");
                     return parentCallback(null, newTeamId);
                 }
                 else {
+                    Log.trace("TeamController::createTeam| Error: " + error);
                     return parentCallback(error, null);
                 }
             }
@@ -148,11 +149,12 @@ export default class TeamController {
             }
         ],
             function end_async(error: any) {
-                Log.trace("TeamController::updateHasTeamStatus| end_async");
                 if (!error) {
+                    Log.trace("TeamController::updateHasTeamStatus| Success");
                     return parentCallback(null);
                 }
                 else {
+                    Log.trace("TeamController::updateHasTeamStatus| Error: " + error);
                     return parentCallback("error");
                 }
             }
