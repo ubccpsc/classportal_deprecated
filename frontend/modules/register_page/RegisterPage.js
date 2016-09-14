@@ -13,45 +13,30 @@ export default React.createClass({
     var sid = event.target.elements[0].value;
     var csid = event.target.elements[1].value;
 
-    // console.log("Register.js| Submitting csid:" + csid + ", sid:" + sid);
-    // incorrect csid regex test: csidRegex.test(csid)
-    if (sidRegex.test(sid)) {
-      Ajax.register(
-        csid,
-        sid,
-        function success(response) {
-          //clear any previously set values in localstorage
-          localStorage.clear();
+    Ajax.register(
+      csid,
+      sid,
+      function success() {
+        //clear any previously set values in localstorage
+        localStorage.clear();
 
-          if (response === "success") {
-            //set sid and csid for later use by postlogin
-            localStorage.setItem('sid', sid);
-            localStorage.setItem('csid', csid);
+        //set sid and csid for later use by postlogin
+        localStorage.setItem('sid', sid);
+        localStorage.setItem('csid', csid);
 
-            //login with github
-            var client_id = config.client_id;
-            var redirect_uri = "http://" + config.host + ":" + config.port + "/postlogin";
-            window.location = "https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=" + redirect_uri;
-          }
-          else {
-            //bad info
-            alert("Error: student does not exist in database");
-          }
-        }.bind(this),
-        function error(xhr, status, err) {
-          var err_msg = JSON.parse(xhr.responseText);
-          alert("Error: " + err_msg);
-        }.bind(this)
-      )
-    }
-    else {
-      //clear any previously set values in localstorage
-      localStorage.clear();
+        //login with github
+        var client_id = config.client_id;
+        var redirect_uri = "http://" + config.host + ":" + config.port + "/postlogin";
+        window.location = "https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=" + redirect_uri;
+      }.bind(this),
+      function error(xhr, status, err) {
+        var err_msg = JSON.parse(xhr.responseText);
+        alert("Error: " + err_msg);
 
-      // console.log("Register.js| Error: Invalid input.");
-      alert("Invalid entry. Please try again.");
-      return;
-    }
+        //clear any previously set values in localstorage
+        localStorage.clear();
+      }.bind(this)
+    )
   },
   render: function () {
     return (

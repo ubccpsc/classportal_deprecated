@@ -230,13 +230,16 @@ export default class LoginController {
                 return callback(null);
             },
             function sidRegexTest(callback: any) {
-                var validSidRegex = /^\d{8}$/;
-                if (validSidRegex.test(sid)) {
-                    return callback(null);
-                }
-                else {
-                    return callback("bad sid");
-                }
+                /*
+                    var validSidRegex = /^\d{8}$/;
+                    if (validSidRegex.test(sid)) {
+                        return callback(null);
+                    }
+                    else {
+                        return callback("bad sid");
+                    }
+                */
+                return callback(null);
             }
         ],
             function end_async(error: any) {
