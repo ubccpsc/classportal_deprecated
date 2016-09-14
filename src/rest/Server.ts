@@ -70,6 +70,7 @@ export default class Server {
                 that.rest.post('/api/logout', requireToken, RouteHandler.logout);
                 that.rest.post('/api/loadStudentPortal', requireToken, RouteHandler.loadStudentPortal);
                 that.rest.post('/api/createTeam', requireToken, RouteHandler.createTeam);
+                that.rest.post('/api/disbandTeam', requireToken, RouteHandler.disbandTeam);
 
                 /* Routes acccessible by ADMIN users only */
                 that.rest.post('/api/loadAdminPortal', requireAdmin, requireToken, RouteHandler.loadAdminPortal);

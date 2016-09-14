@@ -1,11 +1,30 @@
 import React from 'react'
+import Ajax from '../shared_components/Ajax'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
 
 export default React.createClass({
+  disbandTeam: function () {
+    if (confirm("Please confirm that you want to disband the team.")) {
+      Ajax.disbandTeam(
+        this.props.myTeamFile.id,
+        function success() {
+          alert("Team has been disbanded!");
+          window.location.reload(true);
+        },
+        function error() {
+          alert("Error: team could not be disbanded.");
+          window.location.reload(true);
+        }
+      );
+    }
+  },
   renderTeam: function () {
     return (
       <Form>
         {this.renderMembers() }
+        <FormField>
+          <Button size="sm" onClick={this.disbandTeam}>Disband</Button>
+        </FormField>
       </Form>
     );
   },

@@ -1,6 +1,7 @@
 import React from 'react'
-import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
 import ContentModule from '../../shared_components/ContentModule'
+import Ajax from '../../shared_components/Ajax'
+import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
 
 export default React.createClass({
   getInitialState: function () {
@@ -52,19 +53,33 @@ export default React.createClass({
             </a>
             : "Not set" }</td>
         <td className="tg-edam">
-          <a href="" target="blank">{returnName(team.members[0]) }</a>, &nbsp;
-          <a href="" target="blank">{returnName(team.members[1]) }</a>
+          {returnName(team.members[0]) + ", " + returnName(team.members[1]) }
         </td>
         <td className="tg-yw4l">-</td>
         <td className="tg-yw4l">
           <Button size="sm" className="button-text" type="link-text">View/Edit</Button>
         </td>
         <td className="tg-yw4l">
-          <Button size="sm" className="button-text" type="link-text">Edit</Button>
+          <Button id={team.id} size="sm" className="button-text" type="link-text" onClick={this.disbandTeam} >Disband</Button>
         </td>
 
       </tr>
     );
+  },
+  disbandTeam: function (event) {
+    if (confirm("Please confirm that you want to disband team " + event.target.id + ".")) {
+      Ajax.disbandTeam(
+        event.target.id,
+        function success() {
+          alert("Team has been disbanded!");
+          window.location.reload(true);
+        },
+        function error() {
+          alert("Error: team could not be disbanded.");
+          window.location.reload(true);
+        }
+      );
+    }
   },
   render: function () {
     return (
@@ -83,8 +98,7 @@ export default React.createClass({
               <th className="tg-yw4l">Members</th>
               <th className="tg-yw4l">TA</th>
               <th className="tg-yw4l">Grades</th>
-              <th className="tg-yw4l">Edit Team</th>
-
+              <th className="tg-yw4l">Disband</th>
             </tr>
             {!!this.props.teams && this.renderTeams() }
           </tbody>

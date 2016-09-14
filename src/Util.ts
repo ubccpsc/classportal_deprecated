@@ -156,6 +156,35 @@ export class Helper {
         });
     }
 
+    // delete entry from json array in specified file
+    static deleteEntry(filename: string, identifierObject: any, callback: any) {
+        Log.trace("Helper::deleteEntry| filename: " + filename);
+        var path = pathToRoot.concat(config.private_folder, filename);
+        var file = require(path);
+
+        var entryIndex: number = _.findIndex(file, identifierObject);
+
+        if (entryIndex < 0) {
+            Log.trace("Helper::deleteEntry| Error: could not find entry.");
+            return callback(true);
+        }
+        else {
+            // remove entry from file
+            file.splice(entryIndex, 1);
+
+            fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
+                if (err) {
+                    Log.trace("Helper::deleteEntry| Write error: " + err.toString());
+                    return callback(true);
+                }
+                else {
+                    Log.trace("Helper::deleteEntry| Write successful!");
+                    return callback(null);
+                }
+            });
+        }
+    }
+
     // check if supplied username exists in admins.json    
     static isAdmin(username: string, callback: any) {
         Log.trace("Helper::isAdmin| Checking admin status..");

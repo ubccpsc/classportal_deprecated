@@ -16,7 +16,6 @@ export default class TeamController {
      * add new entry to teams.json
      * assign team in admins.json
      * set "hasTeam":true in students.json
-     * 
      *
      * @param 
      * @returns 
@@ -113,13 +112,13 @@ export default class TeamController {
     }
 
     // helper to update students to hasTeam
-    static updateHasTeamStatus(sidArray: any[], hasTeam: boolean, parentCallback: any) {
+    static updateHasTeamStatus(sidArray: any[], newStatus: boolean, parentCallback: any) {
         Log.trace("TeamController::updateHasTeamStatus| Updating..");
 
         async.waterfall([
             function update_first_hasTeam(callback: any) {
                 Log.trace("TeamController::updateHasTeamStatus| update_first_hasTeam");
-                Helper.updateEntry("students.json", { 'sid': sidArray[0] }, { 'hasTeam': true }, function (error: any) {
+                Helper.updateEntry("students.json", { 'sid': sidArray[0] }, { 'hasTeam': newStatus }, function (error: any) {
                     if (!error) {
                         callback(null);
                     }
@@ -130,7 +129,7 @@ export default class TeamController {
             },
             function update_second_hasTeam(callback: any) {
                 Log.trace("TeamController::updateHasTeamStatus| update_first_hasTeam");
-                Helper.updateEntry("students.json", { 'sid': sidArray[1] }, { 'hasTeam': true }, function (error: any) {
+                Helper.updateEntry("students.json", { 'sid': sidArray[1] }, { 'hasTeam': newStatus }, function (error: any) {
                     if (!error) {
                         callback(null);
                     }
@@ -147,6 +146,66 @@ export default class TeamController {
                 }
                 else {
                     return parentCallback("error");
+                }
+            }
+        );
+    }
+
+    /**
+     * Disband a team by deleting the entry from teams.json
+     * and setting 'hasTeam':false for each team member. 
+     *
+     * @param teamId
+     * @returns 
+     */
+    static disbandTeam(teamId: number, parentCallback: any) {
+        Log.trace("TeamController::disbandTeam| Disbanding team " + teamId);
+        var sidArray: any[] = [];
+
+        async.waterfall([
+            function get_team_sids(callback: any) {
+                Log.trace("TeamController::disbandTeam| get_team_sids");
+                Helper.checkEntry("teams.json", { 'id': teamId }, function (error: any, teamFile: any) {
+                    if (!error) {
+                        sidArray = teamFile.members;
+                        return callback(null);
+                    }
+                    else {
+                        return callback("error getting team members");
+                    }
+                });
+            },
+            function delete_team_entry(callback: any) {
+                Log.trace("TeamController::disbandTeam| delete_team_entry");
+                Helper.deleteEntry("teams.json", { 'id': teamId }, function (error: any) {
+                    if (!error) {
+                        return callback(null);
+                    }
+                    else {
+                        return callback("error deleting team entry");
+                    }
+                });
+            },
+            function set_hasTeam_false(callback: any) {
+                Log.trace("TeamController::disbandTeam| set_hasTeam_false");
+                TeamController.updateHasTeamStatus(sidArray, false, function (error: any) {
+                    if (!error) {
+                        return callback(null);
+                    }
+                    else {
+                        return callback("error setting hasTrue statuses");
+                    }
+                });
+            }
+        ],
+            function end_async(error: any) {
+                if (!error) {
+                    Log.trace("TeamController::disbandTeam| Success!");
+                    return parentCallback(null, true);
+                }
+                else {
+                    Log.trace("TeamController::disbandTeam| Error: " + error);
+                    return parentCallback(true, null);
                 }
             }
         );

@@ -97,6 +97,26 @@ module.exports = {
             error: errorCallback
         });
     },
+    //submit new team to be disbanded
+    disbandTeam: function (teamId, successCallback, errorCallback) {
+        // console.log("Ajax.js| Creating team..");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/disbandTeam",
+            headers: {
+                "username": localStorage.username,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: {
+                "teamId": teamId
+            },
+            dataType: "json",
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
     //admin portal: gets all files upon login    
     loadAdminPortal: function (successCallback, errorCallback) {
         // console.log("Ajax.js| Getting all files for admin portal..");
