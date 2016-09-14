@@ -5,7 +5,8 @@ import config from 'config';
 export default React.createClass({
   goToRoot: function (event) {
     event.preventDefault();
-    browserHistory.push('/');
+    //go to root path
+    window.location = "http://" + config.host + ":" + config.port + "/";
   },
   render: function () {
     return (
