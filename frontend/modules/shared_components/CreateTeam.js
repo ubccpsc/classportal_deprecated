@@ -33,18 +33,19 @@ export default React.createClass({
       }
     }
 
-    alert(alertMessage);
-    Ajax.createTeam(
-      newTeamArray,
-      function success(response) {
-        console.log("CreateTeam.js| Success: " + response);
-        alert("Success: Team " + response + " created!")
-        window.location.reload(true);
-      }.bind(this),
-      function error(xhr, status, err) {
-        alert("Error: Could not create team.")
-      }.bind(this)
-    )
+    if (confirm(alertMessage)) {
+      Ajax.createTeam(
+        newTeamArray,
+        function success(response) {
+          console.log("CreateTeam.js| Success: " + response);
+          alert("Success: Team " + response + " created!")
+          window.location.reload(true);
+        }.bind(this),
+        function error(xhr, status, err) {
+          alert("Error: Could not create team.")
+        }.bind(this)
+      )
+    }
   },
   handleSelect: function (index, value) {
     if (!!value) {
