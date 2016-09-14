@@ -1,6 +1,8 @@
 import React from 'react'
+import config from 'config';
 import Ajax from '../shared_components/Ajax'
-import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
+import ContentModule from '../shared_components/ContentModule'
+import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button, InputGroup } from 'elemental'
 
 export default React.createClass({
   disbandTeam: function () {
@@ -20,42 +22,37 @@ export default React.createClass({
   },
   renderTeam: function () {
     return (
-      <Form>
-        {this.renderMembers() }
-        <FormField>
-          <Button size="sm" onClick={this.disbandTeam}>Disband</Button>
-        </FormField>
-      </Form>
+      <div>
+        <InputGroup >
+          {this.renderMembers() }
+          {config.students_can_disband_teams &&
+            (<InputGroup.Section>
+              <Button size="sm" onClick={this.disbandTeam}><Glyph icon="tools"/>&nbsp; Disband</Button>
+            </InputGroup.Section>) }
+        </InputGroup>
+      </div>
     );
   },
   renderMembers: function () {
     var members = [];
+    var memberName;
 
-    for (var index = 0; index < 2; index++) {
-      members[index] = this.renderOneMember(index);
+    for (var index = 0; index < config.team_size; index++) {
+      memberName = this.props.teammateNames[index];
+      members[index] =
+        (<InputGroup.Section key={index} grow>
+          <FormIconField iconPosition="left" iconKey="mortar-board">
+            <FormInput placeholder={" " + memberName} size="sm" disabled/>
+          </FormIconField>
+        </InputGroup.Section>);
     }
-
     return members;
-  },
-  renderOneMember: function (index) {
-    var teammateNames = this.props.teammateNames;
-    var name = teammateNames[index];
-
-    return (
-      <FormIconField iconPosition="left" iconKey="mortar-board" key={index} >
-        <FormInput
-          placeholder={" " + name}
-          name="supported-controls-input-sm" size="sm"
-          name="supported-controls-input-disabled" disabled />
-      </FormIconField>
-    );
   },
   render: function () {
     return (
-      <div className="module">
-        <h3>Team { this.props.myTeamFile.id }</h3>
+      <ContentModule id="display-team-module" title={"Team " + this.props.myTeamFile.id }  initialHideContent={false}>
         {this.renderTeam() }
-      </div>
+      </ContentModule>
     )
   }
 })

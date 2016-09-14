@@ -111,7 +111,6 @@ h5{
   }
 }
 
-
 #body-css{
   position:relative;
   top:0px;
@@ -128,10 +127,6 @@ h5{
 .form{
   margin-left: auto;
   margin-right: auto;
-}
-
-.defaultTable{
-  width:100%;
 }
 
 .text-left{
@@ -172,7 +167,7 @@ h5{
   color:#039;
   background-color:#b9c9fe;
 } .tg .tg-yw4l{
-  vertical-align:top
+  vertical-align:center
 } .tg-wrap-deliverables > table {
   width:100%;
 }
@@ -187,48 +182,11 @@ h5{
     margin: auto 0px;
   }
 }
-.tg .tg-7wrc{
-  background-color:#b9c9fe;
-  color:#003399;
-  vertical-align:top
-}
 .tg .tg-edam {
   background-color:#e8edff;
   color:#666699;
-  vertical-align:top;
+  vertical-align:center;
   text-align:left;
-}.tg .tg-value {
-  background-color:#e8edff;
-  color:#666699;
-  vertical-align:top;
-  text-align:left;
-  width:100%;
-}
-
-#logout-form {
-  text-align:center;
-}
-#logout-formfield {
-  max-width:35%;
-}
-
-.tg .tg-7wrc2{
-  background-color:#e8edff;
-  color:#003399;
-  vertical-align:top
-}
-.tg .tg-edam2 {
-  background-color:#b9c9fe;
-  color:#003399;
-  vertical-align:top;
-  text-align:left;
-}
-.tg .tg-value2 {
-  background-color:#b9c9fe;
-  color:#003399;
-  vertical-align:top;
-  text-align:left;
-  width:100%;
 }
 
 .module{
@@ -251,7 +209,6 @@ h5{
     width:700px;
   }
 }
-
 
 .module p, h3, h4 {
   padding: 0;

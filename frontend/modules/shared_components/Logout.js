@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, FormRow, FormField, FormInput, FormIconField, Glyph, Button } from 'elemental'
+import { Form, FormRow, FormField, FormInput, FormIconField, Glyph, Button, InputGroup } from 'elemental'
 import {browserHistory} from 'react-router'
 import Ajax from '../shared_components/Ajax'
 
@@ -26,17 +26,29 @@ export default React.createClass({
     return (
       <div className="module">
         <h3>Welcome, {this.props.firstname}!</h3>
-        <Form id="logout-form" type="inline" onSubmit={this.logoutSubmit}>
-          <FormIconField id="logout-formfield" iconPosition="left" iconKey="mortar-board" >
-            <FormInput placeholder={" " + this.props.sid} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
-          </FormIconField>
-          <FormIconField id="logout-formfield" iconPosition="left" iconKey="mark-github" >
-            <FormInput placeholder={" " + this.props.username} name="supported-controls-input-sm" size="sm" name="supported-controls-input-disabled" disabled />
-          </FormIconField>
-          <FormField id="logout-formfield">
-            <Button size="sm" submit><Glyph icon="sign-out"/>&nbsp; Log out</Button>
-          </FormField>
-        </Form>
+        <InputGroup >
+          <InputGroup.Section grow >
+            <FormIconField iconKey="mortar-board" >
+              <FormInput
+                placeholder={" " + this.props.sid}
+                size="sm"
+                disabled />
+            </FormIconField>
+          </InputGroup.Section>
+          <InputGroup.Section grow>
+            <FormIconField iconKey="mark-github" >
+              <FormInput
+                placeholder={" " + this.props.username}
+                size="sm"
+                disabled />
+            </FormIconField>
+          </InputGroup.Section>
+          <InputGroup.Section>
+            <Button size="sm" onClick={this.logoutSubmit}>
+              <Glyph icon="sign-out"/>&nbsp; Log out
+            </Button>
+          </InputGroup.Section>
+        </InputGroup>
       </div>
     )
   }
