@@ -4,6 +4,7 @@
 
 import Log from "../Util";
 var request = require('request');
+var config = require('../../config.json');
 
 // TODO: migrate to rp: https://www.npmjs.com/package/request-promise
 var rp = require('request-promise-native');
@@ -11,8 +12,8 @@ var rp = require('request-promise-native');
 export default class GithubProjectController {
 
     // TODO: use external config file; these shouldn't be in github
-    private GITHUB_AUTH_TOKEN = 'token 9c6e586170923383fe5bec2a295c1c38d80e1221';
-    private GITHUB_USER_NAME = 'rtholmes';
+    private GITHUB_AUTH_TOKEN = config.githubcontroller_token;
+    private GITHUB_USER_NAME = config.githubcontroller_user;
     // bruce
     // private GITHUB_AUTH_TOKEN = 'token 8c017236d0429fe33d8aed1ea435e6777aaeab88';
     // private GITHUB_USER_NAME = 'zhihaoli';

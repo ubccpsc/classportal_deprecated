@@ -19,6 +19,8 @@ If you encounter an error during `configure` you might need to install typings g
 ## Configuring the install
 In the project's root directory, a configuration file `/config.json` is needed. A sample file `/sample-config.json` is provided to expose the structure. To fully populate this file you will need to create a new Github OAuth application. You can do this here: https://github.com/settings/applications/ While creating the application, set the callback url to be  ```SERVERNAME/postlogin``` In ```/config.json``` set ```client_id``` and ```client_secret``` to the values from the OAuth page on Github.
 
+You will also need a personal authentication token on Github for the Github project creation featues; go to Github -> Profile -> Personal Access Tokens and ask for lots of permissions (details to follow). Put this in the GithubController fields in config.json.
+
 If you're configuring the data for the first time; in `/priv':
 
 echo [] > tokens.json; echo [] > grades.json; echo [] > teams.json; echo [] > students.json; cp ../sampleData/deliverables.json .

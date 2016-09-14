@@ -32,7 +32,7 @@ describe("GithubProjectController", function () {
     });
 
     // no assertions because we don't really care about repo deletion
-    xit("Should be able to delete a repo", function () {
+    it("Should be able to delete a repo", function () {
         return controller.deleteRepo(REPO_NAME1).then(function (res) {
             Log.test('Repo deleted: ' + res);
             // expect(res).not.to.be.null;
@@ -183,7 +183,7 @@ describe("GithubProjectController", function () {
         });
     });
 
-    it("Should be able to check repo import status", function () {
+    xit("Should be able to check repo import status", function () {
         let targetRepo = REPO_NAME1;
 
         return controller.checkImportProgress(targetRepo).then(function (retVal) {
