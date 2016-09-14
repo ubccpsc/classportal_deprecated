@@ -12,8 +12,8 @@ export default React.createClass({
       <div>
         <div id="titlebar" onClick={this.goToRoot} >
           <img id="titlebar-img" src="../UBCLogo_Reverse.png"/>
-          <h1 id="titlebar-text">{config.titlebar} | </h1>
-          <h3 id="titlebar-subtext">{config.titlebar_subtext}</h3>
+          <div id="titlebar-text">{config.titlebar}</div>
+          <div id="titlebar-subtext">{config.titlebar_subtext}</div>
         </div>
         <div id="body-css">
           {this.props.children}
