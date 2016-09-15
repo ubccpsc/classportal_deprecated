@@ -37,7 +37,7 @@ export default React.createClass({
       Ajax.createTeam(
         newTeamArray,
         function success(response) {
-          console.log("CreateTeam.js| Success: " + response);
+          // console.log("CreateTeam.js| Success: " + response);
           alert("Success: Team " + response + " created!")
           window.location.reload(true);
         }.bind(this),

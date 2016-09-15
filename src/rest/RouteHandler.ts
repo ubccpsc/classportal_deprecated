@@ -203,4 +203,28 @@ export default class RouteHandler {
         });
     }
 
+    /**
+     * Assign a TA to a team.
+     * Handled by AdminController
+     *
+     * @param teamId
+     * @returns server response
+     */
+    static assignTeam(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var newTA: string = req.params.newTA;
+        var teamId: string = req.params.teamId;
+        Log.trace("RouteHandler::assignTeam| Assigning TA: " + newTA + " to team: " + teamId);
+
+        AdminController.assignTeam(newTA, teamId, function (error: any, response: boolean) {
+            if (!error) {
+                Log.trace("RouteHandler::assignTeam| Success!");
+                return res.send(200, "success");
+            }
+            else {
+                Log.trace("RouteHandler::assignTeam| Error");
+                return res.send(500, "error");
+            }
+        });
+    }
+
 }
