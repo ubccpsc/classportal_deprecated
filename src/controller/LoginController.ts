@@ -110,18 +110,7 @@ export default class LoginController {
                                     Helper.updateEntry("students.json", { 'csid': csid, 'sid': sid }, { "username": persistUsername }, function (error: any) {
                                         if (!error) {
                                             Log.trace("LoginController::login| create_user: success");
-
-                                            // next, update_grades_entry
-                                            Helper.updateEntry("grades.json", { 'sid': sid }, { "username": persistUsername }, function (error: any) {
-                                                if (!error) {
-                                                    Log.trace("LoginController::login| update_grades_entry: success");
-                                                    return callback(null);
-                                                }
-                                                else {
-                                                    Log.trace("LoginController::login| update_grades_entry: error");
-                                                    return callback(null);
-                                                }
-                                            });
+                                            return callback(null);
                                         }
                                         else {
                                             Log.trace("LoginController::login| create_user: error");
@@ -354,7 +343,7 @@ export default class LoginController {
                 Helper.readFile("grades.json", function (error: any, data: any) {
                     if (!error) {
                         gradesFile = JSON.parse(data);
-                        myGradesIndex = _.findIndex(gradesFile, { "username": username });
+                        myGradesIndex = _.findIndex(gradesFile, { "sid": studentsFile[myStudentIndex].sid });
 
                         if (myGradesIndex < 0) {
                             return callback("could not load my grades file");
