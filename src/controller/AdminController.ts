@@ -195,7 +195,7 @@ export default class AdminController {
                     return parentCallback(null, true);
                 }
                 else {
-                    Log.trace("AdminController::updateClasslist| end_async_waterfall: Error updating files.");
+                    Log.trace("AdminController::updateClasslist| end_async_waterfall: Error: " + error);
                     return parentCallback(true, null);
                 }
             }

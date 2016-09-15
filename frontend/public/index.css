@@ -73,6 +73,7 @@ h5{
   margin-left: auto;
   margin-right: auto;
   background: #002145;
+  cursor: pointer; 
 } #titlebar-img{
   position: absolute;
   top:  10px;
