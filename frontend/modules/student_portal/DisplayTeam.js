@@ -29,6 +29,7 @@ export default React.createClass({
             (<InputGroup.Section>
               <Button size="sm" onClick={this.disbandTeam}><Glyph icon="tools"/>&nbsp; Disband</Button>
             </InputGroup.Section>) }
+          {this.renderRepoButton() }
         </InputGroup>
       </div>
     );
@@ -47,6 +48,33 @@ export default React.createClass({
         </InputGroup.Section>);
     }
     return members;
+  },
+  renderRepoButton: function () {
+    var button;
+
+    if (!this.props.myTeamFile.url) {
+      function alertOnClick() {
+        alert("Team repository has not yet been set by the prof.");
+      }
+      button = (
+        <InputGroup.Section>
+          <Button size="sm" onClick={alertOnClick }>
+            <Glyph icon="organization"/>&nbsp; Repo
+          </Button>
+        </InputGroup.Section >)
+    }
+    else {
+      button = (
+        <InputGroup.Section>
+          <a href={this.props.myTeamFile.url} target="blank" >
+            <Button size="sm" ><Glyph icon="organization"/>
+              &nbsp; Repo
+            </Button>
+          </a>
+        </InputGroup.Section>)
+    }
+
+    return button;
   },
   render: function () {
     return (
