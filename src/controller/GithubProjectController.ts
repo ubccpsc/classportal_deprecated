@@ -4,6 +4,7 @@
 
 import Log from "../Util";
 var request = require('request');
+var config = require('../../config.json');
 
 // TODO: migrate to rp: https://www.npmjs.com/package/request-promise
 var rp = require('request-promise-native');
@@ -11,8 +12,8 @@ var rp = require('request-promise-native');
 export default class GithubProjectController {
 
     // TODO: use external config file; these shouldn't be in github
-    private GITHUB_AUTH_TOKEN = 'token 9c6e586170923383fe5bec2a295c1c38d80e1221';
-    private GITHUB_USER_NAME = 'rtholmes';
+    private GITHUB_AUTH_TOKEN = config.githubcontroller_token;
+    private GITHUB_USER_NAME = config.githubcontroller_user;
     // bruce
     // private GITHUB_AUTH_TOKEN = 'token 8c017236d0429fe33d8aed1ea435e6777aaeab88';
     // private GITHUB_USER_NAME = 'zhihaoli';
@@ -357,6 +358,42 @@ export default class GithubProjectController {
                 fulfill(results);
             }).catch(function (err: any) {
                 Log.error("GithubProjectController::updateImport(..) - ERROR: " + err);
+                reject(err);
+            });
+        });
+    }
+
+    public addWebhook(repoName: string): Promise<{}> {
+        let ctx = this;
+        Log.info("GithubProjectController::addWebhook(..) - start");
+
+        return new Promise(function (fulfill, reject) {
+
+            // POST /repos/:owner/:repo/hooks
+            let opts = {
+                method: 'POST',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/hooks',
+                headers: {
+                    'Authorization': ctx.GITHUB_AUTH_TOKEN,
+                    'User-Agent': ctx.GITHUB_USER_NAME
+                },
+                body: {
+                    "name": "web",
+                    "active": true,
+                    "events": ["commit_comment"],
+                    "config": {
+                        "url": "http://skaha.cs.ubc.ca:8080/submit",
+                        "content_type": "json"
+                    }
+                },
+                json: true
+            };
+
+            rp(opts).then(function (results: any) {
+                Log.info("GithubProjectController::addWebhook(..) - success: " + results);
+                fulfill(results);
+            }).catch(function (err: any) {
+                Log.error("GithubProjectController::addWebhook(..) - ERROR: " + err);
                 reject(err);
             });
         });
