@@ -362,4 +362,40 @@ export default class GithubProjectController {
             });
         });
     }
+
+    public addWebhook(repoName: string): Promise<{}> {
+        let ctx = this;
+        Log.info("GithubProjectController::addWebhook(..) - start");
+
+        return new Promise(function (fulfill, reject) {
+
+            // POST /repos/:owner/:repo/hooks
+            let opts = {
+                method: 'POST',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/hooks',
+                headers: {
+                    'Authorization': ctx.GITHUB_AUTH_TOKEN,
+                    'User-Agent': ctx.GITHUB_USER_NAME
+                },
+                body: {
+                    "name": "web",
+                    "active": true,
+                    "events": ["commit_comment"],
+                    "config": {
+                        "url": "http://skaha.cs.ubc.ca:8080/submit",
+                        "content_type": "json"
+                    }
+                },
+                json: true
+            };
+
+            rp(opts).then(function (results: any) {
+                Log.info("GithubProjectController::addWebhook(..) - success: " + results);
+                fulfill(results);
+            }).catch(function (err: any) {
+                Log.error("GithubProjectController::addWebhook(..) - ERROR: " + err);
+                reject(err);
+            });
+        });
+    }
 }

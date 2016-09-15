@@ -24,15 +24,15 @@ describe("GithubProjectController", function () {
     let REPO_NAME1 = 'MochaTestRepo1';// 'cpsc310project_forAutoTest';
     let TEAM_NAME1 = 'MochaTestTeam1';
 
-    let REPO_NAME2 = 'MochaTestRepo2';
-    let TEAM_NAME2 = 'MochaTestTeam2';
+    let REPO_NAME2 = 'cpsc310project_rtholmes'; // MochaTestRepo2 // cpsc310project_rtholmes
+    let TEAM_NAME2 = 'cpsc310project_rtholmes';
 
     beforeEach(function () {
         controller = new GithubProjectController();
     });
 
     // no assertions because we don't really care about repo deletion
-    it("Should be able to delete a repo", function () {
+    xit("Should be able to delete a repo", function () {
         return controller.deleteRepo(REPO_NAME1).then(function (res) {
             Log.test('Repo deleted: ' + res);
             // expect(res).not.to.be.null;
@@ -44,7 +44,7 @@ describe("GithubProjectController", function () {
     });
 
     // works the first time (if the project doesn't exist)
-    it("Should be able to create a repo", function () {
+    xit("Should be able to create a repo", function () {
         return controller.createRepo(REPO_NAME1).then(function (res) {
             Log.test('Repo created: ' + res);
             expect(res).not.to.be.null;
@@ -155,7 +155,7 @@ describe("GithubProjectController", function () {
     });
 
     xit("Should be able to import a repo", function () {
-        let targetRepo = REPO_NAME1;
+        let targetRepo = REPO_NAME2;
         let importUrl = 'https://github.com/CS310-2016Fall/cpsc310project';
 
         return controller.importRepoToNewRepo(targetRepo, importUrl).then(function (res) {
@@ -191,6 +191,18 @@ describe("GithubProjectController", function () {
             expect(retVal).not.to.be.null;
         }).catch(function (err: any) {
             Log.test('Repo import status problem: ' + err);
+            expect(true).to.be.false; // should not happen
+        });
+    });
+
+    it("Should be able to add webhook to repo", function () {
+        let targetRepo = REPO_NAME2;
+
+        return controller.addWebhook(targetRepo).then(function (retVal) {
+            Log.test('Repo hook status: ' + JSON.stringify(retVal));
+            expect(retVal).not.to.be.null;
+        }).catch(function (err: any) {
+            Log.test('Repo hook status problem: ' + err);
             expect(true).to.be.false; // should not happen
         });
     });
