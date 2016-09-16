@@ -172,5 +172,28 @@ module.exports = {
             success: successCallback,
             error: errorCallback
         });
+    },
+    submitGrade: function (student, assnId, grade, comments, successCallback, errorCallback) {
+        // console.log("Ajax.js| Submitting new grade..");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/submitGrade",
+            headers: {
+                "username": localStorage.username,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: {
+                "student": student,
+                "assnId": assnId,
+                "grade": grade,
+                "comments": comments
+            },
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: successCallback,
+            error: errorCallback
+        });
     }
 }
