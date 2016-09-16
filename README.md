@@ -35,3 +35,12 @@ Some docs will need to be provided to the system to set it up, these include:
 
 * Student list; this will be a CSV with these fields: ```<NAME>,<STUDENT NUMBER>,<CS LAB ID>```
 * Deliverable list; this will be a JSON file that will look just like an array of model.Deliverable objects.
+
+## Running the system
+
+We only want to restart the system after building; this doesn't seem like it will work in the background:
+
+```
+nohup nodemon --ignore priv/ --exec "npm run start:prod" &
+```
+

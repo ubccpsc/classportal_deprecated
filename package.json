@@ -53,6 +53,7 @@
     "jasmine-reporters": "^2.0.8",
     "joi": "*",
     "mocha": "*",
+    "nodemon": "^1.10.2",
     "request-promise": "*",
     "style-loader": "^0.13.1",
     "tslint": "^3.15.1",
