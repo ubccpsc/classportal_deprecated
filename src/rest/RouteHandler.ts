@@ -29,9 +29,8 @@ export default class RouteHandler {
             if (!error) {
                 Log.trace("RouteHandler::userLogin| Succcess!");
                 return res.send(200, data);
-            }
-            else {
-                Log.trace("RouteHandler::userLogin| Error!");
+            } else {
+                Log.error("RouteHandler::userLogin| Error!");
                 return res.send(500, "Login failed. (Students must first register before logging in.)");
             }
         });
@@ -54,9 +53,8 @@ export default class RouteHandler {
             if (!error && success) {
                 Log.trace("RouteHandler::checkRegistration| Success!");
                 return res.send(200, "success");
-            }
-            else {
-                Log.trace("RouteHandler::checkRegistration| Error: " + error);
+            } else {
+                Log.error("RouteHandler::checkRegistration| Error: " + error);
                 return res.send(500, error);
             }
         });
@@ -77,9 +75,8 @@ export default class RouteHandler {
             if (!error && success) {
                 Log.trace("RouteHandler::userLogout| Success!");
                 return res.send(200, "success");
-            }
-            else {
-                Log.trace("RouteHandler::userLogout| Error!");
+            } else {
+                Log.error("RouteHandler::userLogout| Error!");
                 return res.send(500, "error");
             }
         });
@@ -100,9 +97,8 @@ export default class RouteHandler {
             if (!error) {
                 Log.trace("RouteHandler::loadStudentPortal| Success!");
                 return res.send(200, data);
-            }
-            else {
-                Log.trace("RouteHandler::loadStudentPortal| Error!");
+            } else {
+                Log.error("RouteHandler::loadStudentPortal| Error!");
                 return res.send(500, "error");
             }
         });
@@ -114,7 +110,7 @@ export default class RouteHandler {
      *
      * (admin check done in previous middleware functions)
      *
-     * @param username 
+     * @param username
      * @returns server response: {admin object, students file, teams file, deliverables file}
      */
     static loadAdminPortal(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -125,9 +121,8 @@ export default class RouteHandler {
             if (!error) {
                 Log.trace("RouteHandler::loadAdminPortal| Success!");
                 return res.send(200, data);
-            }
-            else {
-                Log.trace("RouteHandler::loadAdminPortal| Error!");
+            } else {
+                Log.error("RouteHandler::loadAdminPortal| Error!");
                 return res.send(500, "error");
             }
         });
@@ -148,9 +143,8 @@ export default class RouteHandler {
             if (!error) {
                 Log.trace("RouteHandler::updateClasslist| Success!");
                 return res.send(200, "success");
-            }
-            else {
-                Log.trace("RouteHandler::updateClasslist| Error!");
+            } else {
+                Log.error("RouteHandler::updateClasslist| Error!");
                 return res.send(500, "error");
             }
         });
@@ -160,7 +154,7 @@ export default class RouteHandler {
      * Create new team process.
      * Handled by TeamController
      *
-     * @param 
+     * @param
      * @returns server response
      */
     static createTeam(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -172,9 +166,8 @@ export default class RouteHandler {
             if (!error) {
                 Log.trace("RouteHandler::createTeam| Success: Created team " + newTeamId);
                 return res.send(200, newTeamId);
-            }
-            else {
-                Log.trace("RouteHandler::createTeam| Error: " + error);
+            } else {
+                Log.error("RouteHandler::createTeam| Error: " + error);
                 return res.send(500, "error");
             }
         });
@@ -195,9 +188,8 @@ export default class RouteHandler {
             if (!error) {
                 Log.trace("RouteHandler::disbandTeam| Success!");
                 return res.send(200, "success");
-            }
-            else {
-                Log.trace("RouteHandler::disbandTeam| Error");
+            } else {
+                Log.error("RouteHandler::disbandTeam| Error");
                 return res.send(500, "error");
             }
         });
