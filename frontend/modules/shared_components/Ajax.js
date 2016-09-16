@@ -99,7 +99,7 @@ module.exports = {
     },
     //submit new team to be disbanded
     disbandTeam: function (teamId, successCallback, errorCallback) {
-        // console.log("Ajax.js| Creating team..");
+        // console.log("Ajax.js| Disbanding team..");
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/disbandTeam",
@@ -109,6 +109,26 @@ module.exports = {
                 "admin": localStorage.admin
             },
             data: {
+                "teamId": teamId
+            },
+            dataType: "json",
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
+    assignTeam: function (newTA, teamId, successCallback, errorCallback) {
+        // console.log("Ajax.js| Assigning new TA to team");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/assignTeam",
+            headers: {
+                "username": localStorage.username,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: {
+                "newTA": newTA,
                 "teamId": teamId
             },
             dataType: "json",

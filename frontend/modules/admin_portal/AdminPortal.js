@@ -24,7 +24,13 @@ export default React.createClass({
       function success(response) {
         // console.log("AdminPortal.js| Retrieved files: " + JSON.stringify(response, null, 2));
         this.setState({ files: response }, function () {
-          this.setState({ loaded: true });
+          //verify files exist and are a proper format here
+          if (1) {
+            this.setState({ loaded: true });
+          }
+          else {
+            alert("Error loading files for user " + localStorage.username + "!");
+          }
         });
       }.bind(this),
       function error(xhr, status, error) {

@@ -1,5 +1,6 @@
 import fs = require('fs');
 import async = require('async');
+import _ = require('lodash');
 import Log from '../Util';
 import {Helper} from '../Util';
 
@@ -195,5 +196,37 @@ export default class AdminController {
                 }
             }
         );
+    }
+
+    static assignTeam(username: string, teamId: string, callback: any) {
+        var path = pathToRoot.concat(config.private_folder, "admins.json");
+        var file = require(path);
+        var adminIndex: number = _.findIndex(file, { "username": username });
+        if (adminIndex >= 0) {
+            // check if team is already assigned to the admin.
+            if (_.indexOf(file[adminIndex].teams, teamId) >= 0) {
+                Log.trace("AdminController::assignTeam| Error: Admin is already assigned to this team!");
+                return callback(true);
+            }
+            else {
+                file[adminIndex].teams.push(teamId);
+
+                Log.trace("AdminController::assignTeam| Writing to admins file..");
+                fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
+                    if (err) {
+                        Log.trace("AdminController::assignTeam| Error: could not write");
+                        return callback(true);
+                    }
+                    else {
+                        Log.trace("AdminController::assignTeam| Success!");
+                        return callback(null);
+                    }
+                });
+            }
+        }
+        else {
+            Log.trace("AdminController::assignTeam| Error: could not find admin file");
+            return callback(true);
+        }
     }
 }
