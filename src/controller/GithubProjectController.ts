@@ -5,9 +5,7 @@
 import Log from "../Util";
 var request = require('request');
 var config = require('../../config.json');
-
 var rp = require('request-promise-native');
-
 
 /**
  * Represents a complete team that has been formed and where all members
@@ -21,12 +19,9 @@ interface GroupRepoDescription {
 
 export default class GithubProjectController {
 
-    // TODO: use external config file; these shouldn't be in github
+    // Use external config file so tokens are not stored in github
     private GITHUB_AUTH_TOKEN = config.githubcontroller_token;
     private GITHUB_USER_NAME = config.githubcontroller_user;
-    // bruce
-    // private GITHUB_AUTH_TOKEN = 'token 8c017236d0429fe33d8aed1ea435e6777aaeab88';
-    // private GITHUB_USER_NAME = 'zhihaoli';
 
     // private ORG_NAME = "CS410-2015Fall";
     private ORG_NAME = "CS310-2016Fall";
@@ -35,7 +30,7 @@ export default class GithubProjectController {
      * Creates a given repo and returns its url. Will fail if the repo already exists.
      *
      * @param repoName
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     public createRepo(repoName: string): Promise<string> {
         let ctx = this;
@@ -78,7 +73,7 @@ export default class GithubProjectController {
      * Deletes a repo from the organization.
      *
      * @param repoName
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     public deleteRepo(repoName: string): Promise<string> {
         let ctx = this;
@@ -113,8 +108,7 @@ export default class GithubProjectController {
      *
      * The success callback will include the Github team objects.
      *
-     * @param teamName
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     public listTeams(): Promise<{}> {
         let ctx = this;
@@ -166,7 +160,7 @@ export default class GithubProjectController {
      * Returns the teamId (used by many other Github calls).
      *
      * @param teamName
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     public createTeam(teamName: string): Promise<number> {
         let ctx = this;
@@ -205,7 +199,7 @@ export default class GithubProjectController {
      * @param teamId
      * @param repoName
      * @param permission ('pull', 'push', 'admin')
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     public addTeamToRepo(teamId: number, repoName: string, permission: string) {
         let ctx = this;
@@ -242,7 +236,7 @@ export default class GithubProjectController {
      *
      * @param teamId
      * @param members
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     public addMembersToTeam(teamId: number, members: string[]): Promise<{}> {
         let ctx = this;
@@ -281,7 +275,7 @@ export default class GithubProjectController {
      *
      * @param targetRepo
      * @param importRepoUrl
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     public importRepoToNewRepo(targetRepo: string, importRepoUrl: string): Promise<{}> {
         let ctx = this;
@@ -346,7 +340,7 @@ export default class GithubProjectController {
      * Used to provide updated credentials for an import.
      *
      * @param repoName
-     * @returns {Promise<T>}
+     * @returns {Promise<{}>}
      */
     public updateImport(repoName: string): Promise<{}> {
         let ctx = this;
