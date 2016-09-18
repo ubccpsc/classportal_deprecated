@@ -15,8 +15,8 @@ var rp = require('request-promise-native');
  */
 interface GroupRepoDescription {
     team: number;
-    members: string[]; // github usernames
-    teamNumber?: number; // internal Github teamid
+    members: string[];      // github usernames
+    url?: string;           // github url (leave undefined if not set)
 }
 
 export default class GithubProjectController {
