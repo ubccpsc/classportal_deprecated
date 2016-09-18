@@ -89,7 +89,7 @@ describe("GithubProjectController", function () {
 
     xit("Should be able to add a team to a repo", function () {
         let teamId = 2100162;
-        return controller.addTeamToRepo(teamId, REPO_NAME1).then(function (res) {
+        return controller.addTeamToRepo(teamId, REPO_NAME1, 'admin').then(function (res) {
             Log.test('Team added to repo: ' + res);
             expect(res).not.to.be.null;
         }).catch(function (err) {
@@ -141,7 +141,7 @@ describe("GithubProjectController", function () {
             Log.test('Members added to team: ' + JSON.stringify(res));
 
             // add team to repo
-            return controller.addTeamToRepo(outerTeamId, REPO_NAME2);
+            return controller.addTeamToRepo(outerTeamId, REPO_NAME2, 'admin');
         }).then(function (res: any) {
             Log.test('Team added to repo: ' + res);
 

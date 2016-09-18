@@ -6,8 +6,18 @@ import Log from "../Util";
 var request = require('request');
 var config = require('../../config.json');
 
-// TODO: migrate to rp: https://www.npmjs.com/package/request-promise
 var rp = require('request-promise-native');
+
+
+/**
+ * Represents a complete team that has been formed and where all members
+ * are already registered (so we have their Github ids).
+ */
+interface GroupRepoDescription {
+    team: number;
+    members: string[]; // github usernames
+    teamNumber?: number; // internal Github teamid
+}
 
 export default class GithubProjectController {
 
@@ -132,15 +142,17 @@ export default class GithubProjectController {
                     reject(eMessage);
                 }
 
+                let teams: any = [];
                 // Log.trace("GithubProjectController::creatlistTeams(..) - success: " + JSON.stringify(fullResponse.body));
                 for (var team of fullResponse.body) {
                     let id = team.id;
                     let name = team.name;
 
                     Log.info("GithubProjectController::listTeams(..) - team: " + JSON.stringify(team));
+                    teams.push({id: id, name: name});
                 }
 
-                fulfill(JSON.stringify(fullResponse.body));
+                fulfill(teams);
             }).catch(function (err: any) {
                 Log.error("GithubProjectController::listTeams(..) - ERROR: " + err);
                 reject(err);
@@ -192,9 +204,10 @@ export default class GithubProjectController {
      *
      * @param teamId
      * @param repoName
+     * @param permission ('pull', 'push', 'admin')
      * @returns {Promise<T>}
      */
-    public addTeamToRepo(teamId: number, repoName: string) {
+    public addTeamToRepo(teamId: number, repoName: string, permission: string) {
         let ctx = this;
         Log.info("GithubProjectController::addTeamToRepo( " + teamId + ", " + repoName + " ) - start");
         return new Promise(function (fulfill, reject) {
@@ -206,7 +219,11 @@ export default class GithubProjectController {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
                     'User-Agent': ctx.GITHUB_USER_NAME,
                     'Accept': 'application/json'
-                }
+                },
+                body: {
+                    permission: permission
+                },
+                json: true
             };
 
             rp(options).then(function (body: any) {
@@ -398,4 +415,110 @@ export default class GithubProjectController {
             });
         });
     }
+
+
+    public createAllRepos(repoNames: string[]): Promise<any[]> {
+        let ctx = this;
+        Log.info("GithubProjectController::createAllRepos(..) - start");
+
+        let promises: Promise<any>[] = [];
+
+        for (var repoName of repoNames) {
+
+            Log.trace("GithubProjectController::createAllRepos(..) - pushing: " + repoName);
+            promises.push(ctx.createRepo(repoName));
+        }
+        Log.info("GithubProjectController::createAllRepos(..) - all pushed");
+
+        return Promise.all(promises);
+    }
+
+    public importAllRepos(repoNames: string[], importRepoUrl: string): Promise<any[]> {
+        Log.info("GithubProjectController::importAllRepos(..) - start");
+
+        let promises: Promise<any>[] = [];
+        for (var repoName of repoNames) {
+            Log.trace("GithubProjectController::importAllRepos(..) - pushing: " + repoName);
+            promises.push(this.importRepoToNewRepo(repoName, importRepoUrl));
+        }
+        Log.info("GithubProjectController::importAllRepos(..) - all pushed");
+
+        return Promise.all(promises);
+    }
+
+    public addTeamToRepos(repoNames: string[], adminTeamName: string, permissions: string) {
+        Log.info("GithubProjectController::addTeamToRepos(..) - start");
+        let ctx = this;
+
+        return new Promise(function (fulfill, reject) {
+            let teamId = -1;
+            ctx.listTeams().then(function (teamList: any) {
+                Log.info("GithubProjectController::addTeamToRepos(..) - all teams: " + JSON.stringify(teamList));
+                for (var team of teamList) {
+                    if (team.name === adminTeamName) {
+                        teamId = team.id;
+                        Log.info("GithubProjectController::addTeamToRepos(..) - matched admin team; id: " + teamId);
+                    }
+                }
+                if (teamId < 0) {
+                    throw new Error('Could not find team called: ' + adminTeamName);
+                }
+                let promises: Promise<any>[] = [];
+
+                for (var repoName of repoNames) {
+                    promises.push(ctx.addTeamToRepo(teamId, repoName, permissions));
+                }
+                Log.info("GithubProjectController::addTeamToRepos(..) - all addTeams pushed");
+
+                Promise.all(promises).then(function (allDone) {
+                    Log.info("GithubProjectController::addTeamToRepos(..) - all done; final: " + JSON.stringify(allDone));
+                    // Promise.resolve(allDone);
+                    fulfill(allDone);
+                }).catch(function (err) {
+                    Log.info("GithubProjectController::addTeamToRepos(..) - all done ERROR: " + err);
+                    // Promise.reject(err);
+                    reject(err);
+                });
+
+                //}).then(function (res: any) {
+                //    Log.info("GithubProjectController::addTeamToRepos(..) - done; team added to all repos: " + JSON.stringify(res));
+                //    fulfill(res);
+            }).catch(function (err: any) {
+                Log.info("GithubProjectController::addTeamToRepos(..) - ERROR: " + err);
+                reject(err);
+            });
+
+            Log.info("GithubProjectController::addTeamToRepos(..) - end");
+        });
+    }
+
+} // end class
+
+var gpc = new GithubProjectController();
+
+let repoList: string[] = [];
+for (var i = 0; i < 3; i++) {
+    repoList.push('cpsc310test_team' + i);
 }
+/*
+ // create the repos
+ gpc.createAllRepos(repoList).then(function (res) {
+ Log.info('All repos created: ' + JSON.stringify(res));
+ }).catch(function (err) {
+ Log.error('Error creating repos: ' + JSON.stringify(err));
+ });
+
+ let importUrl = 'https://github.com/CS310-2016Fall/cpsc310project';
+ gpc.importAllRepos(repoList, importUrl).then(function (res) {
+ Log.info('All repos importing: ' + JSON.stringify(res));
+ }).catch(function (err) {
+ Log.error('Error importing repos: ' + JSON.stringify(err));
+ });
+ */
+
+gpc.addTeamToRepos(repoList, '310Staff', 'admin').then(function (res) {
+    Log.info('Adding team to repos success: ' + JSON.stringify(res));
+}).catch(function (err) {
+    Log.info('Error adding team to repos: ' + err);
+});
+
