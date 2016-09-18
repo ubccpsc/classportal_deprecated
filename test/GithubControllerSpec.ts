@@ -68,7 +68,7 @@ describe("GithubProjectController", function () {
      */
 
     xit("Should be able to create a team", function () {
-        return controller.createTeam(TEAM_NAME1).then(function (res) {
+        return controller.createTeam(TEAM_NAME1, 'push').then(function (res) {
             Log.test('Team created: ' + res);
             expect(res).not.to.be.null;
         }).catch(function (err) {
@@ -130,7 +130,7 @@ describe("GithubProjectController", function () {
             expect(res).not.to.be.null;
 
             // create team
-            return controller.createTeam(TEAM_NAME2);
+            return controller.createTeam(TEAM_NAME2, 'push');
         }).then(function (teamId: number) {
             Log.test('Team created: ' + teamId);
             outerTeamId = teamId;

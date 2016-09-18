@@ -15,6 +15,8 @@ interface GroupRepoDescription {
     team: number;
     members: string[];      // github usernames
     url?: string;           // github url (leave undefined if not set)
+    projectName?: string;   // github project name
+    teamName?: string;      // github team name
 }
 
 export default class GithubProjectController {
@@ -160,9 +162,10 @@ export default class GithubProjectController {
      * Returns the teamId (used by many other Github calls).
      *
      * @param teamName
+     * @param permission 'admin', 'pull', 'push'
      * @returns {Promise<{}>}
      */
-    public createTeam(teamName: string): Promise<number> {
+    public createTeam(teamName: string, permission: string): Promise<number> {
         let ctx = this;
 
         Log.info("GithubProjectController::createTeam(..) - start");
@@ -177,7 +180,8 @@ export default class GithubProjectController {
                     'Accept': 'application/json'
                 },
                 body: {
-                    name: teamName
+                    name: teamName,
+                    permission: permission
                 },
                 json: true
             };
@@ -185,7 +189,7 @@ export default class GithubProjectController {
             rp(options).then(function (body: any) {
                 let id = body.id;
                 Log.info("GithubProjectController::createTeam(..) - success: " + id);
-                fulfill(id);
+                fulfill({teamName: teamName, teamId: id});
             }).catch(function (err: any) {
                 Log.error("GithubProjectController::createTeam(..) - ERROR: " + err);
                 reject(err);
@@ -261,7 +265,7 @@ export default class GithubProjectController {
             }
 
             Promise.all(promises).then(function (results: any) {
-                Log.info("GithubProjectController::addMembersToTeam(..) - success: " + results);
+                Log.info("GithubProjectController::addMembersToTeam(..) - success: " + JSON.stringify(results));
                 fulfill(results);
             }).catch(function (err: any) {
                 Log.error("GithubProjectController::addMembersToTeam(..) - ERROR: " + err);
@@ -411,14 +415,14 @@ export default class GithubProjectController {
     }
 
 
-    public createAllRepos(repoNames: string[]): Promise<any[]> {
+    public createAllRepos(groupData: GroupRepoDescription[]): Promise<any[]> {
         let ctx = this;
         Log.info("GithubProjectController::createAllRepos(..) - start");
 
         let promises: Promise<any>[] = [];
 
-        for (var repoName of repoNames) {
-
+        for (var gd of groupData) {
+            let repoName = gd.projectName;
             Log.trace("GithubProjectController::createAllRepos(..) - pushing: " + repoName);
             promises.push(ctx.createRepo(repoName));
         }
@@ -427,11 +431,12 @@ export default class GithubProjectController {
         return Promise.all(promises);
     }
 
-    public importAllRepos(repoNames: string[], importRepoUrl: string): Promise<any[]> {
+    public importAllRepos(groupData: GroupRepoDescription[], importRepoUrl: string): Promise<any[]> {
         Log.info("GithubProjectController::importAllRepos(..) - start");
 
         let promises: Promise<any>[] = [];
-        for (var repoName of repoNames) {
+        for (var gd of groupData) {
+            let repoName = gd.projectName;
             Log.trace("GithubProjectController::importAllRepos(..) - pushing: " + repoName);
             promises.push(this.importRepoToNewRepo(repoName, importRepoUrl));
         }
@@ -440,7 +445,21 @@ export default class GithubProjectController {
         return Promise.all(promises);
     }
 
-    public addTeamToRepos(repoNames: string[], adminTeamName: string, permissions: string) {
+    public createAllTeams(groupData: GroupRepoDescription[], permissions: string): Promise<any[]> {
+        Log.info("GithubProjectController::crateAllTeams(..) - start");
+
+        let promises: Promise<any>[] = [];
+        for (var gd of groupData) {
+            let teamName = gd.teamName;
+            Log.trace("GithubProjectController::crateAllTeams(..) - pushing: " + teamName);
+            promises.push(this.createTeam(teamName, permissions));
+        }
+        Log.info("GithubProjectController::crateAllTeams(..) - all pushed");
+
+        return Promise.all(promises);
+    }
+
+    public addTeamToRepos(groupData: GroupRepoDescription[], adminTeamName: string, permissions: string) {
         Log.info("GithubProjectController::addTeamToRepos(..) - start");
         let ctx = this;
 
@@ -459,7 +478,8 @@ export default class GithubProjectController {
                 }
                 let promises: Promise<any>[] = [];
 
-                for (var repoName of repoNames) {
+                for (var gd of groupData) {
+                    let repoName = gd.projectName;
                     promises.push(ctx.addTeamToRepo(teamId, repoName, permissions));
                 }
                 Log.info("GithubProjectController::addTeamToRepos(..) - all addTeams pushed");
@@ -490,29 +510,85 @@ export default class GithubProjectController {
 
 var gpc = new GithubProjectController();
 
-let repoList: string[] = [];
-for (var i = 0; i < 3; i++) {
-    repoList.push('cpsc310test_team' + i);
+const PROJECT_PREFIX = 'cpsc310test_team';
+const TEAM_PREFIX = 'cpsc310_team';
+
+let groupDataIn: GroupRepoDescription[] = [];
+let groupData: GroupRepoDescription[] = [];
+groupDataIn.push({team: 5, members: ['rtholmes', 'rthse2']});
+for (var gd of groupDataIn) {
+    if (typeof gd.url === 'undefined' || gd.url === null) {
+        gd.teamName = TEAM_PREFIX + gd.team;
+        gd.projectName = PROJECT_PREFIX + gd.team;
+        groupData.push(gd);
+    }
 }
+
+
 /*
- // create the repos
- gpc.createAllRepos(repoList).then(function (res) {
+ let repoList: string[] = [];
+ for (var i = 0; i < 3; i++) {
+ repoList.push('cpsc310test_team' + i);
+ }
+ */
+
+/*
+ var promises: Promise<any>[] = [];
+ for (var data of groupData) {
+ let repoName = PROJECT_PREFIX + data.team;
+ promises.push(gpc.deleteRepo(repoName));
+ }
+ Promise.all(promises).then(function (succ) {
+ Log.info('all projects deleted: ' + succ);
+ }).catch(function (err) {
+ Log.error('Error deleting projects: ' + err);
+ });
+ */
+
+// create the repos
+/*
+ gpc.createAllRepos(groupData).then(function (res) {
  Log.info('All repos created: ' + JSON.stringify(res));
  }).catch(function (err) {
  Log.error('Error creating repos: ' + JSON.stringify(err));
  });
 
+ // import the default project to the repos
  let importUrl = 'https://github.com/CS310-2016Fall/cpsc310project';
- gpc.importAllRepos(repoList, importUrl).then(function (res) {
+ gpc.importAllRepos(groupData, importUrl).then(function (res) {
  Log.info('All repos importing: ' + JSON.stringify(res));
  }).catch(function (err) {
  Log.error('Error importing repos: ' + JSON.stringify(err));
  });
  */
 
-gpc.addTeamToRepos(repoList, '310Staff', 'admin').then(function (res) {
-    Log.info('Adding team to repos success: ' + JSON.stringify(res));
-}).catch(function (err) {
-    Log.info('Error adding team to repos: ' + err);
+gpc.createAllTeams(groupData, 'push').then(function (res) {
+    Log.info('All teams created: ' + JSON.stringify(res));
+
+    let promises: Promise<any>[] = [];
+    for (var teamRec of res) {
+        let id = teamRec.teamId;
+        let name = teamRec.teamName;
+        for (var gd of groupData) {
+            if (gd.teamName === name) {
+                promises.push(gpc.addMembersToTeam(id, gd.members));
+            }
+        }
+    }
+    return Promise.all(promises);
+}).then(function (teamsDone) {
+    Log.info('All members successfully added to teams: ' + JSON.stringify(teamsDone));
+}).catch(function (err: any) {
+    Log.error('Error creating teams: ' + err);
 });
+
+
+/*
+ // add the teams to the repos
+ gpc.addTeamToRepos(groupData, '310Staff', 'admin').then(function (res) {
+ Log.info('Adding team to repos success: ' + JSON.stringify(res));
+ }).catch(function (err: any) {
+ Log.info('Error adding team to repos: ' + err);
+ });
+ */
 
