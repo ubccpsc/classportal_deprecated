@@ -508,6 +508,24 @@ export default class GithubProjectController {
 
 } // end class
 
+
+/**
+ * Steps required to configure a course. The first 1-7 are all async.
+ *
+ * 0. Get the data about the github usernames, repos, and teams.
+ * 1. Create N project repos.
+ * 2. Import base repo into each project repo. (optional; often helpful for getting started)
+ * 3. Add webhook to each project repo. (optional; needed for autotest)
+ * 4. Create M student teams.
+ * 5. Add the right students to each team.
+ * 6. Add the student team to the project repo.
+ * 7. Add the course staff team to the project repo.
+ * 8. Report back what has been created.
+ *
+ * @type {GithubProjectController}
+ */
+
+
 var gpc = new GithubProjectController();
 
 const PROJECT_PREFIX = 'cpsc310test_team';
