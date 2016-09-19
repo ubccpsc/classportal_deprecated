@@ -7,6 +7,9 @@ var request = require('request');
 var config = require('../../config.json');
 var rp = require('request-promise-native');
 
+import {Helper} from "../Util";
+import async = require('async');
+
 /**
  * Represents a complete team that has been formed and where all members
  * are already registered (so we have their Github ids).
@@ -27,6 +30,73 @@ export default class GithubProjectController {
 
     // private ORG_NAME = "CS410-2015Fall";
     private ORG_NAME = "CS310-2016Fall";
+
+
+    /**
+     * get group repo descriptions
+     *
+     * on success, returns callback with 1st arg: null, 2nd arg: GroupRepoDescription[]
+     * on error, returns callback with 1st arg: error message, 2nd arg: null 
+     */
+    public getGroupDescriptions(parentCallback: any) {
+        var returnVal: GroupRepoDescription[] = [];
+        Log.info("GithubProjectController::getGroupDescriptions(..) - start");
+
+        async.waterfall([
+            function get_teams_loop(callback: any) {
+                Log.info("GithubProjectController::getGroupDescriptions(..) - get_teams_loop");
+
+                Helper.readFile("teams.json", function (error: any, data: any) {
+                    if (!error) {
+                        var teamsFile = JSON.parse(data);
+
+                        for (var index = 0; index < teamsFile.length; index++) {
+                            Log.info("GithubProjectController::getGroupDescriptions(..) - index: " + index);
+
+                            var newGroupRepoDescription: GroupRepoDescription = {
+                                team: teamsFile[index].team,
+                                members: teamsFile[index].members,
+                                url: teamsFile[index].url
+                            };
+
+                            // add new GroupRepoDescription to array
+                            returnVal.push(newGroupRepoDescription);
+                        }
+                        return callback(null);
+                    } else {
+                        return callback("error reading file!");
+                    }
+                });
+            }
+        ], function end(error: any) {
+            if (!error) {
+                Log.info("GithubProjectController::getGroupDescriptions(..) - success");
+                return parentCallback(null, returnVal);
+            } else {
+                Log.info("GithubProjectController::getGroupDescriptions(..) - error: " + error);
+                return parentCallback(error, null);
+            }
+        });
+    }
+
+    /**
+     * Update team entry with new URL.
+     *
+     * @param teamId, url, callback
+     * @returns callback(null) on success, callback("error") on error 
+     */
+    public setGithubUrl(teamId: number, url: string, callback: any) {
+        Log.trace("AdminController::setGithubUrl| Updating team " + teamId + " with url: " + url)
+        Helper.updateEntry("teams.json", { 'id': teamId }, { 'url': url }, function (error: any) {
+            if (!error) {
+                // success
+                return callback(null);
+            } else {
+                // error
+                return callback("error: entry not updated");
+            }
+        });
+    }
 
     /**
      * Creates a given repo and returns its url. Will fail if the repo already exists.
@@ -145,7 +215,7 @@ export default class GithubProjectController {
                     let name = team.name;
 
                     Log.info("GithubProjectController::listTeams(..) - team: " + JSON.stringify(team));
-                    teams.push({id: id, name: name});
+                    teams.push({ id: id, name: name });
                 }
 
                 fulfill(teams);
@@ -189,7 +259,7 @@ export default class GithubProjectController {
             rp(options).then(function (body: any) {
                 let id = body.id;
                 Log.info("GithubProjectController::createTeam(..) - success: " + id);
-                fulfill({teamName: teamName, teamId: id});
+                fulfill({ teamName: teamName, teamId: id });
             }).catch(function (err: any) {
                 Log.error("GithubProjectController::createTeam(..) - ERROR: " + err);
                 reject(err);
@@ -533,7 +603,7 @@ const TEAM_PREFIX = 'cpsc310_team';
 
 let groupDataIn: GroupRepoDescription[] = [];
 let groupData: GroupRepoDescription[] = [];
-groupDataIn.push({team: 5, members: ['rtholmes', 'rthse2']});
+groupDataIn.push({ team: 5, members: ['rtholmes', 'rthse2'] });
 for (var gd of groupDataIn) {
     if (typeof gd.url === 'undefined' || gd.url === null) {
         gd.teamName = TEAM_PREFIX + gd.team;
