@@ -35,3 +35,13 @@ Some docs will need to be provided to the system to set it up, these include:
 
 * Student list; this will be a CSV with these fields: ```<NAME>,<STUDENT NUMBER>,<CS LAB ID>```
 * Deliverable list; this will be a JSON file that will look just like an array of model.Deliverable objects.
+
+
+
+To send/recieve data; go to the portal directory on the non-server machine:
+
+To Send:
+```rsync -auvp HOST:/PATHTOPORTAL/priv/ priv/```
+
+To Receive:
+```rsync -auvp priv/ HOST:PATHTOPORTAL/priv/```
