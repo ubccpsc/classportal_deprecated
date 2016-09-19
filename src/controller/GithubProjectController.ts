@@ -39,35 +39,81 @@ export default class GithubProjectController {
      * on error, returns callback with 1st arg: error message, 2nd arg: null
      */
     public getGroupDescriptions(): Promise<GroupRepoDescription[]> {
-        var returnVal: GroupRepoDescription[] = [];
         Log.info("GithubProjectController::getGroupDescriptions(..) - start");
+        var returnVal: GroupRepoDescription[] = [];
+        var studentsFile: any;
+        var teamsFile: any;
 
         return new Promise(function (fulfill, reject) {
             async.waterfall([
-                function get_teams_loop(callback: any) {
-                    Log.info("GithubProjectController::getGroupDescriptions(..) - get_teams_loop");
-
-                    Helper.readFile("teams.json", function (error: any, data: any) {
+                function get_students_file(callback: any) {
+                    Log.info("GithubProjectController::getGroupDescriptions(..) - get_students_file");
+                    Helper.readFile("students.json", function (error: any, data: any) {
                         if (!error) {
-                            var teamsFile = JSON.parse(data);
-
-                            for (var index = 0; index < teamsFile.length; index++) {
-                                Log.info("GithubProjectController::getGroupDescriptions(..) - index: " + index);
-
-                                var newGroupRepoDescription: GroupRepoDescription = {
-                                    team: teamsFile[index].team,
-                                    members: teamsFile[index].members,
-                                    url: teamsFile[index].url
-                                };
-
-                                // add new GroupRepoDescription to array
-                                returnVal.push(newGroupRepoDescription);
-                            }
+                            studentsFile = JSON.parse(data);
                             return callback(null);
                         } else {
-                            return callback("error reading file!");
+                            return callback("error reading students.json");
                         }
                     });
+                },
+                function get_teams_file(callback: any) {
+                    Log.info("GithubProjectController::getGroupDescriptions(..) - get_teams_file");
+                    Helper.readFile("teams.json", function (error: any, data: any) {
+                        if (!error) {
+                            teamsFile = JSON.parse(data);
+                            return callback(null);
+                        } else {
+                            return callback("error reading teams.json");
+                        }
+                    });
+                },
+                function get_group_repo_descriptions(callback: any) {
+                    Log.info("GithubProjectController::getGroupDescriptions(..) - get_group_repo_descriptions");
+
+                    // for each team entry, convert team sids to usernames, then add new GroupRepoDescription to returnVal
+                    for (var i = 0; i < teamsFile.length; i++) {
+                        Log.trace("GithubProjectController::getGroupDescriptions(..) - teamId: " + teamsFile[i].id);
+
+                        var sidArray: string[] = teamsFile[i].members;
+                        var usernamesArray: string[] = [];
+
+                        // convert each sid in the current team entry to a username
+                        async.forEachOf(sidArray,
+                            function convert_sid_to_username(sid: string, index: number, callback: any) {
+                                Log.trace("GithubProjectController::getGroupDescriptions(..) - sid: " + sid);
+                                var studentIndex = _.findIndex(studentsFile, { "sid": sid });
+
+                                if (studentIndex >= 0) {
+                                    var username = studentsFile[studentIndex].username;
+                                    Log.trace("GithubProjectController::getGroupDescriptions(..) - username: " + username);
+
+                                    // return error if any student does not yet have a github username
+                                    if (!username) {
+                                        return callback(new Error(sid + "'s github username is not set"));
+                                    } else {
+                                        usernamesArray[index] = username;
+                                        return callback();
+                                    }
+                                } else {
+                                    return callback(new Error("could not find sid in students.json"));
+                                }
+                            }, function add_new_group_repo_description(error: any) {
+                                if (!error) {
+                                    var newGroupRepoDescription: GroupRepoDescription = {
+                                        team: teamsFile[i].id,
+                                        members: usernamesArray,
+                                        url: teamsFile[i].url
+                                    };
+                                    returnVal.push(newGroupRepoDescription);
+                                } else {
+                                    return callback(error.message);
+                                }
+                            }
+                        );
+                    }
+                    // next function 'end' won't execute until above for loop is finished runnning.
+                    return callback(null);
                 }
             ], function end(error: any) {
                 if (!error) {
