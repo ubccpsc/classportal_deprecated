@@ -9,6 +9,7 @@ var rp = require('request-promise-native');
 
 import {Helper} from "../Util";
 import async = require('async');
+import _ = require('lodash');
 
 /**
  * Represents a complete team that has been formed and where all members
