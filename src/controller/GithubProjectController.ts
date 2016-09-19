@@ -139,7 +139,7 @@ export default class GithubProjectController {
      * @param teamId, url, callback
      * @returns callback(null) on success, callback("error") on error
      */
-    public setGithubUrl(teamId: number, url: string, callback: any): Promise<string> {
+    public setGithubUrl(teamId: number, url: string): Promise<string> {
         Log.trace("AdminController::setGithubUrl| Updating team " + teamId + " with url: " + url);
         return new Promise(function (fulfill, reject) {
             Helper.updateEntry("teams.json", {'id': teamId}, {'url': url}, function (error: any) {
@@ -664,9 +664,13 @@ let groupDataIn: GroupRepoDescription[];
 
 gpc.getGroupDescriptions().then(function (descriptions) {
     Log.info('getGroupeDescriptions(..) - done: ' + descriptions);
+    Log.info('getGroupeDescriptions(..) - # complete teams: ' + descriptions.length);
     for (var descr of descriptions) {
         Log.info('Group: ' + JSON.stringify(descr));
     }
+    return gpc.setGithubUrl(1, 'test url');
+}).then(function (url) {
+    Log.info('url set successfully: ' + url);
 }).catch(function (err) {
     Log.error('getGroupeDescriptions(..) - ERROR: ' + err);
 });
