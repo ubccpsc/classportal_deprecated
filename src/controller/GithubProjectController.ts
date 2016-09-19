@@ -83,7 +83,7 @@ export default class GithubProjectController {
                         async.forEachOf(sidArray,
                             function convert_sid_to_username(sid: string, index: number, callback: any) {
                                 Log.trace("GithubProjectController::getGroupDescriptions(..) - sid: " + sid);
-                                var studentIndex = _.findIndex(studentsFile, { "sid": sid });
+                                var studentIndex = _.findIndex(studentsFile, {"sid": sid});
 
                                 if (studentIndex >= 0) {
                                     var username = studentsFile[studentIndex].username;
@@ -108,7 +108,10 @@ export default class GithubProjectController {
                                     };
                                     returnVal.push(newGroupRepoDescription);
                                 } else {
-                                    return callback(error.message);
+                                    // return callback(error.message);
+                                    // there was a problem, but this just means we won't add it to the group list
+                                    Log.warn('Problem adding new repo description: ' + error.message);
+                                    // return callback(null);
                                 }
                             }
                         );
@@ -660,9 +663,12 @@ const TEAM_PREFIX = 'cpsc310_team';
 let groupDataIn: GroupRepoDescription[];
 
 gpc.getGroupDescriptions().then(function (descriptions) {
-    Log.info('get gpc: ' + descriptions);
+    Log.info('getGroupeDescriptions(..) - done: ' + descriptions);
+    for (var descr of descriptions) {
+        Log.info('Group: ' + JSON.stringify(descr));
+    }
 }).catch(function (err) {
-    Log.error('get gpc ERROR: ' + err);
+    Log.error('getGroupeDescriptions(..) - ERROR: ' + err);
 });
 
 /*
