@@ -36,46 +36,50 @@ export default class GithubProjectController {
      * get group repo descriptions
      *
      * on success, returns callback with 1st arg: null, 2nd arg: GroupRepoDescription[]
-     * on error, returns callback with 1st arg: error message, 2nd arg: null 
+     * on error, returns callback with 1st arg: error message, 2nd arg: null
      */
-    public getGroupDescriptions(parentCallback: any) {
+    public getGroupDescriptions(): Promise<GroupRepoDescription[]> {
         var returnVal: GroupRepoDescription[] = [];
         Log.info("GithubProjectController::getGroupDescriptions(..) - start");
 
-        async.waterfall([
-            function get_teams_loop(callback: any) {
-                Log.info("GithubProjectController::getGroupDescriptions(..) - get_teams_loop");
+        return new Promise(function (fulfill, reject) {
+            async.waterfall([
+                function get_teams_loop(callback: any) {
+                    Log.info("GithubProjectController::getGroupDescriptions(..) - get_teams_loop");
 
-                Helper.readFile("teams.json", function (error: any, data: any) {
-                    if (!error) {
-                        var teamsFile = JSON.parse(data);
+                    Helper.readFile("teams.json", function (error: any, data: any) {
+                        if (!error) {
+                            var teamsFile = JSON.parse(data);
 
-                        for (var index = 0; index < teamsFile.length; index++) {
-                            Log.info("GithubProjectController::getGroupDescriptions(..) - index: " + index);
+                            for (var index = 0; index < teamsFile.length; index++) {
+                                Log.info("GithubProjectController::getGroupDescriptions(..) - index: " + index);
 
-                            var newGroupRepoDescription: GroupRepoDescription = {
-                                team: teamsFile[index].team,
-                                members: teamsFile[index].members,
-                                url: teamsFile[index].url
-                            };
+                                var newGroupRepoDescription: GroupRepoDescription = {
+                                    team: teamsFile[index].team,
+                                    members: teamsFile[index].members,
+                                    url: teamsFile[index].url
+                                };
 
-                            // add new GroupRepoDescription to array
-                            returnVal.push(newGroupRepoDescription);
+                                // add new GroupRepoDescription to array
+                                returnVal.push(newGroupRepoDescription);
+                            }
+                            return callback(null);
+                        } else {
+                            return callback("error reading file!");
                         }
-                        return callback(null);
-                    } else {
-                        return callback("error reading file!");
-                    }
-                });
-            }
-        ], function end(error: any) {
-            if (!error) {
-                Log.info("GithubProjectController::getGroupDescriptions(..) - success");
-                return parentCallback(null, returnVal);
-            } else {
-                Log.info("GithubProjectController::getGroupDescriptions(..) - error: " + error);
-                return parentCallback(error, null);
-            }
+                    });
+                }
+            ], function end(error: any) {
+                if (!error) {
+                    Log.info("GithubProjectController::getGroupDescriptions(..) - success");
+                    // return parentCallback(null, returnVal);
+                    fulfill(returnVal);
+                } else {
+                    Log.info("GithubProjectController::getGroupDescriptions(..) - error: " + error);
+                    // return parentCallback(error, null);
+                    reject(error);
+                }
+            });
         });
     }
 
@@ -83,18 +87,22 @@ export default class GithubProjectController {
      * Update team entry with new URL.
      *
      * @param teamId, url, callback
-     * @returns callback(null) on success, callback("error") on error 
+     * @returns callback(null) on success, callback("error") on error
      */
-    public setGithubUrl(teamId: number, url: string, callback: any) {
-        Log.trace("AdminController::setGithubUrl| Updating team " + teamId + " with url: " + url)
-        Helper.updateEntry("teams.json", { 'id': teamId }, { 'url': url }, function (error: any) {
-            if (!error) {
-                // success
-                return callback(null);
-            } else {
-                // error
-                return callback("error: entry not updated");
-            }
+    public setGithubUrl(teamId: number, url: string, callback: any): Promise<string> {
+        Log.trace("AdminController::setGithubUrl| Updating team " + teamId + " with url: " + url);
+        return new Promise(function (fulfill, reject) {
+            Helper.updateEntry("teams.json", {'id': teamId}, {'url': url}, function (error: any) {
+                if (!error) {
+                    // success
+                    //         return callback(null);
+                    fulfill(url);
+                } else {
+                    // error
+                    // return callback("error: entry not updated");
+                    reject('URL not assigned for: ' + url);
+                }
+            });
         });
     }
 
@@ -215,7 +223,7 @@ export default class GithubProjectController {
                     let name = team.name;
 
                     Log.info("GithubProjectController::listTeams(..) - team: " + JSON.stringify(team));
-                    teams.push({ id: id, name: name });
+                    teams.push({id: id, name: name});
                 }
 
                 fulfill(teams);
@@ -259,7 +267,7 @@ export default class GithubProjectController {
             rp(options).then(function (body: any) {
                 let id = body.id;
                 Log.info("GithubProjectController::createTeam(..) - success: " + id);
-                fulfill({ teamName: teamName, teamId: id });
+                fulfill({teamName: teamName, teamId: id});
             }).catch(function (err: any) {
                 Log.error("GithubProjectController::createTeam(..) - ERROR: " + err);
                 reject(err);
@@ -601,16 +609,25 @@ var gpc = new GithubProjectController();
 const PROJECT_PREFIX = 'cpsc310test_team';
 const TEAM_PREFIX = 'cpsc310_team';
 
-let groupDataIn: GroupRepoDescription[] = [];
-let groupData: GroupRepoDescription[] = [];
-groupDataIn.push({ team: 5, members: ['rtholmes', 'rthse2'] });
-for (var gd of groupDataIn) {
-    if (typeof gd.url === 'undefined' || gd.url === null) {
-        gd.teamName = TEAM_PREFIX + gd.team;
-        gd.projectName = PROJECT_PREFIX + gd.team;
-        groupData.push(gd);
-    }
-}
+
+let groupDataIn: GroupRepoDescription[];
+
+gpc.getGroupDescriptions().then(function (descriptions) {
+    Log.info('get gpc: ' + descriptions);
+}).catch(function (err) {
+    Log.error('get gpc ERROR: ' + err);
+});
+
+/*
+ let groupData: GroupRepoDescription[] = [];
+ groupDataIn.push({team: 5, members: ['rtholmes', 'rthse2']});
+ for (var gd of groupDataIn) {
+ if (typeof gd.url === 'undefined' || gd.url === null) {
+ gd.teamName = TEAM_PREFIX + gd.team;
+ gd.projectName = PROJECT_PREFIX + gd.team;
+ groupData.push(gd);
+ }
+ }*/
 
 
 /*
@@ -650,26 +667,27 @@ for (var gd of groupDataIn) {
  });
  */
 
-gpc.createAllTeams(groupData, 'push').then(function (res) {
-    Log.info('All teams created: ' + JSON.stringify(res));
+/*
+ gpc.createAllTeams(groupData, 'push').then(function (res) {
+ Log.info('All teams created: ' + JSON.stringify(res));
 
-    let promises: Promise<any>[] = [];
-    for (var teamRec of res) {
-        let id = teamRec.teamId;
-        let name = teamRec.teamName;
-        for (var gd of groupData) {
-            if (gd.teamName === name) {
-                promises.push(gpc.addMembersToTeam(id, gd.members));
-            }
-        }
-    }
-    return Promise.all(promises);
-}).then(function (teamsDone) {
-    Log.info('All members successfully added to teams: ' + JSON.stringify(teamsDone));
-}).catch(function (err: any) {
-    Log.error('Error creating teams: ' + err);
-});
-
+ let promises: Promise<any>[] = [];
+ for (var teamRec of res) {
+ let id = teamRec.teamId;
+ let name = teamRec.teamName;
+ for (var gd of groupData) {
+ if (gd.teamName === name) {
+ promises.push(gpc.addMembersToTeam(id, gd.members));
+ }
+ }
+ }
+ return Promise.all(promises);
+ }).then(function (teamsDone) {
+ Log.info('All members successfully added to teams: ' + JSON.stringify(teamsDone));
+ }).catch(function (err: any) {
+ Log.error('Error creating teams: ' + err);
+ });
+ */
 
 /*
  // add the teams to the repos
