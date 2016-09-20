@@ -82,10 +82,10 @@ export default class LoginController {
                 },
                 function check_user_exists_or_create_user(callback: any) {
                     Log.trace("LoginController::login| check_user_exists_or_create_user");
-                    Helper.readFile(persistAdmin ? "admins.json" : "students.json", function (error: any, data: any) {
+                    Helper.readJSON(persistAdmin ? "admins.json" : "students.json", function (error: any, data: any) {
                         if (!error) {
                             Log.trace("LoginController::login| Checking for user");
-                            var file = JSON.parse(data);
+                            var file = data;
                             var userIndex: number = _.findIndex(file, {'username': persistUsername});
 
                             // user found, continue to write githubtoken
@@ -275,9 +275,9 @@ export default class LoginController {
                 function get_student_file_and_index(callback: any) {
                     Log.trace("LoginController::loadStudentPortal| get_student_file_and_index");
 
-                    Helper.readFile("students.json", function (error: any, data: any) {
+                    Helper.readJSON("students.json", function (error: any, data: any) {
                         if (!error) {
-                            studentsFile = JSON.parse(data);
+                            studentsFile = data;
                             myStudentIndex = _.findIndex(studentsFile, {"username": username});
 
                             if (myStudentIndex < 0) {
@@ -297,9 +297,9 @@ export default class LoginController {
                     if (studentsFile[myStudentIndex].hasTeam === false) {
                         return callback(null);
                     } else {
-                        Helper.readFile("teams.json", function (error: any, data: any) {
+                        Helper.readJSON("teams.json", function (error: any, data: any) {
                             if (!error) {
-                                teamsFile = JSON.parse(data);
+                                teamsFile = data;
 
                                 // find the index of the object with a field 'members' which contains the given sid
                                 myTeamIndex = _.findIndex(teamsFile, function (team: any) {
@@ -322,9 +322,9 @@ export default class LoginController {
                 function get_my_grades_file(callback: any) {
                     Log.trace("LoginController::loadStudentPortal| get_my_grades_file");
 
-                    Helper.readFile("grades.json", function (error: any, data: any) {
+                    Helper.readJSON("grades.json", function (error: any, data: any) {
                         if (!error) {
-                            gradesFile = JSON.parse(data);
+                            gradesFile = data;
                             myGradesIndex = _.findIndex(gradesFile, {"sid": studentsFile[myStudentIndex].sid});
 
                             if (myGradesIndex < 0) {
@@ -340,9 +340,9 @@ export default class LoginController {
                 function get_deliverables_file(callback: any) {
                     Log.trace("LoginController::loadStudentPortal| get_deliverables_file");
 
-                    Helper.readFile("deliverables.json", function (error: any, data: any) {
+                    Helper.readJSON("deliverables.json", function (error: any, data: any) {
                         if (!error) {
-                            deliverablesFile = JSON.parse(data);
+                            deliverablesFile = data;
                             return callback(null);
                         } else {
                             return callback("could not load deliverables file");
@@ -425,9 +425,9 @@ export default class LoginController {
                 function get_admins_file_and_index(callback: any) {
                     Log.trace("LoginController::loadAdminPortal| get_admins_file_and_index");
 
-                    Helper.readFile("admins.json", function (error: any, data: any) {
+                    Helper.readJSON("admins.json", function (error: any, data: any) {
                         if (!error) {
-                            adminsFile = JSON.parse(data);
+                            adminsFile = data;
                             myAdminIndex = _.findIndex(adminsFile, {"username": username});
 
                             if (myAdminIndex < 0) {
@@ -443,9 +443,9 @@ export default class LoginController {
                 function get_students_file(callback: any) {
                     Log.trace("LoginController::loadAdminPortal| get_students_file");
 
-                    Helper.readFile("students.json", function (error: any, data: any) {
+                    Helper.readJSON("students.json", function (error: any, data: any) {
                         if (!error) {
-                            studentsFile = JSON.parse(data);
+                            studentsFile = data;
                             return callback(null);
                         } else {
                             return callback("could not load students file");
@@ -454,9 +454,9 @@ export default class LoginController {
                 },
                 function get_teams_file(callback: any) {
                     Log.trace("LoginController::loadAdminPortal| get_teams_file");
-                    Helper.readFile("teams.json", function (error: any, data: any) {
+                    Helper.readJSON("teams.json", function (error: any, data: any) {
                         if (!error) {
-                            teamsFile = JSON.parse(data);
+                            teamsFile = data;
                             return callback(null);
                         } else {
                             return callback("could not load teams file");
@@ -466,9 +466,9 @@ export default class LoginController {
                 function get_grades_file(callback: any) {
                     Log.trace("LoginController::loadAdminPortal| get_grades_file");
 
-                    Helper.readFile("grades.json", function (error: any, data: any) {
+                    Helper.readJSON("grades.json", function (error: any, data: any) {
                         if (!error) {
-                            gradesFile = JSON.parse(data);
+                            gradesFile = data;
                             return callback(null);
                         } else {
                             return callback("could not load grades file");
@@ -478,9 +478,9 @@ export default class LoginController {
                 function get_deliverables_file(callback: any) {
                     Log.trace("LoginController::loadAdminPortal| get_deliverables_file");
 
-                    Helper.readFile("deliverables.json", function (error: any, data: any) {
+                    Helper.readJSON("deliverables.json", function (error: any, data: any) {
                         if (!error) {
-                            deliverablesFile = JSON.parse(data);
+                            deliverablesFile = data;
                             return callback(null);
                         } else {
                             return callback("could not load deliverables file");

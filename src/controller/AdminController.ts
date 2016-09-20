@@ -84,9 +84,9 @@ export default class AdminController {
         async.waterfall([
             function get_students_file(callback: any) {
                 Log.info("AdminController::updateClasslist - get_students_file");
-                Helper.readFile("students.json", function (error: any, data: any) {
+                Helper.readJSON("students.json", function (error: any, data: any) {
                     if (!error) {
-                        studentsFile = JSON.parse(data);
+                        studentsFile = data;
                         return callback(null);
                     } else {
                         return callback("get_students_file failed!");
@@ -95,9 +95,9 @@ export default class AdminController {
             },
             function get_teams_file(callback: any) {
                 Log.info("AdminController::updateClasslist - get_teams_file");
-                Helper.readFile("teams.json", function (error: any, data: any) {
+                Helper.readJSON("teams.json", function (error: any, data: any) {
                     if (!error) {
-                        teamsFile = JSON.parse(data);
+                        teamsFile = data;
                         return callback(null);
                     } else {
                         return callback("get_teams_file failed!");
@@ -106,9 +106,9 @@ export default class AdminController {
             },
             function get_grades_file(callback: any) {
                 Log.info("AdminController::updateClasslist - get_grades_file");
-                Helper.readFile("grades.json", function (error: any, data: any) {
+                Helper.readJSON("grades.json", function (error: any, data: any) {
                     if (!error) {
-                        gradesFile = JSON.parse(data);
+                        gradesFile = data;
                         return callback(null);
                     } else {
                         return callback("get_grades_file failed!");

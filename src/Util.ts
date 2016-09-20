@@ -38,29 +38,44 @@ export default class Log {
 }
 
 /**
- * Helper methods for common read/write actions.
+ * Helper methods for common file i/o actions.
  */
 export class Helper {
 
-    // encapsulates fs.readFile
-    // todo: error handling - if data.length = 0, fill file with empty array instead? 
-    static readFile(filename: string, callback: any) {
-        Log.trace("Helper::readFile| Reading file: " + filename);
+    /**
+     * This function cannot be optimised, so it's best to keep it small!
+     * Original: http://stackoverflow.com/questions/29797946/handling-bad-json-parse-in-node-safely
+     */
+    static safelyParseJSON(json: any, callback: any) {
+        Log.trace("Helper::safelyParseJSON(..) - start");
+        try {
+            var parsedJSON = JSON.parse(json);
+            return callback(null, parsedJSON);
+        } catch (error) {
+            return callback(error, null);
+        }
+    }
+
+    /**
+     * Helper method for reading and parsing JSON data files.
+     */
+    static readJSON(filename: string, callback: any) {
+        Log.trace("Helper::readJSON(..) - File: " + filename);
         var path = pathToRoot.concat(config.private_folder, filename);
 
-        fs.readFile(path, function (err: any, data: any) {
-            if (!err) {
-                if (data.length > 0) {
-                    Log.trace("Helper::readFile| File read success.");
-                    return callback(null, data);
-                } else {
-                    // todo: if data.length = 0, fill with square brackets []
-                    // quick fix: just return error for now
-                    Log.trace("Helper::readFile| File read error.");
-                    return callback(true, null);
-                }
+        fs.readFile(path, function (error: any, data: any) {
+            if (!error) {
+                Helper.safelyParseJSON(data, function (error: any, parsedJSON: any) {
+                    if (!error) {
+                        Log.trace("Helper::readJSON(..) - success!");
+                        return callback(null, parsedJSON);
+                    } else {
+                        Log.error("Helper::readJSON(..) - error parsing json: " + error);
+                        return callback(error, null);
+                    }
+                });
             } else {
-                Log.trace("Helper::readFile| File read error.");
+                Log.error("Helper::readJSON(..) - file read error.");
                 return callback(true, null);
             }
         });
@@ -195,7 +210,7 @@ export class Helper {
                 return callback(true, null);
             } else {
                 var file = JSON.parse(data);
-                var userIndex: number = _.findIndex(file, {"username": username});
+                var userIndex: number = _.findIndex(file, { "username": username });
                 var isAdmin: boolean = userIndex >= 0;
                 Log.trace("Helper::isAdmin| isAdmin: " + isAdmin);
                 return callback(null, isAdmin);
