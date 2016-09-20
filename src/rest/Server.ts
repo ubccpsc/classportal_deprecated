@@ -111,7 +111,7 @@ function requireTempToken(req: restify.Request, res: restify.Response, next: res
         return next();
     }
     else {
-        Log.trace("checkTempToken| Error: Bad request. Returning..");
+        Log.error("checkTempToken| Error: Bad request. Returning..");
         return res.send(500, "bad request");
     }
 }
@@ -127,7 +127,7 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
         Helper.readFile("tokens.json", function (error: any, data: any) {
             if (!error) {
                 var file = JSON.parse(data);
-                var userIndex: number = _.findIndex(file, { 'username': username });
+                var userIndex: number = _.findIndex(file, {'username': username});
                 var servertoken: string = file[userIndex].servertoken;
 
                 if (!!servertoken && (token === servertoken)) {
@@ -135,18 +135,18 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
                     return next();
                 }
                 else {
-                    Log.trace("checkToken| Error: Tokens do not match (" + token + ":" + servertoken + ") Returning..");
+                    Log.error("checkToken| Error: Tokens do not match (" + token + ":" + servertoken + ") Returning..");
                     return res.send(500, "bad request");
                 }
             }
             else {
-                Log.trace("checkToken| Could not read file! Returning..");
+                Log.error("checkToken| Could not read file! Returning..");
                 return res.send(500, "Error reading tokens.json");
             }
         });
     }
     else {
-        Log.trace("checkToken| Error: Bad request. Returning..");
+        Log.error("checkToken| Error: Bad request. Returning..");
         return res.send(500, "bad request");
     }
 }
@@ -162,7 +162,7 @@ function requireAdmin(req: restify.Request, res: restify.Response, next: restify
         return next();
     }
     else {
-        Log.trace("requireAdmin| Missing admin field. Returning..");
+        Log.warn("requireAdmin| Missing admin field. Returning..");
         return res.send(500, "permission denied");
     }
 }

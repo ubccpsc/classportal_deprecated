@@ -39,7 +39,7 @@ export default class AdminController {
                         callback(null);
                     }
                     else {
-                        Log.trace("AdminController::updateClasslist| parse_csv: error");
+                        Log.error("AdminController::updateClasslist| parse_csv: error");
                         callback("err");
                     }
                 });
@@ -65,10 +65,9 @@ export default class AdminController {
                 var filename = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/priv/classlist.csv';
                 fs.writeFile(filename, persistCSV, function (err: any) {
                     if (err) {
-                        Log.trace("AdminController::updateClasslist| write_classlist_file: error");
+                        Log.error("AdminController::updateClasslist| write_classlist_file: error");
                         return callback(true);
-                    }
-                    else {
+                    } else {
                         Log.trace("AdminController::updateClasslist| write_classlist_file: success");
                         return callback(null);
                     }
@@ -116,10 +115,9 @@ export default class AdminController {
                 // update students.json
                 fs.writeFile(path, JSON.stringify(studentsFile, null, 2), function (err: any) {
                     if (err) {
-                        Log.trace("AdminController::updateClasslist| write_students_file: error");
+                        Log.error("AdminController::updateClasslist| write_students_file: error");
                         return callback("error");
-                    }
-                    else {
+                    } else {
                         Log.trace("AdminController::updateClasslist| write_students_file: success");
                         return callback(null);
                     }
@@ -137,10 +135,9 @@ export default class AdminController {
                 // update teams.json
                 fs.writeFile(path, JSON.stringify(teamsFile, null, 2), function (err: any) {
                     if (err) {
-                        Log.trace("AdminController::updateClasslist| write_teams_file: error");
+                        Log.error("AdminController::updateClasslist| write_teams_file: error");
                         return callback("error");
-                    }
-                    else {
+                    } else {
                         Log.trace("AdminController::updateClasslist| write_teams_file: success");
                         return callback(null);
                     }
@@ -180,10 +177,9 @@ export default class AdminController {
                 // update students.json
                 fs.writeFile(path, JSON.stringify(gradesFile, null, 2), function (err: any) {
                     if (err) {
-                        Log.trace("AdminController::updateClasslist| write_grades_file: error");
+                        Log.error("AdminController::updateClasslist| write_grades_file: error");
                         return callback("error");
-                    }
-                    else {
+                    } else {
                         Log.trace("AdminController::updateClasslist| write_grades_file: success");
                         return callback(null);
                     }
@@ -194,9 +190,8 @@ export default class AdminController {
                 if (!error) {
                     Log.trace("AdminController::updateClasslist| end_async_waterfall: Successfully updated all files.");
                     return parentCallback(null, true);
-                }
-                else {
-                    Log.trace("AdminController::updateClasslist| end_async_waterfall: Error: " + error);
+                } else {
+                    Log.error("AdminController::updateClasslist| end_async_waterfall: Error: " + error);
                     return parentCallback(true, null);
                 }
             }

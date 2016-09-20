@@ -1,10 +1,18 @@
 import React from 'react'
-import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button } from 'elemental'
+import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button, Modal, ModalHeader, ModalBody, ModalFooter, Dropdown } from 'elemental'
 import ContentModule from '../../shared_components/ContentModule'
+import Ajax from '../../shared_components/Ajax'
 
 export default React.createClass({
   getInitialState: function () {
-    return { viewAll: true };
+    return {
+      viewAll: true,
+      modalIsOpen: false,
+      student: '',
+      assnId: '',
+      grade: '',
+      comments: ''
+    };
   },
   toggleView: function (e) {
     e.preventDefault();
@@ -46,10 +54,71 @@ export default React.createClass({
             </a>
             : "-" }</td>
         <td className="tg-yw4l">
-          <Button size="sm" className="button-text" type="link-text">View/Edit</Button>
+          <Button
+            id={student.firstname + ' ' + student.lastname}
+            size="sm"
+            className="button-text"
+            type="link-text"
+            onClick={this.openModal}>View/Edit</Button>
         </td>
       </tr>
     )
+  },
+  openModal: function (event) {
+    // console.log(event.target.id);
+    this.setState({ student: event.target.id }, function () {
+      this.setState({ modalIsOpen: true });
+    });
+  },
+  closeModal: function () {
+    this.setState({ modalIsOpen: false });
+  },
+  submitGrades: function () {
+    // check for valid assignment
+    if (!this.state.assnId) {
+      alert("Error: assignment field not set.");
+      return;
+    }
+
+    // convert grade from string to int
+    var intGrade = parseInt(this.state.grade, 10);
+
+    // check for valid grade
+    if (isNaN(intGrade) || intGrade < 0 || intGrade > 100) {
+      alert("Error: grade must by an integer between 0-100.");
+      return;
+    }
+
+    // confirm before submitting new grade
+    var submitMessage = "Please confirm new grade:\nStudent: " + this.state.student + "\nAssignment: " + this.state.assnId + "\nGrade: " + intGrade + "/100\nComments: " + this.state.comments;
+    if (confirm(submitMessage)) {
+      Ajax.submitGrade(
+        this.state.student,
+        this.state.assnId,
+        intGrade,
+        this.state.comments,
+        function success() {
+          alert("Success!")
+          this.closeModal();
+          window.location.reload(true);
+        }.bind(this),
+        function error() {
+          alert("Error submitting grades.")
+        }.bind(this),
+      );
+    }
+  },
+  handleSelectAssignment: function (event) {
+    // console.log(event);
+    this.setState({ assnId: event });
+  },
+  setNewGrade: function (event) {
+    // console.log(event.target.value);
+    this.setState({ grade: event.target.value });
+  },
+  setNewComment: function (event) {
+    // console.log(event.target.value);
+    this.setState({ comments: event.target.value });
   },
   render: function () {
     return (
@@ -73,6 +142,37 @@ export default React.createClass({
             {!!this.props.students && this.renderStudents() }
           </tbody>
         </table>
+
+        <Modal isOpen={this.state.modalIsOpen} onCancel={this.closeModal} backdropClosesModal>
+          <ModalHeader text="Edit Grades" showCloseButton onClose={this.closeModal} />
+          <ModalBody>
+            <Form className="form" type="horizontal" >
+              <FormField label="Student">
+                <FormInput placeholder={this.state.student} disabled />
+              </FormField>
+              <FormField className="no-margin" label="Assn">
+                <FormSelect options={
+                  [
+                    { label: 'Assignment 1' },
+                    { label: 'Assignment 2' },
+                    { label: 'Assignment 3' }
+                  ]
+                } firstOption="Select" onChange={this.handleSelectAssignment} />
+              </FormField>
+              <FormField label="Grade (%)" onChange={this.setNewGrade}>
+                <FormInput />
+              </FormField>
+              <FormField label="Comments" onChange={this.setNewComment}>
+                <FormInput multiline />
+              </FormField>
+            </Form>
+          </ModalBody>
+          <ModalFooter>
+            <Button type="danger" onClick={this.submitGrades}>Submit</Button>
+            <Button type="link-cancel" onClick={this.closeModal}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+
       </ContentModule>
     )
   }

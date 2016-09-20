@@ -119,6 +119,10 @@ export class Helper {
         fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
             if (err) {
                 Log.trace("Helper::addEntry| Write error: " + err.toString());
+
+                // create a backup
+                fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
+
                 return callback(true);
             }
             else {
@@ -197,7 +201,7 @@ export class Helper {
             }
             else {
                 var file = JSON.parse(data);
-                var userIndex: number = _.findIndex(file, { "username": username });
+                var userIndex: number = _.findIndex(file, {"username": username});
                 var isAdmin: boolean = userIndex >= 0;
                 Log.trace("Helper::isAdmin| isAdmin: " + isAdmin);
                 return callback(null, isAdmin);

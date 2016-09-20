@@ -44,3 +44,20 @@ We only want to restart the system after building; this doesn't seem like it wil
 nohup nodemon --ignore priv/ --exec "npm run start:prod" &
 ```
 
+
+# Github requirements
+
+Sign up for an organization in Github.
+
+Make sure you set the "Default repository permission" in the Organization setting page to "none".
+
+Right now GithubProjectController has some hard coded fields for the organization; these should change in the future, but if they haven't, make sure they are set for your org.
+
+
+To send/recieve data; go to the portal directory on the non-server machine:
+
+To Send:
+```rsync -auvp HOST:/PATHTOPORTAL/priv/ priv/```
+
+To Receive:
+```rsync -auvp priv/ HOST:PATHTOPORTAL/priv/```
