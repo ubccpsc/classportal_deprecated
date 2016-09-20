@@ -139,13 +139,13 @@ export default class RouteHandler {
         Log.trace("RouteHandler::updateClasslist| Updating database with new classlist");
         var csv_path = req.files[0].path;
 
-        AdminController.updateClasslist(csv_path, function (error: any, data: any) {
+        AdminController.updateClasslist(csv_path, function (error: any) {
             if (!error) {
                 Log.trace("RouteHandler::updateClasslist| Success!");
                 return res.send(200, "success");
             } else {
                 Log.error("RouteHandler::updateClasslist| Error!");
-                return res.send(500, "error");
+                return res.send(500, error);
             }
         });
     }

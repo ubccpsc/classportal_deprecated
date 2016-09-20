@@ -1,10 +1,18 @@
 [
   {
-    "username": "msarge2015",
-    "csid": "a6j8",
-    "sid": "54813118",
-    "lastname": "Sargent",
-    "firstname": "Michael",
+    "csid": "a1a1",
+    "sid": "00000001",
+    "lastname": "Afirst",
+    "firstname": "Alast",
+    "username": "",
+    "hasTeam": false
+  },
+  {
+    "csid": "a2a2",
+    "sid": "00000002",
+    "lastname": "Bfirst",
+    "firstname": "Blast",
+    "username": "",
     "hasTeam": false
   }
 ]
