@@ -53,15 +53,13 @@ export class Helper {
                 if (data.length > 0) {
                     Log.trace("Helper::readFile| File read success.");
                     return callback(null, data);
-                }
-                else {
+                } else {
                     // todo: if data.length = 0, fill with square brackets []
                     // quick fix: just return error for now
                     Log.trace("Helper::readFile| File read error.");
                     return callback(true, null);
                 }
-            }
-            else {
+            } else {
                 Log.trace("Helper::readFile| File read error.");
                 return callback(true, null);
             }
@@ -93,14 +91,12 @@ export class Helper {
                 if (err) {
                     Log.trace("Helper::updateEntry| Write error: " + err.toString());
                     return callback(true);
-                }
-                else {
+                } else {
                     Log.trace("Helper::updateEntry| Write successful!");
                     return callback(null);
                 }
             });
-        }
-        else {
+        } else {
             Log.trace("Helper::updateEntry| Error: Username was not found.");
             return callback(true);
         }
@@ -124,8 +120,7 @@ export class Helper {
                 fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
 
                 return callback(true);
-            }
-            else {
+            } else {
                 Log.trace("Helper::addEntry| Write successful!");
                 return callback(null);
             }
@@ -147,13 +142,11 @@ export class Helper {
                 if (entry !== undefined) {
                     Log.trace("Helper::checkEntry| Entry found: " + JSON.stringify(entry));
                     return callback(null, entry);
-                }
-                else {
+                } else {
                     Log.trace("Helper::checkEntry| Error: entry not found!");
                     return callback(true, null);
                 }
-            }
-            else {
+            } else {
                 Log.trace("Helper::checkEntry| File read error.");
                 return callback(true, null);
             }
@@ -171,8 +164,7 @@ export class Helper {
         if (entryIndex < 0) {
             Log.trace("Helper::deleteEntry| Error: could not find entry.");
             return callback(true);
-        }
-        else {
+        } else {
             // remove entry from file
             file.splice(entryIndex, 1);
 
@@ -180,8 +172,7 @@ export class Helper {
                 if (err) {
                     Log.trace("Helper::deleteEntry| Write error: " + err.toString());
                     return callback(true);
-                }
-                else {
+                } else {
                     Log.trace("Helper::deleteEntry| Write successful!");
                     return callback(null);
                 }
@@ -198,8 +189,7 @@ export class Helper {
             if (err) {
                 Log.trace("Helper::isAdmin| Error reading file: " + err.toString());
                 return callback(true, null);
-            }
-            else {
+            } else {
                 var file = JSON.parse(data);
                 var userIndex: number = _.findIndex(file, {"username": username});
                 var isAdmin: boolean = userIndex >= 0;
