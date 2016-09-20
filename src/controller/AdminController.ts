@@ -396,10 +396,10 @@ export default class AdminController {
             function end_waterfall(error: any) {
                 if (!error) {
                     Log.trace("AdminController::updateClasslist - succcess!");
-                    return parentCallback(null);
+                    return parentCallback(null, invalidStudents, newStudents);
                 } else {
                     Log.error("AdminController::updateClasslist - error: " + error);
-                    return parentCallback(error);
+                    return parentCallback(error, null, null);
                 }
             }
         );
