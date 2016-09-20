@@ -117,7 +117,11 @@ export class Helper {
                 Log.trace("Helper::addEntry| Write error: " + err.toString());
 
                 // create a backup
-                fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
+                try {
+                    fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
+                } catch (err) {
+                    Log.error('Helper::addEntry() - ERROR: ' + err.message);
+                }
 
                 return callback(true);
             } else {
