@@ -325,7 +325,7 @@ export default class GithubProjectController {
                     let id = team.id;
                     let name = team.name;
 
-                    Log.info("GithubProjectController::listTeams(..) - team: " + JSON.stringify(team));
+                    // Log.info("GithubProjectController::listTeams(..) - team: " + JSON.stringify(team));
                     teams.push({id: id, name: name});
                 }
 
@@ -406,9 +406,9 @@ export default class GithubProjectController {
             };
 
             rp(options).then(function (body: any) {
-                Log.info("GithubProjectController::addTeamToRepo(..) - success: " + body);
+                Log.info("GithubProjectController::addTeamToRepo(..) - success; team: " + teamId + "; repo: " + repoName);
                 // onSuccess(body);
-                fulfill(body);
+                fulfill({teamId: teamId, repoName: repoName});
             }).catch(function (err: any) {
                 Log.error("GithubProjectController::addTeamToRepo(..) - ERROR: " + err);
                 reject(err);
@@ -484,7 +484,7 @@ export default class GithubProjectController {
             };
 
             rp(opts).then(function (results: any) {
-                Log.info("GithubProjectController::importRepoToNewRepo(..) - success: " + results);
+                Log.info("GithubProjectController::importRepoToNewRepo(..) - success: " + JSON.stringify(results));
                 fulfill(results);
             }).catch(function (err: any) {
                 Log.error("GithubProjectController::importRepoToNewRepo(..) - ERROR: " + err);
@@ -651,17 +651,17 @@ export default class GithubProjectController {
                 for (var team of teamList) {
                     if (team.name === teamName) {
                         teamId = team.id;
-                        Log.info("GithubProjectController::getTeamNumber(..) - matched admin team; id: " + teamId);
+                        Log.info("GithubProjectController::getTeamNumber(..) - matched team: " + teamName + "; id: " + teamId);
                     }
                 }
 
                 if (teamId < 0) {
-                    reject('GithubProjectController::getTeamNumber(..) - ERROR: Could not find team called: ' + teamName);
+                    reject('GithubProjectController::getTeamNumber(..) - ERROR: Could not find team: ' + teamName);
+                } else {
+                    fulfill(teamId);
                 }
-
-                fulfill(team.id);
             }).catch(function (err) {
-                Log.error("GithubProjectController::addTeamToRepos(..) - matched admin team; id: " + teamId);
+                Log.error("GithubProjectController::addTeamToRepos(..) - could not match team: " + teamName + "; ERROR: " + err);
                 reject(err);
             });
         });
@@ -814,7 +814,7 @@ export default class GithubProjectController {
         return new Promise(function (fulfill, reject) {
 
             Log.info("GithubProjectController::completeClean(..) - removing project: " + inputGroup.projectName);
-            
+
             that.deleteRepo(inputGroup.projectName).then(function (url: string) {
 
                 Log.info("GithubProjectController::completeClean(..) - project removed; removing team");
@@ -870,6 +870,8 @@ try {
     const PROJECT_PREFIX = 'cpsc310project_team';
     const TEAM_PREFIX = 'cpsc310_team';
 
+    const D1_PREFIX = 'cpsc310d1public_team';
+    const D1_URL = 'https://github.com/CS310-2016Fall/cpsc310d1public';
 
     let groupDataIn: GroupRepoDescription[];
 
@@ -882,19 +884,24 @@ try {
                 // really don't want to do this by accident! comment return if you actually want to clean
                 return;
             }
+
+            // won't normally need this
+            //var testGroup: GroupRepoDescription = {team: 1, members: ['rthse2', 'mksarge']};
+            //descriptions.push(testGroup);
+
             let groupsToProcess: GroupRepoDescription[] = [];
             let completeGroups: GroupRepoDescription[] = [];
             for (var descr of descriptions) {
                 descr.projectName = PROJECT_PREFIX + descr.team;
                 descr.teamName = TEAM_PREFIX + descr.team;
 
-
                 if (clean === true) {
                     Log.info('ProvisioningMain() - Clean Team: ' + JSON.stringify(descr));
                     groupsToProcess.push(descr);
                 } else {
-                    //if (descr.team < 5) {
+                    //if (descr.team === 1) {
                     if (typeof descr.url === 'undefined' || descr.url === null || descr.url === "") {
+                        // if (descr.url.length > 5) { // for all provisioned repos
                         Log.info('ProvisioningMain() - Prepared Team: ' + JSON.stringify(descr));
                         groupsToProcess.push(descr);
                     } else {
@@ -902,19 +909,20 @@ try {
                         // Log.info('ProvisioningMain() - Team Repo Created: ' + descr.team);
                         completeGroups.push(descr);
                     }
-                    //}
+//                    }
                 }
             }
 
             // set the index for available teams (used by timeout backoff)
             for (var i = 0; i < groupsToProcess.length; i++) {
-                let grp = groupsToProcess[0];
+                let grp = groupsToProcess[i];
                 grp.teamIndex = i;
             }
 
-            Log.info("Completed teams: " + JSON.stringify(completeGroups));
+            Log.info("ProvisioningMain() - # Complete teams: " + completeGroups.length);
 
-            Log.info('ProvisioningMain() - # teams to process: ' + groupsToProcess.length);
+            Log.info('ProvisioningMain() - # Teams to process: ' + groupsToProcess.length);
+            Log.info("ProvisioningMain() - Teams to process: " + JSON.stringify(completeGroups.length));
 
             let processList: GroupRepoDescription[] = []; // this is really Promise<GroupRepoDescription>[]
             for (var toProcess of groupsToProcess) {
@@ -923,19 +931,23 @@ try {
                     // clean instead of provision
                     processList.push(<any>gpc.completeClean(toProcess));
                 } else {
-                    processList.push(<any>gpc.completeProvision(toProcess));
+                    // new project
+                    // processList.push(<any>gpc.completeProvision(toProcess));
+
+                    // test suite
+                    // processList.push(<any>gpc.provisionRepo(toProcess, D1_PREFIX + toProcess.team, D1_URL));
+
                 }
             }
 
             return Promise.all(processList);
-        }).then(
-        function (provisionedRepos: GroupRepoDescription[]) {
-            Log.info("ProvisioningMain() - Creation complete for # projects: " + provisionedRepos.length);
-            for (var repo of provisionedRepos) {
-                Log.info("ProvisioningMain() - Repo: " + repo.url);
-            }
-            Log.info("ProvisioningMain() - Done.");
-        }).catch(function (err: any) {
+        }).then(function (provisionedRepos: GroupRepoDescription[]) {
+        Log.info("ProvisioningMain() - Creation complete for # projects: " + provisionedRepos.length);
+        for (var repo of provisionedRepos) {
+            Log.info("ProvisioningMain() - Repo: " + repo.url);
+        }
+        Log.info("ProvisioningMain() - Done.");
+    }).catch(function (err: any) {
             Log.error('ProvisioningMain() - ERROR processing project creation chain: ' + err);
         }
     );
