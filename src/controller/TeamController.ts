@@ -77,7 +77,6 @@ export default class TeamController {
                 function add_team_entry(callback: any) {
                     Log.trace("TeamController::createTeam| add_team_entry");
 
-
                     var newTeam = {
                         "id": newTeamId,
                         "url": "",
