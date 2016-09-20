@@ -103,9 +103,9 @@ export default class GithubProjectController {
                             }, function add_new_group_repo_description(error: any) {
                                 if (!error) {
                                     var newGroupRepoDescription: GroupRepoDescription = {
-                                        team: teamsFile[i].id,
+                                        team:    teamsFile[i].id,
                                         members: usernamesArray,
-                                        url: teamsFile[i].url
+                                        url:     teamsFile[i].url
                                     };
                                     returnVal.push(newGroupRepoDescription);
                                 } else {
@@ -169,22 +169,22 @@ export default class GithubProjectController {
         Log.info("GithubProjectController::createRepo( " + repoName + " ) - start");
         return new Promise(function (fulfill, reject) {
             var options = {
-                method: 'POST',
-                uri: 'https://api.github.com/orgs/' + ctx.ORG_NAME + '/repos',
+                method:  'POST',
+                uri:     'https://api.github.com/orgs/' + ctx.ORG_NAME + '/repos',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME,
-                    'Accept': 'application/json'
+                    'User-Agent':    ctx.GITHUB_USER_NAME,
+                    'Accept':        'application/json'
                 },
-                body: {
-                    name: repoName,
-                    private: true,
-                    has_issues: true,
-                    has_wiki: false,
+                body:    {
+                    name:          repoName,
+                    private:       true,
+                    has_issues:    true,
+                    has_wiki:      false,
                     has_downloads: false,
-                    auto_init: false
+                    auto_init:     false
                 },
-                json: true
+                json:    true
             };
 
             rp(options).then(function (body: any) {
@@ -212,12 +212,12 @@ export default class GithubProjectController {
         return new Promise(function (fulfill, reject) {
 
             var options = {
-                method: 'DELETE',
-                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName,
+                method:  'DELETE',
+                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName,
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME,
-                    'Accept': 'application/json'
+                    'User-Agent':    ctx.GITHUB_USER_NAME,
+                    'Accept':        'application/json'
                 }
             };
 
@@ -257,12 +257,12 @@ export default class GithubProjectController {
                 }
 
                 var options = {
-                    method: 'DELETE',
-                    uri: 'https://api.github.com/teams/' + teamId,
+                    method:  'DELETE',
+                    uri:     'https://api.github.com/teams/' + teamId,
                     headers: {
                         'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                        'User-Agent': ctx.GITHUB_USER_NAME,
-                        'Accept': 'application/json'
+                        'User-Agent':    ctx.GITHUB_USER_NAME,
+                        'Accept':        'application/json'
                     }
                 };
                 Log.info("GithubProjectController::deleteTeam(..) - deleting team; id: " + teamId);
@@ -300,15 +300,15 @@ export default class GithubProjectController {
         return new Promise(function (fulfill, reject) {
 
             var options = {
-                method: 'GET',
-                uri: 'https://api.github.com/orgs/' + ctx.ORG_NAME + '/teams?per_page=200',
-                headers: {
+                method:                  'GET',
+                uri:                     'https://api.github.com/orgs/' + ctx.ORG_NAME + '/teams?per_page=200',
+                headers:                 {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME,
-                    'Accept': 'application/json'
+                    'User-Agent':    ctx.GITHUB_USER_NAME,
+                    'Accept':        'application/json'
                 },
                 resolveWithFullResponse: true,
-                json: true
+                json:                    true
             };
 
             rp(options).then(function (fullResponse: any) {
@@ -353,18 +353,18 @@ export default class GithubProjectController {
         return new Promise(function (fulfill, reject) {
 
             var options = {
-                method: 'POST',
-                uri: 'https://api.github.com/orgs/' + ctx.ORG_NAME + '/teams',
+                method:  'POST',
+                uri:     'https://api.github.com/orgs/' + ctx.ORG_NAME + '/teams',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME,
-                    'Accept': 'application/json'
+                    'User-Agent':    ctx.GITHUB_USER_NAME,
+                    'Accept':        'application/json'
                 },
-                body: {
-                    name: teamName,
+                body:    {
+                    name:       teamName,
                     permission: permission
                 },
-                json: true
+                json:    true
             };
 
             rp(options).then(function (body: any) {
@@ -392,17 +392,17 @@ export default class GithubProjectController {
         return new Promise(function (fulfill, reject) {
 
             var options = {
-                method: 'PUT',
-                uri: 'https://api.github.com/teams/' + teamId + '/repos/' + ctx.ORG_NAME + '/' + repoName,
+                method:  'PUT',
+                uri:     'https://api.github.com/teams/' + teamId + '/repos/' + ctx.ORG_NAME + '/' + repoName,
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME,
-                    'Accept': 'application/json'
+                    'User-Agent':    ctx.GITHUB_USER_NAME,
+                    'Accept':        'application/json'
                 },
-                body: {
+                body:    {
                     permission: permission
                 },
-                json: true
+                json:    true
             };
 
             rp(options).then(function (body: any) {
@@ -433,14 +433,14 @@ export default class GithubProjectController {
                 Log.info("GithubProjectController::addMembersToTeam(..) - adding member: " + member);
 
                 let opts = {
-                    method: 'PUT',
-                    uri: 'https://api.github.com/teams/' + teamId + '/memberships/' + member,
+                    method:  'PUT',
+                    uri:     'https://api.github.com/teams/' + teamId + '/memberships/' + member,
                     headers: {
                         'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                        'User-Agent': ctx.GITHUB_USER_NAME,
-                        'Accept': 'application/json'
+                        'User-Agent':    ctx.GITHUB_USER_NAME,
+                        'Accept':        'application/json'
                     },
-                    json: true
+                    json:    true
                 };
                 promises.push(rp(opts));
             }
@@ -470,17 +470,17 @@ export default class GithubProjectController {
 
             // PUT /repos/:owner/:repo/import
             let opts = {
-                method: 'PUT',
-                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + targetRepo + '/import',
+                method:  'PUT',
+                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + targetRepo + '/import',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME,
-                    'Accept': 'application/vnd.github.barred-rock-preview'
+                    'User-Agent':    ctx.GITHUB_USER_NAME,
+                    'Accept':        'application/vnd.github.barred-rock-preview'
                 },
-                body: {
+                body:    {
                     vcs_url: importRepoUrl
                 },
-                json: true
+                json:    true
             };
 
             rp(opts).then(function (results: any) {
@@ -501,14 +501,14 @@ export default class GithubProjectController {
 
             // GET /repos/:owner/:repo/import
             let opts = {
-                method: 'GET',
-                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/import',
+                method:  'GET',
+                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/import',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME,
-                    'Accept': 'application/vnd.github.barred-rock-preview'
+                    'User-Agent':    ctx.GITHUB_USER_NAME,
+                    'Accept':        'application/vnd.github.barred-rock-preview'
                 },
-                json: true
+                json:    true
             };
 
             rp(opts).then(function (results: any) {
@@ -535,18 +535,18 @@ export default class GithubProjectController {
 
             // PATCH /repos/:owner/:repo/import
             let opts = {
-                method: 'PATCH',
-                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/import',
+                method:  'PATCH',
+                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/import',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME,
-                    'Accept': 'application/vnd.github.barred-rock-preview'
+                    'User-Agent':    ctx.GITHUB_USER_NAME,
+                    'Accept':        'application/vnd.github.barred-rock-preview'
                 },
-                body: {
+                body:    {
                     "vcs_username": "foo",
                     "vcs_password": "bar"
                 },
-                json: true
+                json:    true
             };
 
             rp(opts).then(function (results: any) {
@@ -567,22 +567,22 @@ export default class GithubProjectController {
 
             // POST /repos/:owner/:repo/hooks
             let opts = {
-                method: 'POST',
-                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/hooks',
+                method:  'POST',
+                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/hooks',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent': ctx.GITHUB_USER_NAME
+                    'User-Agent':    ctx.GITHUB_USER_NAME
                 },
-                body: {
-                    "name": "web",
+                body:    {
+                    "name":   "web",
                     "active": true,
                     "events": ["commit_comment"],
                     "config": {
-                        "url": "http://skaha.cs.ubc.ca:8080/submit",
+                        "url":          "http://skaha.cs.ubc.ca:8080/submit",
                         "content_type": "json"
                     }
                 },
-                json: true
+                json:    true
             };
 
             rp(opts).then(function (results: any) {
@@ -638,6 +638,33 @@ export default class GithubProjectController {
         Log.info("GithubProjectController::crateAllTeams(..) - all pushed");
 
         return Promise.all(promises);
+    }
+
+    public getTeamNumber(teamName: string): Promise<number> {
+        Log.info("GithubProjectController::getTeamNumber( " + teamName + " ) - start");
+        let ctx = this;
+
+        return new Promise(function (fulfill, reject) {
+            let teamId = -1;
+            ctx.listTeams().then(function (teamList: any) {
+                Log.trace("GithubProjectController::getTeamNumber(..) - all teams: " + JSON.stringify(teamList));
+                for (var team of teamList) {
+                    if (team.name === teamName) {
+                        teamId = team.id;
+                        Log.info("GithubProjectController::getTeamNumber(..) - matched admin team; id: " + teamId);
+                    }
+                }
+
+                if (teamId < 0) {
+                    reject('GithubProjectController::getTeamNumber(..) - ERROR: Could not find team called: ' + teamName);
+                }
+
+                fulfill(team.id);
+            }).catch(function (err) {
+                Log.error("GithubProjectController::addTeamToRepos(..) - matched admin team; id: " + teamId);
+                reject(err);
+            });
+        });
     }
 
     public addTeamToRepos(groupData: GroupRepoDescription[], adminTeamName: string, permissions: string) {
@@ -722,12 +749,15 @@ export default class GithubProjectController {
                 return that.addTeamToRepo(teamId, inputGroup.projectName, 'push');
 
             }).then(function () {
-                Log.info("GithubProjectController::completeProvision(..) - team added to repo; adding staff to team");
+                Log.info("GithubProjectController::completeProvision(..) - team added to repo; getting staff team number");
+                return that.getTeamNumber('310Staff');
+            }).then(function (staffTeamNumber: number) {
 
-                let inputAsArray: GroupRepoDescription[] = [];
-                inputAsArray.push(inputGroup);
+                Log.info("GithubProjectController::completeProvision(..) - found staff team number ( " + staffTeamNumber + " ); adding staff to repo");
+                //let inputAsArray: GroupRepoDescription[] = [];
+                //inputAsArray.push(inputGroup);
 
-                return that.addTeamToRepos(inputAsArray, '310Staff', 'admin');
+                return that.addTeamToRepo(staffTeamNumber, inputGroup.projectName, 'admin');
             }).then(function () {
                 Log.info("GithubProjectController::completeProvision(..) - admin staff added to repo; saving url");
 
@@ -744,15 +774,47 @@ export default class GithubProjectController {
         });
     }
 
+    provisionRepo(inputGroup: GroupRepoDescription, repoName: string, importURL: string): Promise<GroupRepoDescription> {
+        let that = this;
+        Log.info("GithubProjectController::provisionRepo(..) - start: " + JSON.stringify(inputGroup));
+        return new Promise(function (fulfill, reject) {
 
-    completeClean(inputGroup: GroupRepoDescription): Promise<GroupRepoDescription> {
+            that.delay(inputGroup.teamIndex * 5000).then(function () {
+                Log.info("GithubProjectController::provisionProject(..) - creating repo: " + repoName);
+                return that.createRepo(repoName);
+            }).then(function (url: string) {
+                Log.info("GithubProjectController::provisionProject(..) - repo created; importing url: " + importURL);
+                return that.importRepoToNewRepo(repoName, importURL);
+            }).then(function () {
+                Log.info("GithubProjectController::provisionProject(..) - repo imported; getting team number for: " + inputGroup.teamName);
+                return that.getTeamNumber(inputGroup.teamName);
+            }).then(function (teamId: number) {
+                Log.info("GithubProjectController::provisionProject(..) - have team id ( " + teamId + " ); adding to repo");
+                return that.addTeamToRepo(teamId, repoName, 'push');
+            }).then(function () {
+                Log.info("GithubProjectController::provisionProject(..) - team added to repo; getting staff team number");
+                return that.getTeamNumber('310Staff');
+            }).then(function (staffTeamNumber: number) {
+                Log.info("GithubProjectController::provisionProject(..) - found staff team number ( " + staffTeamNumber + " ); adding staff to repo");
+                return that.addTeamToRepo(staffTeamNumber, repoName, 'admin');
+            }).then(function () {
+                Log.info("GithubProjectController::provisionProject(..) - process complete for: " + JSON.stringify(inputGroup));
+                fulfill(inputGroup);
+            }).catch(function (err) {
+                Log.error("GithubProjectController::provisionProject(..) - ERROR: " + err);
+                reject(err);
+            });
+        });
+    }
+
+
+    completeClean(inputGroup: GroupRepoDescription): Promise < GroupRepoDescription > {
         let that = this;
         Log.info("GithubProjectController::completeClean(..) - start: " + JSON.stringify(inputGroup));
         return new Promise(function (fulfill, reject) {
 
             Log.info("GithubProjectController::completeClean(..) - removing project: " + inputGroup.projectName);
-
-
+            
             that.deleteRepo(inputGroup.projectName).then(function (url: string) {
 
                 Log.info("GithubProjectController::completeClean(..) - project removed; removing team");
@@ -772,7 +834,7 @@ export default class GithubProjectController {
     }
 
 
-    delay(ms: number): Promise<{}> {
+    delay(ms: number): Promise < {} > {
         Log.info("GithubProjectController::delay( " + ms + ") - start");
         return new Promise(function (resolve, reject) {
             Log.info("GithubProjectController::delay( " + ms + ") - resolving");
@@ -816,7 +878,10 @@ try {
             Log.info('ProvisioningMain() - Available teams: ' + JSON.stringify(descriptions));
 
             const clean = false;
-
+            if (clean === true) {
+                // really don't want to do this by accident! comment return if you actually want to clean
+                return;
+            }
             let groupsToProcess: GroupRepoDescription[] = [];
             let completeGroups: GroupRepoDescription[] = [];
             for (var descr of descriptions) {
