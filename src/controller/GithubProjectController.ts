@@ -145,12 +145,8 @@ export default class GithubProjectController {
         return new Promise(function (fulfill, reject) {
             Helper.updateEntry("teams.json", {'id': teamId}, {'url': url}, function (error: any) {
                 if (!error) {
-                    // success
-                    //         return callback(null);
                     fulfill(url);
                 } else {
-                    // error
-                    // return callback("error: entry not updated");
                     reject('URL not assigned for: ' + url);
                 }
             });

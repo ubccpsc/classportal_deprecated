@@ -102,10 +102,7 @@ export default class LoginController {
                                     var newUserIndex = _.findIndex(file, {'csid': csid, 'sid': sid});
                                     if (newUserIndex >= 0) {
                                         Log.trace("LoginController::login| First time login! Updating student file");
-                                        Helper.updateEntry("students.json", {
-                                            'csid': csid,
-                                            'sid': sid
-                                        }, {"username": persistUsername}, function (error: any) {
+                                        Helper.updateEntry("students.json", {'csid': csid, 'sid': sid}, {"username": persistUsername}, function (error: any) {
                                             if (!error) {
                                                 Log.trace("LoginController::login| create_user: success");
                                                 return callback(null);

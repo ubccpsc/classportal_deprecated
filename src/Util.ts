@@ -4,6 +4,7 @@
 
 import fs = require('fs');
 import _ = require('lodash');
+import async = require('async');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
 var config = require(pathToRoot + 'config.json');
@@ -47,7 +48,6 @@ export class Helper {
      * Original: http://stackoverflow.com/questions/29797946/handling-bad-json-parse-in-node-safely
      */
     static safelyParseJSON(json: any, callback: any) {
-        Log.trace("Helper::safelyParseJSON(..) - start");
         try {
             var parsedJSON = JSON.parse(json);
             return callback(null, parsedJSON);
@@ -60,7 +60,7 @@ export class Helper {
      * Helper method for reading and parsing JSON data files.
      */
     static readJSON(filename: string, callback: any) {
-        Log.trace("Helper::readJSON(..) - File: " + filename);
+        Log.trace("Helper::readJSON(..) - file: " + filename);
         var path = pathToRoot.concat(config.private_folder, filename);
 
         fs.readFile(path, function (error: any, data: any) {
@@ -81,40 +81,62 @@ export class Helper {
         });
     }
 
-    // write new value to existing object in json array (students/admins/teams/tokens/grades.json)
+    /**
+     * Add new key/value pairs to an existing entry in a JSON array.
+     *
+     * Design: is this check needed?
+     *      if (jsonFile[index].hasOwnProperty(key)){
+     *          //only add value if key already existed!
+     *      }
+     */
     static updateEntry(filename: string, identifierObject: any, newValuesObject: any, callback: any) {
-        Log.trace("Helper::updateEntry| filename: " + filename + " identifier: " + JSON.stringify(identifierObject));
+        Log.trace("Helper::updateEntry(..) - start");
         var path = pathToRoot.concat(config.private_folder, filename);
-        var file = require(path);
-        // Log.trace("Helper::updateEntry| File: " + JSON.stringify(file));
 
-        var userIndex: number = _.findIndex(file, identifierObject);
-        if (userIndex >= 0) {
-            Log.trace("Helper::updateEntry| Username found.");
-            var count = 0;
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                // find index of entry containing values specified in identifierObject
+                var index: number = _.findIndex(jsonFile, identifierObject);
 
-            for (var key in newValuesObject) {
-                if (file[userIndex].hasOwnProperty(key)) {
-                    Log.trace("Helper::updateEntry| Set " + key + ":" + newValuesObject[key]);
-                    file[userIndex][key] = newValuesObject[key];
-                    count++;
-                }
-            }
+                if (index !== -1) {
+                    Log.trace("Helper::updateEntry(..) - found entry containing " + JSON.stringify(identifierObject));
+                    var count: number = 0;
 
-            Log.trace("Helper::updateEntry| Updated " + count + " key(s).");
-            fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
-                if (err) {
-                    Log.trace("Helper::updateEntry| Write error: " + err.toString());
-                    return callback(true);
+                    // update entry with each key/value in newValuesObject, then write to file.
+                    async.forEachOfSeries(
+                        newValuesObject,
+                        function add_key_value(value: any, key: any, callback: any) {
+                            Log.trace("Helper::updateEntry(..) - new key/value: {\"" + key + "\":" + value + "}");
+                            jsonFile[index][key] = value;
+                            count++;
+                            return callback();
+                        },
+                        function end(error: any) {
+                            if (!error) {
+                                fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
+                                    if (!error) {
+                                        Log.trace("Helper::updateEntry(..) - successfully updated " + count + " value(s)!");
+                                        return callback(null);
+                                    } else {
+                                        Log.trace("Helper::updateEntry(..) - write error: " + error);
+                                        return callback(error);
+                                    }
+                                });
+                            } else {
+                                Log.trace("Helper::updateEntry(..) - error: " + error);
+                                return callback(true);
+                            }
+                        }
+                    );
                 } else {
-                    Log.trace("Helper::updateEntry| Write successful!");
-                    return callback(null);
+                    Log.error("Helper::updateEntry(..) - error: entry not found!");
+                    return callback("entry not found");
                 }
-            });
-        } else {
-            Log.trace("Helper::updateEntry| Error: Username was not found.");
-            return callback(true);
-        }
+            } else {
+                Log.error("Helper::updateEntry(..) - error");
+                return callback(error);
+            }
+        });
     }
 
     // write new object json array (students/admins/teams/tokens/grades.json)
