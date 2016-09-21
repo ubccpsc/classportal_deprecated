@@ -60,14 +60,14 @@ export class Helper {
      * Helper method for reading and parsing JSON data files.
      */
     static readJSON(filename: string, callback: any) {
-        Log.trace("Helper::readJSON(..) - file: " + filename);
+        Log.trace("Helper::readJSON(..) - reading file: " + filename);
         var path = pathToRoot.concat(config.private_folder, filename);
 
         fs.readFile(path, function (error: any, data: any) {
             if (!error) {
                 Helper.safelyParseJSON(data, function (error: any, parsedJSON: any) {
                     if (!error) {
-                        Log.trace("Helper::readJSON(..) - success!");
+                        Log.trace("Helper::readJSON(..) - read and parsed file successfully.");
                         return callback(null, parsedJSON);
                     } else {
                         Log.error("Helper::readJSON(..) - error parsing json: " + error);
@@ -82,12 +82,7 @@ export class Helper {
     }
 
     /**
-     * Add new key/value pairs to an existing entry in a JSON array.
-     *
-     * Design: is this check needed?
-     *      if (jsonFile[index].hasOwnProperty(key)){
-     *          //only add value if key already existed!
-     *      }
+     * Add or update key/value pairs in an existing entry in a JSON array.
      */
     static updateEntry(filename: string, identifierObject: any, newValuesObject: any, callback: any) {
         Log.trace("Helper::updateEntry(..) - start");
@@ -118,12 +113,12 @@ export class Helper {
                                         Log.trace("Helper::updateEntry(..) - successfully updated " + count + " value(s)!");
                                         return callback(null);
                                     } else {
-                                        Log.trace("Helper::updateEntry(..) - write error: " + error);
+                                        Log.error("Helper::updateEntry(..) - write error: " + error);
                                         return callback(error);
                                     }
                                 });
                             } else {
-                                Log.trace("Helper::updateEntry(..) - error: " + error);
+                                Log.error("Helper::updateEntry(..) - error: " + error);
                                 return callback(true);
                             }
                         }
@@ -133,109 +128,133 @@ export class Helper {
                     return callback("entry not found");
                 }
             } else {
-                Log.error("Helper::updateEntry(..) - error");
+                Log.error("Helper::updateEntry(..) - file read error");
                 return callback(error);
             }
         });
     }
 
-    // write new object json array (students/admins/teams/tokens/grades.json)
+    /** 
+     * Add new entry to a JSON array of objects.
+     */
     static addEntry(filename: string, newEntry: any, callback: any) {
-        Log.trace("Helper::addEntry| filename: " + filename);
+        Log.trace("Helper::addEntry(..) - start");
         var path = pathToRoot.concat(config.private_folder, filename);
-        var file = require(path);
 
-        // add new entry to end of file
-        file[file.length] = newEntry;
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                jsonFile.push(newEntry);
+                Log.trace("Helper::addEntry(..) - adding new entry:\n" + JSON.stringify(newEntry, null, 2));
 
-        Log.trace("Helper::addEntry| New entry added: " + JSON.stringify(newEntry));
-        fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
-            if (err) {
-                Log.trace("Helper::addEntry| Write error: " + err.toString());
+                fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
+                    if (!error) {
+                        Log.error("Helper::addEntry(..) - success!");
+                        return callback(null);
+                    } else {
+                        Log.trace("Helper::::addEntry(..) - write error: " + error);
 
-                // create a backup
-                try {
-                    fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
-                } catch (err) {
-                    Log.error('Helper::addEntry() - ERROR: ' + err.message);
-                }
-
-                return callback(true);
+                        // create a backup
+                        try {
+                            fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
+                        } catch (err) {
+                            Log.error('Helper::addEntry() - error creating backup: ' + err.message);
+                        }
+                        return callback(error);
+                    }
+                });
             } else {
-                Log.trace("Helper::addEntry| Write successful!");
-                return callback(null);
+                Log.error("Helper::addEntry(..) - file read error");
+                return callback(error);
             }
         });
     }
 
-    // check if any entry in the json array contains the key/values in checkedObject.
-    // if true, return object.
-    // TODO: migrate other code to this function!
-    static checkEntry(filename: string, checkedObject: any, callback: any) {
-        Log.trace("Helper::checkEntry| Checking " + filename + " for values: " + JSON.stringify(checkedObject));
+    /**
+     * Check if all the key/value pairs in objectToCheck are found in the JSON array of objects.
+     * If true, return the object.
+     */
+    static checkEntry(filename: string, objectToCheck: any, callback: any) {
+        Log.trace("Helper::checkEntry(..) - start");
         var path = pathToRoot.concat(config.private_folder, filename);
 
-        fs.readFile(path, function (err: any, data: any) {
-            if (!err && data.length > 0) {
-                var file = JSON.parse(data);
-                var entry = _.find(file, checkedObject);
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                var entry = _.find(jsonFile, objectToCheck);
 
                 if (entry !== undefined) {
-                    Log.trace("Helper::checkEntry| Entry found: " + JSON.stringify(entry));
+                    Log.trace("Helper::checkEntry(..) - entry found: " + JSON.stringify(entry));
                     return callback(null, entry);
                 } else {
-                    Log.trace("Helper::checkEntry| Error: entry not found!");
-                    return callback(true, null);
+                    Log.trace("Helper::checkEntry(..) - error: entry not found!");
+                    return callback("entry not found", null);
                 }
             } else {
-                Log.trace("Helper::checkEntry| File read error.");
-                return callback(true, null);
+                Log.trace("Helper::checkEntry(..) - file read error");
+                return callback(error, null);
             }
         });
     }
 
-    // delete entry from json array in specified file
+    /**
+     * Delete an entry from the specified file.
+     * The entry to be deleted is uniquely identified by matching all the key/value pairs in identifierObject.
+     */
     static deleteEntry(filename: string, identifierObject: any, callback: any) {
-        Log.trace("Helper::deleteEntry| filename: " + filename);
+        Log.trace("Helper::deleteEntry(..) - start");
         var path = pathToRoot.concat(config.private_folder, filename);
-        var file = require(path);
 
-        var entryIndex: number = _.findIndex(file, identifierObject);
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                var index: number = _.findIndex(jsonFile, identifierObject);
+                if (index !== -1) {
+                    Log.trace("Helper::deleteEntry(..) - entry to be deleted: " + JSON.stringify(jsonFile[index]));
 
-        if (entryIndex < 0) {
-            Log.trace("Helper::deleteEntry| Error: could not find entry.");
-            return callback(true);
-        } else {
-            // remove entry from file
-            file.splice(entryIndex, 1);
-
-            fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
-                if (err) {
-                    Log.trace("Helper::deleteEntry| Write error: " + err.toString());
-                    return callback(true);
+                    // use async library to ensure that the write happens AFTER the splice.
+                    async.waterfall([
+                        function splice_array(cb: any) {
+                            jsonFile.splice(index, 1);
+                            return cb();
+                        }],
+                        function write_file(err: any) {
+                            fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
+                                if (error) {
+                                    Log.trace("Helper::deleteEntry(..) - write error: " + error);
+                                    return callback(error);
+                                } else {
+                                    Log.trace(" Helper::deleteEntry(..) - delete successful!");
+                                    return callback(null);
+                                }
+                            });
+                        }
+                    );
                 } else {
-                    Log.trace("Helper::deleteEntry| Write successful!");
-                    return callback(null);
+                    Log.trace("Helper::deleteEntry(..) - error: could not find entry.");
+                    return callback(true);
                 }
-            });
-        }
+            } else {
+                Log.trace("Helper::deleteEntry(..) - file read error");
+                return callback(error, null);
+            }
+        });
     }
 
-    // check if supplied username exists in admins.json    
+    /**
+     * Check if the supplied username belongs to an admin.
+     */
     static isAdmin(username: string, callback: any) {
-        Log.trace("Helper::isAdmin| Checking admin status..");
-        var path = pathToRoot.concat(config.path_to_admins);
+        Log.trace("Helper::isAdmin(..) - start");
+        var filename = "admins.json";
+        var path = pathToRoot.concat(config.private_folder, filename);
 
-        fs.readFile(path, function read(err: any, data: any) {
-            if (err) {
-                Log.trace("Helper::isAdmin| Error reading file: " + err.toString());
-                return callback(true, null);
-            } else {
-                var file = JSON.parse(data);
-                var userIndex: number = _.findIndex(file, { "username": username });
-                var isAdmin: boolean = userIndex >= 0;
-                Log.trace("Helper::isAdmin| isAdmin: " + isAdmin);
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                var index: number = _.findIndex(jsonFile, { "username": username });
+                var isAdmin: boolean = index !== -1;
+                Log.trace("Helper::isAdmin(..) - admin status: " + isAdmin);
                 return callback(null, isAdmin);
+            } else {
+                Log.trace("Helper::isAdmin(..) - file read error");
+                return callback(error, null);
             }
         });
     }
