@@ -50,9 +50,9 @@ export default class GithubProjectController {
             async.waterfall([
                 function get_students_file(callback: any) {
                     Log.info("GithubProjectController::getGroupDescriptions(..) - get_students_file");
-                    Helper.readFile("students.json", function (error: any, data: any) {
+                    Helper.readJSON("students.json", function (error: any, data: any) {
                         if (!error) {
-                            studentsFile = JSON.parse(data);
+                            studentsFile = data;
                             return callback(null);
                         } else {
                             return callback("error reading students.json");
@@ -61,9 +61,9 @@ export default class GithubProjectController {
                 },
                 function get_teams_file(callback: any) {
                     Log.info("GithubProjectController::getGroupDescriptions(..) - get_teams_file");
-                    Helper.readFile("teams.json", function (error: any, data: any) {
+                    Helper.readJSON("teams.json", function (error: any, data: any) {
                         if (!error) {
-                            teamsFile = JSON.parse(data);
+                            teamsFile = data;
                             return callback(null);
                         } else {
                             return callback("error reading teams.json");
@@ -145,12 +145,8 @@ export default class GithubProjectController {
         return new Promise(function (fulfill, reject) {
             Helper.updateEntry("teams.json", {'id': teamId}, {'url': url}, function (error: any) {
                 if (!error) {
-                    // success
-                    //         return callback(null);
                     fulfill(url);
                 } else {
-                    // error
-                    // return callback("error: entry not updated");
                     reject('URL not assigned for: ' + url);
                 }
             });

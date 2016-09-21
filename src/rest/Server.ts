@@ -124,11 +124,11 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
     var admin: string = req.header('admin');
 
     if (!!username && !!token) {
-        Helper.readFile("tokens.json", function (error: any, data: any) {
+        Helper.readJSON("tokens.json", function (error: any, data: any) {
             if (!error) {
-                var file = JSON.parse(data);
-                var userIndex: number = _.findIndex(file, {'username': username});
-                var servertoken: string = file[userIndex].servertoken;
+                var tokensFile = data;
+                var userIndex: number = _.findIndex(tokensFile, { 'username': username });
+                var servertoken: string = tokensFile[userIndex].servertoken;
 
                 if (!!servertoken && (token === servertoken)) {
                     Log.trace("checkToken| Tokens match! Continuing to next middleware..\n----------------------------------------------------");

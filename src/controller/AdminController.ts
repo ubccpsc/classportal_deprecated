@@ -84,9 +84,9 @@ export default class AdminController {
         async.waterfall([
             function get_students_file(callback: any) {
                 Log.info("AdminController::updateClasslist - get_students_file");
-                Helper.readFile("students.json", function (error: any, data: any) {
+                Helper.readJSON("students.json", function (error: any, data: any) {
                     if (!error) {
-                        studentsFile = JSON.parse(data);
+                        studentsFile = data;
                         return callback(null);
                     } else {
                         return callback("get_students_file failed!");
@@ -95,9 +95,9 @@ export default class AdminController {
             },
             function get_teams_file(callback: any) {
                 Log.info("AdminController::updateClasslist - get_teams_file");
-                Helper.readFile("teams.json", function (error: any, data: any) {
+                Helper.readJSON("teams.json", function (error: any, data: any) {
                     if (!error) {
-                        teamsFile = JSON.parse(data);
+                        teamsFile = data;
                         return callback(null);
                     } else {
                         return callback("get_teams_file failed!");
@@ -106,9 +106,9 @@ export default class AdminController {
             },
             function get_grades_file(callback: any) {
                 Log.info("AdminController::updateClasslist - get_grades_file");
-                Helper.readFile("grades.json", function (error: any, data: any) {
+                Helper.readJSON("grades.json", function (error: any, data: any) {
                     if (!error) {
-                        gradesFile = JSON.parse(data);
+                        gradesFile = data;
                         return callback(null);
                     } else {
                         return callback("get_grades_file failed!");
@@ -405,35 +405,46 @@ export default class AdminController {
         );
     }
 
+    /**
+     * Add teamId to the specified admin's 'teams' array in admins.json. 
+     */
     static assignTeam(username: string, teamId: string, callback: any) {
+        Log.trace("AdminController::assignTeam(..) - start");
         var path = pathToRoot.concat(config.private_folder, "admins.json");
-        var file = require(path);
-        var adminIndex: number = _.findIndex(file, { "username": username });
-        if (adminIndex >= 0) {
-            // check if team is already assigned to the admin.
-            if (_.indexOf(file[adminIndex].teams, teamId) >= 0) {
-                Log.trace("AdminController::assignTeam| Error: Admin is already assigned to this team!");
-                return callback(true);
-            }
-            else {
-                file[adminIndex].teams.push(teamId);
 
-                Log.trace("AdminController::assignTeam| Writing to admins file..");
-                fs.writeFile(path, JSON.stringify(file, null, 2), function (err: any) {
-                    if (err) {
-                        Log.trace("AdminController::assignTeam| Error: could not write");
-                        return callback(true);
+        Helper.readJSON("admins.json", function (error: any, adminsFile: any) {
+            if (!error) {
+                var adminIndex: number = _.findIndex(adminsFile, { "username": username });
+                if (adminIndex !== -1) {
+                    // if the team is already assigned to the admin, return error
+                    if (_.indexOf(adminsFile[adminIndex].teams, teamId) !== -1) {
+                        Log.trace("AdminController::assignTeam(..) - error: admin is already assigned to this team!");
+                        return callback("admin is already assigned to this team.");
                     }
                     else {
-                        Log.trace("AdminController::assignTeam| Success!");
-                        return callback(null);
+                        // add teamId to the admin's teams.
+                        adminsFile[adminIndex].teams.push(teamId);
+
+                        Log.trace("AdminController::assignTeam(...) - writing to admins file..");
+                        fs.writeFile(path, JSON.stringify(adminsFile, null, 2), function (error: any) {
+                            if (!error) {
+                                Log.trace("AdminController::assignTeam(..) - team " + teamId + " was successfully added to " + username + "'s assigned teams.");
+                                return callback(null);
+                            }
+                            else {
+                                Log.trace("AdminController::assignTeam(..) - write failed!");
+                                return callback("write error");
+                            }
+                        });
                     }
-                });
+                } else {
+                    Log.trace("AdminController::assignTeam(..) - error: admin file could not be found!");
+                    return callback("admin file could not be found");
+                }
+            } else {
+                Log.trace("AdminController::assignTeam(..) - file read error");
+                return callback(error);
             }
-        }
-        else {
-            Log.trace("AdminController::assignTeam| Error: could not find admin file");
-            return callback(true);
-        }
+        });
     }
 }

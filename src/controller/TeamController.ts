@@ -29,9 +29,9 @@ export default class TeamController {
         async.waterfall([
                 function get_student_file(callback: any) {
                     Log.trace("TeamController::createTeam| get_student_file");
-                    Helper.readFile("students.json", function (error: any, data: any) {
+                    Helper.readJSON("students.json", function (error: any, data: any) {
                         if (!error) {
-                            studentsFile = JSON.parse(data);
+                            studentsFile = data;
                             return callback(null);
                         } else {
                             return callback("could not read students file");
@@ -40,9 +40,9 @@ export default class TeamController {
                 },
                 function get_teams_file(callback: any) {
                     Log.trace("TeamController::createTeam| get_teams_file");
-                    Helper.readFile("teams.json", function (error: any, data: any) {
+                    Helper.readJSON("teams.json", function (error: any, data: any) {
                         if (!error) {
-                            teamsFile = JSON.parse(data);
+                            teamsFile = data;
 
                             // set newId to the 1 higher than the last entry in the array.
                             if (teamsFile.length > 0) {
