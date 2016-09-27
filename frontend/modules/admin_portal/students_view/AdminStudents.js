@@ -97,12 +97,12 @@ export default React.createClass({
         this.state.assnId,
         intGrade,
         this.state.comments,
-        function success() {
+        function onSuccess() {
           alert("Success!")
           this.closeModal();
           window.location.reload(true);
         }.bind(this),
-        function error() {
+        function onError() {
           alert("Error submitting grades.")
         }.bind(this),
       );

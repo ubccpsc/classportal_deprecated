@@ -7,11 +7,11 @@ export default React.createClass({
   logoutSubmit: function (event) {
     event.preventDefault();
     Ajax.logout(
-      function success(response) {
+      function onSuccess(response) {
         localStorage.clear();
         browserHistory.push("/login");
       }.bind(this),
-      function error(xhr, status, err) {
+      function onError(xhr, status, err) {
         /* Design: For any reason, if the logout process fails, we still log the
            user out as normal instead of leaving them stuck in the course portal.
            Similarly, the server will clear the servertoken even if there were any

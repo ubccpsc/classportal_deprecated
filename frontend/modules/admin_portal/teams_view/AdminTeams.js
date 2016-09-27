@@ -113,11 +113,11 @@ export default React.createClass({
       Ajax.assignTeam(
         localStorage.username,
         event.target.id,
-        function success() {
+        function onSuccess() {
           alert("Success!");
           window.location.reload(true);
         },
-        function error() {
+        function onError() {
           alert("Error: admin was not added.");
         }
       )
@@ -127,11 +127,11 @@ export default React.createClass({
     if (confirm("Please confirm that you want to disband team " + event.target.id + ".")) {
       Ajax.disbandTeam(
         event.target.id,
-        function success() {
+        function onSuccess() {
           alert("Team has been disbanded!");
           window.location.reload(true);
         },
-        function error() {
+        function onError() {
           alert("Error: team could not be disbanded.");
           window.location.reload(true);
         }

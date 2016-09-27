@@ -29,7 +29,7 @@ export default React.createClass({
         localStorage.csid ? localStorage.csid : "",
         localStorage.sid ? localStorage.sid : "",
         authcode,
-        function success(response) {
+        function onSuccess(response) {
           // console.log("PostLogin.js| Authentication success! Response: " + JSON.stringify(response));
           var admin = response.admin;
           var username = response.username;
@@ -63,7 +63,7 @@ export default React.createClass({
             });
           }
         }.bind(this),
-        function error(xhr, status, err) {
+        function onError(xhr, status, err) {
           var err_msg = JSON.parse(xhr.responseText);
           alert("Error: " + err_msg);
 

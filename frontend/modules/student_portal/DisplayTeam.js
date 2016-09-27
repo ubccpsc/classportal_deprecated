@@ -9,11 +9,11 @@ export default React.createClass({
     if (confirm("Please confirm that you want to disband the team.")) {
       Ajax.disbandTeam(
         this.props.myTeamFile.id,
-        function success() {
+        function onSuccess() {
           alert("Team has been disbanded!");
           window.location.reload(true);
         },
-        function error() {
+        function onError() {
           alert("Error: team could not be disbanded.");
           window.location.reload(true);
         }

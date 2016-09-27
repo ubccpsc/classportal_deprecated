@@ -21,13 +21,13 @@ export default React.createClass({
   },
   loadStudentPortal: function () {
     Ajax.loadStudentPortal(
-      function success(response) {
+      function onSuccess(response) {
         // console.log("StudentPortal.js| Retrieved files:" + JSON.stringify(response, null, 2));
         this.setState({ files: response }, function () {
           this.setState({ loaded: true });
         });
       }.bind(this),
-      function error(xhr, status, error) {
+      function onError(xhr, status, error) {
         console.log("error loading files");
       }.bind(this)
     )

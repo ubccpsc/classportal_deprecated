@@ -21,7 +21,7 @@ export default React.createClass({
   },
   loadAdminPortal: function () {
     Ajax.loadAdminPortal(
-      function success(response) {
+      function onSuccess(response) {
         // console.log("AdminPortal.js| Retrieved files: " + JSON.stringify(response, null, 2));
         this.setState({ files: response }, function () {
           //verify files exist and are a proper format here
@@ -33,7 +33,7 @@ export default React.createClass({
           }
         });
       }.bind(this),
-      function error(xhr, status, error) {
+      function onError(xhr, status, error) {
         console.log("AdminPortal.js| Error getting files!");
       }.bind(this)
     )

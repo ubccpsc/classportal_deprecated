@@ -27,11 +27,11 @@ export default React.createClass({
 
     Ajax.submitClasslist(
       files,
-      function success(response) {
+      function onSuccess(response) {
         alert("Successfully updated classlist!\n\n" + response);
         window.location.reload(true);
       },
-      function error() {
+      function onError() {
         alert("Error updating classlist!");
         window.location.reload(true);
       }

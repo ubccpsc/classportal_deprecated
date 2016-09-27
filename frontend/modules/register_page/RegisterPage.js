@@ -16,7 +16,7 @@ export default React.createClass({
     Ajax.register(
       csid,
       sid,
-      function success() {
+      function onSuccess() {
         //clear any previously set values in localstorage
         localStorage.clear();
 
@@ -29,7 +29,7 @@ export default React.createClass({
         var redirect_uri = "http://" + config.host + ":" + config.port + "/postlogin";
         window.location = "https://github.com/login/oauth/authorize?client_id=" + client_id + "&redirect_uri=" + redirect_uri;
       }.bind(this),
-      function error(xhr, status, err) {
+      function onError(xhr, status, err) {
         var err_msg = JSON.parse(xhr.responseText);
         alert("Error: " + err_msg);
 
