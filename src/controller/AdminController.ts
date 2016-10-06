@@ -447,4 +447,14 @@ export default class AdminController {
             }
         });
     }
+
+    // update grades.json
+    // todo: function not yet implmented.
+    static submitGrade(student: string, assnId: string, grade: string, comment: string, callback: any) {
+        Log.trace("AdminController::submitGrade| Not yet implemented!");
+
+        // return error
+        return callback("grade submission not implemented");
+    }
+
 }

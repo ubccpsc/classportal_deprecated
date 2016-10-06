@@ -8,10 +8,11 @@ export default React.createClass({
     return {
       viewAll: true,
       modalIsOpen: false,
+      labelArray: [],
       student: '',
       assnId: '',
       grade: '',
-      comments: ''
+      comment: ''
     };
   },
   toggleView: function (e) {
@@ -90,13 +91,13 @@ export default React.createClass({
     }
 
     // confirm before submitting new grade
-    var submitMessage = "Please confirm new grade:\nStudent: " + this.state.student + "\nAssignment: " + this.state.assnId + "\nGrade: " + intGrade + "/100\nComments: " + this.state.comments;
+    var submitMessage = "Please confirm new grade:\nStudent: " + this.state.student + "\nAssignment: " + this.state.assnId + "\nGrade: " + intGrade + "/100\nComment: " + this.state.comment;
     if (confirm(submitMessage)) {
       Ajax.submitGrade(
         this.state.student,
         this.state.assnId,
         intGrade,
-        this.state.comments,
+        this.state.comment,
         function onSuccess() {
           alert("Success!")
           this.closeModal();
@@ -110,7 +111,12 @@ export default React.createClass({
   },
   handleSelectAssignment: function (event) {
     // console.log(event);
-    this.setState({ assnId: event });
+    var delivs = this.props.deliverables;
+    for (var index = 0; index < delivs.length; index++){
+      if (event === delivs[index].name) {
+        this.setState({ assnId: delivs[index].id });
+      }
+    }
   },
   setNewGrade: function (event) {
     // console.log(event.target.value);
@@ -118,7 +124,15 @@ export default React.createClass({
   },
   setNewComment: function (event) {
     // console.log(event.target.value);
-    this.setState({ comments: event.target.value });
+    this.setState({ comment: event.target.value });
+  },
+  componentDidMount: function () {
+    var delivs = this.props.deliverables;
+    var labelArray = [];
+    for (var index = 0; index < delivs.length; index++) {
+      labelArray[index] = { 'label': delivs[index].name }
+    }
+    this.setState({ 'labelArray': labelArray });
   },
   render: function () {
     return (
@@ -151,18 +165,12 @@ export default React.createClass({
                 <FormInput placeholder={this.state.student} disabled />
               </FormField>
               <FormField className="no-margin" label="Assn">
-                <FormSelect options={
-                  [
-                    { label: 'Assignment 1' },
-                    { label: 'Assignment 2' },
-                    { label: 'Assignment 3' }
-                  ]
-                } firstOption="Select" onChange={this.handleSelectAssignment} />
+                <FormSelect options={this.state.labelArray} firstOption="Select" onChange={this.handleSelectAssignment} />
               </FormField>
               <FormField label="Grade (%)" onChange={this.setNewGrade}>
                 <FormInput />
               </FormField>
-              <FormField label="Comments" onChange={this.setNewComment}>
+              <FormField label="Comment" onChange={this.setNewComment}>
                 <FormInput multiline />
               </FormField>
             </Form>

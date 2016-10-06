@@ -173,7 +173,7 @@ module.exports = {
             error: errorCallback
         });
     },
-    submitGrade: function (student, assnId, grade, comments, successCallback, errorCallback) {
+    submitGrade: function (student, assnId, grade, comment, successCallback, errorCallback) {
         // console.log("Ajax.js| Submitting new grade..");
         $.ajax({
             type: "POST",
@@ -187,11 +187,10 @@ module.exports = {
                 "student": student,
                 "assnId": assnId,
                 "grade": grade,
-                "comments": comments
+                "comment": comment
             },
+            dataType: "json",
             cache: false,
-            contentType: false,
-            processData: false,
             success: successCallback,
             error: errorCallback
         });
