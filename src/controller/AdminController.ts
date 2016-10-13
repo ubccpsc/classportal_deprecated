@@ -335,7 +335,7 @@ export default class AdminController {
 
                             var newGradesEntry = {
                                 "sid": sidArray[index],
-                                "grades": {}
+                                "grades": new Array()
                             };
 
                             Log.trace("AdminController::updateClasslist - adding new student: " + JSON.stringify(newStudentEntry));
