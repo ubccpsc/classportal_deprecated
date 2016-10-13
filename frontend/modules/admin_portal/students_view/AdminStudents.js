@@ -10,6 +10,7 @@ export default React.createClass({
       modalIsOpen: false,
       labelArray: [],
       student: '',
+      sid: '',
       assnId: '',
       grade: '',
       comment: ''
@@ -56,7 +57,7 @@ export default React.createClass({
             : "-" }</td>
         <td className="tg-yw4l">
           <Button
-            id={student.firstname + ' ' + student.lastname}
+            id={student.sid + ':' + student.firstname + ' ' + student.lastname}
             size="sm"
             className="button-text"
             type="link-text"
@@ -66,9 +67,12 @@ export default React.createClass({
     )
   },
   openModal: function (event) {
-    // console.log(event.target.id);
-    this.setState({ student: event.target.id }, function () {
-      this.setState({ modalIsOpen: true });
+    var lines = event.target.id.split(':');
+    console.log(lines);
+    this.setState({ sid: lines[0] }, function () {
+      this.setState({ student: lines[1] }, function () {
+        this.setState({ modalIsOpen: true });
+      });
     });
   },
   closeModal: function () {
@@ -94,7 +98,7 @@ export default React.createClass({
     var submitMessage = "Please confirm new grade:\nStudent: " + this.state.student + "\nAssignment: " + this.state.assnId + "\nGrade: " + intGrade + "/100\nComment: " + this.state.comment;
     if (confirm(submitMessage)) {
       Ajax.submitGrade(
-        this.state.student,
+        this.state.sid,
         this.state.assnId,
         intGrade,
         this.state.comment,
@@ -112,7 +116,7 @@ export default React.createClass({
   handleSelectAssignment: function (event) {
     // console.log(event);
     var delivs = this.props.deliverables;
-    for (var index = 0; index < delivs.length; index++){
+    for (var index = 0; index < delivs.length; index++) {
       if (event === delivs[index].name) {
         this.setState({ assnId: delivs[index].id });
       }

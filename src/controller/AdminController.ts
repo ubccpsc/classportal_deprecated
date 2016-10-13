@@ -449,12 +449,17 @@ export default class AdminController {
     }
 
     // update grades.json
-    // todo: function not yet implmented.
-    static submitGrade(student: string, assnId: string, grade: string, comment: string, callback: any) {
-        Log.trace("AdminController::submitGrade| Not yet implemented!");
+    static submitGrade(sid: string, assnId: string, grade: string, comment: string, callback: any) {
+        Log.trace("AdminController::submitGrade(..) - start");
 
-        // return error
-        return callback("grade submission not implemented");
+        Helper.addGrade(sid, assnId, grade, comment, function (error: any, data: any) {
+            if (!error) {
+                return callback(null, "success!");
+            } else {
+                // return error
+                return callback("grade submission not implemented");
+            }
+        });
     }
 
 }

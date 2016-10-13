@@ -227,19 +227,19 @@ export default class RouteHandler {
      * @returns server response
      */
     static submitGrade(req: restify.Request, res: restify.Response, next: restify.Next) {
-        var student: string = req.params.student;
+        var sid: string = req.params.sid;
         var assnId: string = req.params.assnId;
         var grade: string = req.params.grade;
         var comment: string = req.params.comment;
-        Log.trace("RouteHandler::submitGrade| " + student + ", " + assnId + ", " + grade + ", " + comment);
+        Log.trace("RouteHandler::submitGrade(..) - " + sid + ", " + assnId + ", " + grade + ", " + comment);
 
-        AdminController.submitGrade(student, assnId, grade, comment, function (error: any, response: boolean) {
+        AdminController.submitGrade(sid, assnId, grade, comment, function (error: any, response: boolean) {
             if (!error) {
-                Log.trace("RouteHandler::submitGrade| Success!");
+                Log.trace("RouteHandler::submitGrade(..) - Success!");
                 return res.send(200, "success");
             }
             else {
-                Log.trace("RouteHandler::submitGrade| Error:" + error);
+                Log.trace("RouteHandler::submitGrade(..) - Error:" + error);
                 return res.send(500, error);
             }
         });

@@ -173,7 +173,7 @@ module.exports = {
             error: errorCallback
         });
     },
-    submitGrade: function (student, assnId, grade, comment, successCallback, errorCallback) {
+    submitGrade: function (sid, assnId, grade, comment, successCallback, errorCallback) {
         // console.log("Ajax.js| Submitting new grade..");
         $.ajax({
             type: "POST",
@@ -184,7 +184,7 @@ module.exports = {
                 "admin": localStorage.admin
             },
             data: {
-                "student": student,
+                "sid": sid,
                 "assnId": assnId,
                 "grade": grade,
                 "comment": comment

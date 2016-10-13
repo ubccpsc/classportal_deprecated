@@ -258,4 +258,74 @@ export class Helper {
             }
         });
     }
+
+    // add or edit grade
+    static addGrade(sid: string, assnId: string, grade: string, comment: string, callback: any) {
+        Log.trace("Helper::addGrade(..) - start");
+        var filename = "grades.json";
+        var path = pathToRoot.concat(config.private_folder, filename);
+
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                Log.trace("Helper::addGrade(..) - finding index of student in grades");
+                var studentIndex: number = _.findIndex(jsonFile, { "sid": sid });
+                if (studentIndex !== -1) {
+                    // check if grade for that assnId already exists
+                    Log.trace("Helper::addGrade(..) - finding index of grade in grades.grades");
+                    var assnIndex: number = _.findIndex(jsonFile[studentIndex].grades, { "assnId": assnId });
+
+                    async.waterfall([
+                        function assign(cb: any) {
+                            if (assnIndex !== -1) {
+                                // set grade
+                                Log.trace("Helper::addGrade(..) - re-assigning old grade");
+                                jsonFile[studentIndex].grades[assnIndex].grade = grade;
+                                jsonFile[studentIndex].grades[assnIndex].comment = comment;
+                            } else {
+                                Log.trace("Helper::addGrade(..) - assigning new grade");
+                                var newGrade = {
+                                    assnId: assnId,
+                                    grade: grade,
+                                    comment: comment
+                                };
+                                jsonFile[studentIndex].grades.push(newGrade);
+                            }
+                            return cb();
+                        }
+                    ], function write(error: any) {
+                        if (!error) {
+                            Log.trace("Helper::addGrade(..) - writing to file");
+                            fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
+                                if (!error) {
+                                    Log.error("Helper::addEntry(..) - success!");
+                                    return callback(null);
+                                } else {
+                                    Log.trace("Helper::::addEntry(..) - write error: " + error);
+
+                                    // create a backup
+                                    try {
+                                        fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
+                                    } catch (err) {
+                                        Log.error('Helper::addEntry() - error creating backup: ' + err.message);
+                                    }
+                                    return callback(error);
+                                }
+                            });
+                        } else {
+                            return callback("Failed to assign grades");
+                        }
+                    });
+
+                } else {
+                    Log.trace("Helper::addGrade(..) - error: student " + sid + " does not exist in grades.json");
+                    return callback(error, null);
+                }
+            }
+            else {
+                Log.trace("Helper::addGrade(..) - file read error");
+                return callback(error, null);
+            }
+        });
+
+    }
 }
