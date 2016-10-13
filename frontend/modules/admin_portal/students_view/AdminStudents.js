@@ -2,6 +2,7 @@ import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button, Modal, ModalHeader, ModalBody, ModalFooter, Dropdown } from 'elemental'
 import ContentModule from '../../shared_components/ContentModule'
 import Ajax from '../../shared_components/Ajax'
+import _ from 'lodash';
 
 export default React.createClass({
   getInitialState: function () {
@@ -96,7 +97,20 @@ export default React.createClass({
 
     // confirm before submitting new grade
     var submitMessage = "Please confirm new grade:\nStudent: " + this.state.student + "\nAssignment: " + this.state.assnId + "\nGrade: " + intGrade + "/100\nComment: " + this.state.comment;
+    var resubmitMessage = "This assignment has already been assigned a grade. Overwrite?";
+
+    //check if student already has grade assigned
+    var studentIndex = _.findIndex(this.props.grades, { "sid": this.state.sid });
+    var assnIndex = _.findIndex(this.props.grades[studentIndex].grades, { "assnId": this.state.assnId });
+
     if (confirm(submitMessage)) {
+      if (assnIndex !== -1) {
+        var oldGrade = this.props.grades[studentIndex].grades[assnIndex].grade;
+        var oldComment = this.props.grades[studentIndex].grades[assnIndex].comment;
+        if (!confirm(resubmitMessage + "\n\nPrevious:\nGrade: " + oldGrade + "\nComment: " + oldComment)) {
+          return;
+        }
+      }
       Ajax.submitGrade(
         this.state.sid,
         this.state.assnId,
