@@ -9,6 +9,7 @@ export default React.createClass({
     return {
       viewAll: true,
       modalIsOpen: false,
+      gradesModalIsOpen: false,
       labelArray: [],
       student: '',
       sid: '',
@@ -41,6 +42,40 @@ export default React.createClass({
     }
     return students;
   },
+  renderGrades: function () {
+    var rows = [];
+    var gradesFile = this.props.grades;
+    var studentIndex = _.findIndex(gradesFile, { sid: this.state.sid });
+
+    if (studentIndex !== -1) {
+      if (gradesFile[studentIndex].grades.length < 1) {
+        var emptyRow = (
+          <tr key="0">
+            <td className="tg-yw4l">-</td>
+            <td className="tg-yw4l">-</td>
+            <td className="tg-yw4l">-</td>
+          </tr>
+        );
+        rows.push(emptyRow);
+      } else {
+        for (var index = 0; index < gradesFile[studentIndex].grades.length; index++) {
+          var currentGrade = gradesFile[studentIndex].grades[index];
+          var row = (
+            <tr key={index}>
+              <td className="tg-yw4l">{currentGrade.assnId}</td>
+              <td className="tg-yw4l">{currentGrade.grade}</td>
+              <td className="tg-yw4l">{currentGrade.comment}</td>
+            </tr>
+          );
+          rows.push(row);
+        }
+      }
+    } else {
+      alert("Error loading student: " + this.state.sid);
+    }
+
+    return rows;
+  },
   renderOneStudent: function (index) {
     var student = this.props.students[index];
     return (
@@ -62,7 +97,16 @@ export default React.createClass({
             size="sm"
             className="button-text"
             type="link-text"
-            onClick={this.openModal}>View/Edit</Button>
+            onClick={this.openGradesModal}>View
+          </Button>
+          &nbsp; /&nbsp;
+          <Button
+            id={student.sid + ':' + student.firstname + ' ' + student.lastname}
+            size="sm"
+            className="button-text"
+            type="link-text"
+            onClick={this.openModal}>Edit
+          </Button>
         </td>
       </tr>
     )
@@ -78,6 +122,18 @@ export default React.createClass({
   },
   closeModal: function () {
     this.setState({ modalIsOpen: false });
+  },
+  openGradesModal: function (event) {
+    var lines = event.target.id.split(':');
+    // console.log(lines);
+    this.setState({ sid: lines[0] }, function () {
+      this.setState({ student: lines[1] }, function () {
+        this.setState({ gradesModalIsOpen: true });
+      });
+    });
+  },
+  closeGradesModal: function () {
+    this.setState({ gradesModalIsOpen: false });
   },
   submitGrades: function () {
     // check for valid assignment
@@ -196,6 +252,27 @@ export default React.createClass({
           <ModalFooter>
             <Button type="danger" onClick={this.submitGrades}>Submit</Button>
             <Button type="link-cancel" onClick={this.closeModal}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+
+        <Modal isOpen={this.state.gradesModalIsOpen} onCancel={this.closeGradesModal} backdropClosesModal>
+          <ModalHeader text={"View Grades: " + this.state.student } showCloseButton onClose={this.closeGradesModal} />
+          <ModalBody>
+            <Form className="form" type="horizontal" >
+              <table className="tg">
+                <tbody>
+                  <tr>
+                    <th className="tg-yw4l">AssnId #</th>
+                    <th className="tg-yw4l">Grade</th>
+                    <th className="tg-yw4l">Comment</th>
+                  </tr>
+                  {this.state.gradesModalIsOpen && this.renderGrades() }
+                </tbody>
+              </table>
+            </Form>
+          </ModalBody>
+          <ModalFooter>
+            <Button type="link-cancel" onClick={this.closeGradesModal}>Cancel</Button>
           </ModalFooter>
         </Modal>
 
