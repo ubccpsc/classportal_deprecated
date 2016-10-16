@@ -159,29 +159,27 @@ export default React.createClass({
     var studentIndex = _.findIndex(this.props.grades, { "sid": this.state.sid });
     var assnIndex = _.findIndex(this.props.grades[studentIndex].grades, { "assnId": this.state.assnId });
 
-    if (confirm(submitMessage)) {
-      if (assnIndex !== -1) {
-        var oldGrade = this.props.grades[studentIndex].grades[assnIndex].grade;
-        var oldComment = this.props.grades[studentIndex].grades[assnIndex].comment;
-        if (!confirm(resubmitMessage + "\n\nPrevious:\nGrade: " + oldGrade + "\nComment: " + oldComment)) {
-          return;
-        }
+    if (assnIndex !== -1) {
+      var oldGrade = this.props.grades[studentIndex].grades[assnIndex].grade;
+      var oldComment = this.props.grades[studentIndex].grades[assnIndex].comment;
+      if (!confirm(resubmitMessage + "\n\nPrevious:\nGrade: " + oldGrade + "\nComment: " + oldComment)) {
+        return;
       }
-      Ajax.submitGrade(
-        this.state.sid,
-        this.state.assnId,
-        intGrade,
-        this.state.comment,
-        function onSuccess() {
-          alert("Success!")
-          this.closeModal();
-          window.location.reload(true);
-        }.bind(this),
-        function onError() {
-          alert("Error submitting grades.")
-        }.bind(this),
-      );
     }
+    Ajax.submitGrade(
+      this.state.sid,
+      this.state.assnId,
+      intGrade,
+      this.state.comment,
+      function onSuccess() {
+        // alert("Success!")
+        this.closeModal();
+        window.location.reload(true);
+      }.bind(this),
+      function onError() {
+        alert("Error submitting grades.")
+      }.bind(this),
+    );
   },
   handleSelectAssignment: function (event) {
     // console.log(event);
