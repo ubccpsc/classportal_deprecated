@@ -42,6 +42,27 @@ export default React.createClass({
     }
     return students;
   },
+  returnDeliverable: function (sid, assnId) {
+    // TODO: loading the grades file each time is not efficient!
+    console.log("searching grades.json for sid: " + sid);
+    var gradesFile = this.props.grades;
+    var studentIndex = _.findIndex(gradesFile, { 'sid': sid });
+    if (studentIndex !== -1) {
+      console.log("found sid! in grades entry: " + studentIndex);
+      var studentGrades = gradesFile[studentIndex];
+      var thisGradeIndex = _.findIndex(studentGrades.grades, { 'assnId': assnId });
+
+      if (thisGradeIndex !== -1) {
+        return studentGrades.grades[thisGradeIndex].grade;
+      } else {
+        console.log("could not find grade for deliv: " + assnId + " in grades file.");
+        return "-";
+      }
+    } else {
+      console.log("could not find sid: " + sid + " in grades file.");
+      return "-";
+    }
+  },
   renderGrades: function () {
     var rows = [];
     var gradesFile = this.props.grades;
@@ -76,36 +97,60 @@ export default React.createClass({
 
     return rows;
   },
+  getTeam: function (sid) {
+    let teams = this.props.teams;
+    console.log("sid: " + sid);
+    let teamIndex = _.findIndex(teams, function (o) {
+      return _.some(o.members, function (value) {
+        console.log("value: " + value);
+        return value == sid;
+      });
+    });
+
+    if (teamIndex !== -1) {
+      return teams[teamIndex].id;
+    } else {
+      return "Error";
+    }
+  },
+  renderDeliverables: function (sid) {
+    let delivs = [];
+    for (let index = 0; index < this.props.deliverables.length; index++) {
+      delivs[index] = (
+        <td className="tg-yw4l">
+          { this.returnDeliverable(sid, this.props.deliverables[index].id) }
+        </td>);
+    }
+    return delivs;
+  },
   renderOneStudent: function (index) {
     var student = this.props.students[index];
     return (
       <tr key={index}>
-        <td className="tg-yw4l">{student.sid}</td>
-        <td className="tg-yw4l">{student.lastname}</td>
-        <td className="tg-yw4l">{student.firstname}</td>
         <td className="tg-yw4l">
-          {!!student.hasTeam ? "True" : "-" }</td>
+          {student.sid}
+        </td>
+        <td className="tg-yw4l2">
+          {student.lastname + ", " + student.firstname}
+        </td>
         <td className="tg-yw4l">
           {!!student.username ?
             <a href={"http://github.com/" + student.username} target="blank" >
               {student.username}
             </a>
-            : "-" }</td>
+            : "-" }
+        </td>
+        <td className="tg-yw4l">
+          {!!student.hasTeam ? this.getTeam(student.sid) : "-" }
+        </td>
+        {this.renderDeliverables(student.sid) }
         <td className="tg-yw4l">
           <Button
             id={student.sid + ':' + student.firstname + ' ' + student.lastname}
             size="sm"
             className="button-text"
             type="link-text"
-            onClick={this.openGradesModal}>View
-          </Button>
-          &nbsp; /&nbsp;
-          <Button
-            id={student.sid + ':' + student.firstname + ' ' + student.lastname}
-            size="sm"
-            className="button-text"
-            type="link-text"
-            onClick={this.openModal}>Edit
+            onClick={this.openModal}>Submit
           </Button>
         </td>
       </tr>
@@ -198,6 +243,15 @@ export default React.createClass({
     // console.log(event.target.value);
     this.setState({ comment: event.target.value });
   },
+  renderDeliverableHeaders: function () {
+    let headers = []
+    for (let index = 0; index < this.props.deliverables.length; index++) {
+      headers[index] = (
+        <th className="tg-yw4l">{this.props.deliverables[index].id}</th>
+      );
+    }
+    return headers;
+  },
   componentDidMount: function () {
     var delivs = this.props.deliverables;
     var labelArray = [];
@@ -218,11 +272,11 @@ export default React.createClass({
         <table className="tg">
           <tbody>
             <tr>
-              <th className="tg-yw4l">Student #</th>
-              <th className="tg-yw4l">Last</th>
-              <th className="tg-yw4l">First</th>
-              <th className="tg-yw4l">Team</th>
+              <th className="tg-yw4l">SID</th>
+              <th className="tg-yw4l">Name</th>
               <th className="tg-yw4l">GitHub</th>
+              <th className="tg-yw4l">Team</th>
+              {this.renderDeliverableHeaders() }
               <th className="tg-yw4l">Grades</th>
             </tr>
             {!!this.props.students && this.renderStudents() }
