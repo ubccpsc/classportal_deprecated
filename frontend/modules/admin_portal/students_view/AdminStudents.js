@@ -113,12 +113,19 @@ export default React.createClass({
       return "Error";
     }
   },
-  renderDeliverables: function (sid) {
+  renderDeliverables: function (sid, firstname, lastname) {
     let delivs = [];
     for (let index = 0; index < this.props.deliverables.length; index++) {
       delivs[index] = (
-        <td className="tg-yw4l">
-          { this.returnDeliverable(sid, this.props.deliverables[index].id) }
+        <td className="tg-yw4l" key={index}>
+          <Button
+            id={sid + ':' + firstname + ' ' + lastname}
+            size="sm"
+            className="button-text"
+            type="link-text"
+            onClick={this.openGradesModal}>
+            { this.returnDeliverable(sid, this.props.deliverables[index].id) }
+          </Button>
         </td>);
     }
     return delivs;
@@ -143,7 +150,7 @@ export default React.createClass({
         <td className="tg-yw4l">
           {!!student.hasTeam ? this.getTeam(student.sid) : "-" }
         </td>
-        {this.renderDeliverables(student.sid) }
+        {this.renderDeliverables(student.sid, student.firstname, student.lastname) }
         <td className="tg-yw4l">
           <Button
             id={student.sid + ':' + student.firstname + ' ' + student.lastname}
@@ -314,7 +321,7 @@ export default React.createClass({
               <table className="tg">
                 <tbody>
                   <tr>
-                    <th className="tg-yw4l">AssnId #</th>
+                    <th className="tg-yw4l">Deliverable</th>
                     <th className="tg-yw4l">Grade</th>
                     <th className="tg-yw4l">Comment</th>
                   </tr>
