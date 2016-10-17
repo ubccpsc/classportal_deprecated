@@ -74,7 +74,7 @@ export default React.createClass({
   renderDeliverables: function (sid, firstname, lastname) {
     let delivs = [];
     for (let index = 0; index < this.props.deliverables.length; index++) {
-      let grade = this.returnGrade(sid, this.props.deliverables[index].id);
+      let grade = this.returnGradeAndComment(sid, this.props.deliverables[index].id).grade;
       delivs[index] = (
         <td className="tg-yw4l" key={index} id={index === (this.props.deliverables.length - 1) ? "strongBorderRight" : ""}>
           {!!grade && (
@@ -90,12 +90,12 @@ export default React.createClass({
     }
     return delivs;
   },
-  returnGrade: function (sid, assnId) {
+  returnGradeAndComment: function (sid, assnId) {
     var myGradesEntry = _.find(this.props.grades, { 'sid': sid });
     if (myGradesEntry !== undefined) {
       var thisGrade = _.find(myGradesEntry.grades, { 'assnId': assnId });
       if (thisGrade !== undefined) {
-        return thisGrade.grade;
+        return { 'grade': thisGrade.grade, 'comment': thisGrade.comment };
       } else {
         return "";
       }
@@ -233,7 +233,13 @@ export default React.createClass({
     var delivs = this.props.deliverables;
     for (var index = 0; index < delivs.length; index++) {
       if (event === delivs[index].name) {
-        this.setState({ assnId: delivs[index].id });
+        this.setState({ assnId: delivs[index].id }, function () {
+          let gradeEntry = this.returnGradeAndComment(this.state.sid, this.state.assnId);
+          this.setState({ grade: gradeEntry.grade }, function () {
+            this.setState({ comment: gradeEntry.comment }, function () {
+            });
+          });
+        });
       }
     }
   },
@@ -287,10 +293,10 @@ export default React.createClass({
                 <FormSelect options={this.state.labelArray} firstOption="Select" onChange={this.handleSelectAssignment} />
               </FormField>
               <FormField label="Grade (%)" onChange={this.setNewGrade}>
-                <FormInput />
+                <FormInput placeholder={this.state.grade} />
               </FormField>
               <FormField label="Comment" onChange={this.setNewComment}>
-                <FormInput multiline />
+                <FormInput multiline  placeholder={this.state.comment} />
               </FormField>
             </Form>
           </ModalBody>
