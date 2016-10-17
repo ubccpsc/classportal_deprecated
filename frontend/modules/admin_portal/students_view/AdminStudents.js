@@ -43,7 +43,7 @@ export default React.createClass({
   renderOneStudent: function (student, index) {
     return (
       <tr key={index} >
-        <td className="tg-yw4l">
+        <td className="tg-yw4l" id="strongBorderLeft">
           {student.sid}
         </td>
         <td className="tg-yw4l2">
@@ -59,16 +59,15 @@ export default React.createClass({
         <td className="tg-yw4l">
           {student.hasTeam ? this.getTeamFromSid(student.sid) : "-" }
         </td>
-        {this.renderDeliverables(student.sid, student.firstname, student.lastname) }
-        <td className="tg-yw4l">
+        <td className="tg-yw4l" id="strongBorderRight">
           <Button
-            id={student.sid + ':' + student.firstname + ' ' + student.lastname}
             size="sm"
             className="button-text"
             type="link-text"
-            onClick={this.openModal}>Submit
+            onClick={this.openModal.bind(this, student.sid, student.firstname, student.lastname) }>Submit
           </Button>
         </td>
+        {this.renderDeliverables(student.sid, student.firstname, student.lastname) }
       </tr>
     );
   },
@@ -77,17 +76,16 @@ export default React.createClass({
     for (let index = 0; index < this.props.deliverables.length; index++) {
       let grade = this.returnGrade(sid, this.props.deliverables[index].id);
       delivs[index] = (
-        <td className="tg-yw4l" key={index}>
-          {grade === "-" ? "-" :
-            (<Button
+        <td className="tg-yw4l" key={index} id={index === (this.props.deliverables.length - 1) ? "strongBorderRight" : ""}>
+          {!!grade && (
+            <Button
               id={sid + ':' + firstname + ' ' + lastname}
               size="sm"
               className="button-text"
               type="link-text"
               onClick={this.openGradesModal}>
-              { grade }
-            </Button>)
-          }
+              { grade + "%" }
+            </Button>) }
         </td>);
     }
     return delivs;
@@ -99,10 +97,10 @@ export default React.createClass({
       if (thisGrade !== undefined) {
         return thisGrade.grade;
       } else {
-        return "-";
+        return "";
       }
     } else {
-      return "-";
+      return "";
     }
   },
   renderGrades: function () {
@@ -154,15 +152,19 @@ export default React.createClass({
     let headers = []
     for (let index = 0; index < this.props.deliverables.length; index++) {
       headers[index] = (
-        <th key={index} className="tg-yw4l">{this.props.deliverables[index].id}</th>
+        <th
+          key={index}
+          className="tg-yw4l"
+          id={index === (this.props.deliverables.length - 1) ? "strongBorderRight" : ""}>
+          {this.props.deliverables[index].id}
+        </th>
       );
     }
     return headers;
   },
-  openModal: function (event) {
-    var lines = event.target.id.split(':');
-    this.setState({ sid: lines[0] }, function () {
-      this.setState({ student: lines[1] }, function () {
+  openModal: function (sid, firstname, lastname, event) {
+    this.setState({ 'sid': sid }, function () {
+      this.setState({ student: firstname + ' ' + lastname }, function () {
         this.setState({ modalIsOpen: true });
       });
     });
@@ -258,19 +260,21 @@ export default React.createClass({
           </FormField>
         </Form>
 
-        <table className="tg">
-          <tbody>
-            <tr>
-              <th className="tg-yw4l">SID</th>
-              <th className="tg-yw4l">Name</th>
-              <th className="tg-yw4l">GitHub</th>
-              <th className="tg-yw4l">Team</th>
-              {this.renderDeliverableHeaders() }
-              <th className="tg-yw4l">Grades</th>
-            </tr>
-            {!!this.props.students && this.renderStudents() }
-          </tbody>
-        </table>
+        <div className="scrollingTable">
+          <table className="tg">
+            <tbody>
+              <tr>
+                <th id="strongBorderLeft" className="tg-yw4l">SID</th>
+                <th className="tg-yw4l">Name</th>
+                <th className="tg-yw4l">GitHub</th>
+                <th className="tg-yw4l">Team</th>
+                <th id="strongBorderRight" className="tg-yw4l">Grades</th>
+                {this.renderDeliverableHeaders() }
+              </tr>
+              {!!this.props.students && this.renderStudents() }
+            </tbody>
+          </table>
+        </div>
 
         <Modal isOpen={this.state.modalIsOpen} onCancel={this.closeModal} backdropClosesModal>
           <ModalHeader text="Edit Grades" showCloseButton onClose={this.closeModal} />

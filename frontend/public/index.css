@@ -159,7 +159,7 @@ h5{
   font-family:Arial, sans-serif;
   font-size:14px;
   font-weight:normal;
-  padding:5px 20px;
+  padding:5px 10px;
   border-style:solid;
   border-width:1px;
   overflow:hidden;
@@ -167,6 +167,8 @@ h5{
   border-color:#aabcfe;
   color:#039;
   background-color:#b9c9fe;
+  border-top: 2px solid #aabcfe;
+  border-bottom: 2px solid #aabcfe;
 } .tg .tg-yw4l{
   vertical-align:center;
 } .tg .tg-yw4l2{
@@ -237,4 +239,18 @@ h5{
 .no-margin{
   padding-bottom:0px;
   margin-bottom:0px;
+}
+
+.scrollingTable {
+  position: relative;
+  height: 600px;
+  overflow: auto;
+}
+
+#strongBorderRight{
+  border-right: 2px solid #aabcfe;
+}
+
+#strongBorderLeft{
+  border-left: 2px solid #aabcfe;
 }
