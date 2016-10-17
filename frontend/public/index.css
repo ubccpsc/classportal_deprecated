@@ -212,7 +212,7 @@ h5{
 }
 @media screen and (min-width: 700px) {
   .module {
-    width:700px;
+    /* fill screen for wide devices width:700px; */
   }
 }
 
