@@ -20,120 +20,29 @@ export default React.createClass({
   },
   toggleView: function (e) {
     e.preventDefault();
-    this.setState({ "viewAll": !this.state.viewAll }, function () {
-      // console.log("AdminStudents.js| viewAll: " + this.state.viewAll);
-    });
-  },
-  include: function (arr, obj) {
-    var result = (arr.indexOf(obj) != -1);
-    // console.log("AdminStudents.js| Checking if " + obj + " exists in " + JSON.stringify(arr) + ". Result: " + result.toString());
-    return (result);
+    this.setState({ "viewAll": !this.state.viewAll });
   },
   renderStudents: function () {
     var that = this;
-    //todo: decide how to display myStudents properly
-    var myStudents = this.props.myTeams;
     var students = [];
+
     for (var index = 0; index < this.props.students.length; index++) {
-      //if viewAll is true, render all students; otherwise, only render students from myTeams.
-      if (that.state.viewAll ? true : this.include(myStudents, index.toString())) {
-        students.push(that.renderOneStudent(index));
+      var thisStudent = this.props.students[index];
+      var thisTeam = this.getTeamFromSid(thisStudent.sid).toString();
+      let isInMyGroup = _.some(this.props.myTeams, function (oneOfMyTeams) {
+        return oneOfMyTeams === thisTeam;
+      });
+
+      // if viewAll is true, render all students; otherwise, only render students who are part of groups the current admin is responsible for.
+      if (that.state.viewAll ? true : isInMyGroup) {
+        students.push(that.renderOneStudent(thisStudent, index));
       }
     }
     return students;
   },
-  returnDeliverable: function (sid, assnId) {
-    // TODO: loading the grades file each time is not efficient!
-    console.log("searching grades.json for sid: " + sid);
-    var gradesFile = this.props.grades;
-    var studentIndex = _.findIndex(gradesFile, { 'sid': sid });
-    if (studentIndex !== -1) {
-      console.log("found sid! in grades entry: " + studentIndex);
-      var studentGrades = gradesFile[studentIndex];
-      var thisGradeIndex = _.findIndex(studentGrades.grades, { 'assnId': assnId });
-
-      if (thisGradeIndex !== -1) {
-        return studentGrades.grades[thisGradeIndex].grade;
-      } else {
-        console.log("could not find grade for deliv: " + assnId + " in grades file.");
-        return "-";
-      }
-    } else {
-      console.log("could not find sid: " + sid + " in grades file.");
-      return "-";
-    }
-  },
-  renderGrades: function () {
-    var rows = [];
-    var gradesFile = this.props.grades;
-    var studentIndex = _.findIndex(gradesFile, { sid: this.state.sid });
-
-    if (studentIndex !== -1) {
-      if (gradesFile[studentIndex].grades.length < 1) {
-        var emptyRow = (
-          <tr key="0">
-            <td className="tg-yw4l">-</td>
-            <td className="tg-yw4l">-</td>
-            <td className="tg-yw4l">-</td>
-          </tr>
-        );
-        rows.push(emptyRow);
-      } else {
-        for (var index = 0; index < gradesFile[studentIndex].grades.length; index++) {
-          var currentGrade = gradesFile[studentIndex].grades[index];
-          var row = (
-            <tr key={index}>
-              <td className="tg-yw4l">{currentGrade.assnId}</td>
-              <td className="tg-yw4l">{currentGrade.grade}</td>
-              <td className="tg-yw4l">{currentGrade.comment}</td>
-            </tr>
-          );
-          rows.push(row);
-        }
-      }
-    } else {
-      alert("Error loading student: " + this.state.sid);
-    }
-
-    return rows;
-  },
-  getTeam: function (sid) {
-    let teams = this.props.teams;
-    console.log("sid: " + sid);
-    let teamIndex = _.findIndex(teams, function (o) {
-      return _.some(o.members, function (value) {
-        console.log("value: " + value);
-        return value == sid;
-      });
-    });
-
-    if (teamIndex !== -1) {
-      return teams[teamIndex].id;
-    } else {
-      return "Error";
-    }
-  },
-  renderDeliverables: function (sid, firstname, lastname) {
-    let delivs = [];
-    for (let index = 0; index < this.props.deliverables.length; index++) {
-      delivs[index] = (
-        <td className="tg-yw4l" key={index}>
-          <Button
-            id={sid + ':' + firstname + ' ' + lastname}
-            size="sm"
-            className="button-text"
-            type="link-text"
-            onClick={this.openGradesModal}>
-            { this.returnDeliverable(sid, this.props.deliverables[index].id) }
-          </Button>
-        </td>);
-    }
-    return delivs;
-  },
-  renderOneStudent: function (index) {
-    var student = this.props.students[index];
+  renderOneStudent: function (student, index) {
     return (
-      <tr key={index}>
+      <tr key={index} >
         <td className="tg-yw4l">
           {student.sid}
         </td>
@@ -148,7 +57,7 @@ export default React.createClass({
             : "-" }
         </td>
         <td className="tg-yw4l">
-          {!!student.hasTeam ? this.getTeam(student.sid) : "-" }
+          {student.hasTeam ? this.getTeamFromSid(student.sid) : "-" }
         </td>
         {this.renderDeliverables(student.sid, student.firstname, student.lastname) }
         <td className="tg-yw4l">
@@ -161,28 +70,113 @@ export default React.createClass({
           </Button>
         </td>
       </tr>
-    )
+    );
+  },
+  renderDeliverables: function (sid, firstname, lastname) {
+    let delivs = [];
+    for (let index = 0; index < this.props.deliverables.length; index++) {
+      let grade = this.returnGrade(sid, this.props.deliverables[index].id);
+      delivs[index] = (
+        <td className="tg-yw4l" key={index}>
+          {grade === "-" ? "-" :
+            (<Button
+              id={sid + ':' + firstname + ' ' + lastname}
+              size="sm"
+              className="button-text"
+              type="link-text"
+              onClick={this.openGradesModal}>
+              { grade }
+            </Button>)
+          }
+        </td>);
+    }
+    return delivs;
+  },
+  returnGrade: function (sid, assnId) {
+    var myGradesEntry = _.find(this.props.grades, { 'sid': sid });
+    if (myGradesEntry !== undefined) {
+      var thisGrade = _.find(myGradesEntry.grades, { 'assnId': assnId });
+      if (thisGrade !== undefined) {
+        return thisGrade.grade;
+      } else {
+        return "-";
+      }
+    } else {
+      return "-";
+    }
+  },
+  renderGrades: function () {
+    var rows = [];
+    var myGradesEntry = _.find(this.props.grades, { sid: this.state.sid });
+
+    if (myGradesEntry !== undefined) {
+      if (myGradesEntry.grades.length < 1) {
+        var emptyRow = (
+          <tr key="0">
+            <td className="tg-yw4l">-</td>
+            <td className="tg-yw4l">-</td>
+            <td className="tg-yw4l">-</td>
+          </tr>
+        );
+        rows.push(emptyRow);
+      } else {
+        for (var index = 0; index < myGradesEntry.grades.length; index++) {
+          var currentGrade = myGradesEntry.grades[index];
+          var row = (
+            <tr key={index}>
+              <td className="tg-yw4l">{currentGrade.assnId}</td>
+              <td className="tg-yw4l">{currentGrade.grade}</td>
+              <td className="tg-yw4l">{currentGrade.comment}</td>
+            </tr>
+          );
+          rows.push(row);
+        }
+      }
+    } else {
+      alert("Error loading student: " + this.state.sid);
+    }
+    return rows;
+  },
+  getTeamFromSid: function (sid) {
+    let teamEntry = _.find(this.props.teams, function (team) {
+      return _.some(team.members, function (value) {
+        return value === sid;
+      });
+    });
+
+    if (teamEntry !== undefined) {
+      return teamEntry.id;
+    } else {
+      return -1;
+    }
+  },
+  renderDeliverableHeaders: function () {
+    let headers = []
+    for (let index = 0; index < this.props.deliverables.length; index++) {
+      headers[index] = (
+        <th key={index} className="tg-yw4l">{this.props.deliverables[index].id}</th>
+      );
+    }
+    return headers;
   },
   openModal: function (event) {
     var lines = event.target.id.split(':');
-    console.log(lines);
     this.setState({ sid: lines[0] }, function () {
       this.setState({ student: lines[1] }, function () {
         this.setState({ modalIsOpen: true });
       });
     });
   },
-  closeModal: function () {
-    this.setState({ modalIsOpen: false });
-  },
   openGradesModal: function (event) {
     var lines = event.target.id.split(':');
-    // console.log(lines);
     this.setState({ sid: lines[0] }, function () {
       this.setState({ student: lines[1] }, function () {
         this.setState({ gradesModalIsOpen: true });
       });
     });
+  },
+  closeModal: function () {
+    this.setState({ modalIsOpen: false });
   },
   closeGradesModal: function () {
     this.setState({ gradesModalIsOpen: false });
@@ -234,7 +228,6 @@ export default React.createClass({
     );
   },
   handleSelectAssignment: function (event) {
-    // console.log(event);
     var delivs = this.props.deliverables;
     for (var index = 0; index < delivs.length; index++) {
       if (event === delivs[index].name) {
@@ -243,21 +236,10 @@ export default React.createClass({
     }
   },
   setNewGrade: function (event) {
-    // console.log(event.target.value);
     this.setState({ grade: event.target.value });
   },
   setNewComment: function (event) {
-    // console.log(event.target.value);
     this.setState({ comment: event.target.value });
-  },
-  renderDeliverableHeaders: function () {
-    let headers = []
-    for (let index = 0; index < this.props.deliverables.length; index++) {
-      headers[index] = (
-        <th className="tg-yw4l">{this.props.deliverables[index].id}</th>
-      );
-    }
-    return headers;
   },
   componentDidMount: function () {
     var delivs = this.props.deliverables;
@@ -272,7 +254,7 @@ export default React.createClass({
       <ContentModule id="admin-students-module" title={this.state.viewAll ? "All Students" : "My Students"} initialHideContent={false}>
         <Form id="text-center" onSubmit={this.toggleView} >
           <FormField>
-            <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle View</Button>&nbsp;
+            <Button type={this.state.viewAll ? "hollow-primary" : "primary"} submit size="sm">Toggle</Button>&nbsp;
           </FormField>
         </Form>
 
