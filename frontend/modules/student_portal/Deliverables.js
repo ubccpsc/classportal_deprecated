@@ -81,7 +81,7 @@ export default React.createClass({
             <p>{this.returnGradeAndComment(this.state.assnId).comment}</p>
           </ModalBody>
           <ModalFooter>
-            <Button type="link-cancel" onClick={this.closeModal}>Cancel</Button>
+            <Button type="link-cancel" onClick={this.closeModal}>Close</Button>
           </ModalFooter>
         </Modal>
 
