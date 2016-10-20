@@ -54,7 +54,7 @@ export default React.createClass({
       <div>
         <Logout firstname={this.state.files.myStudentFile.firstname} sid={this.state.files.myStudentFile.sid} username={localStorage.username}/>
         {this.state.loaded && this.renderTeamDisplay() }
-        {this.state.loaded && (<Deliverables deliverables={this.state.files.deliverablesFile}/>) }
+        {this.state.loaded && (<Deliverables deliverables={this.state.files.deliverablesFile} grades={this.state.files.myGradesFile.grades}/>) }
       </div>
     )
   }
