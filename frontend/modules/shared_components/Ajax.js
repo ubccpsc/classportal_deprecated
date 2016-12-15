@@ -194,5 +194,22 @@ module.exports = {
             success: successCallback,
             error: errorCallback
         });
+    },
+    submitAllGrades: function (studentGrades, successCallback, errorCallback) {
+        // console.log("Ajax.js | Submitting news grades...");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/submitGrades",
+            headers: {
+                "username": localStorage.username,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: { "student" : studentGrades},
+            dataType: "json",
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
     }
 }
