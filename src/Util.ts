@@ -246,16 +246,10 @@ export class Helper {
         var filename = "admins.json";
         var path = pathToRoot.concat(config.private_folder, filename);
 
-        console.log(username);
-
         Helper.readJSON(filename, function (error: any, jsonFile: any) {
             if (!error) {
                 var index: number = _.findIndex(jsonFile, { "username": username });
                 var isAdmin: boolean = index !== -1;
-
-                console.log(index);
-                console.log(isAdmin);
-
                 Log.trace("Helper::isAdmin(..) - admin status: " + isAdmin);
                 return callback(null, isAdmin);
             } else {

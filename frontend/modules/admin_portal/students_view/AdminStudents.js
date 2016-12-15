@@ -273,7 +273,7 @@ export default React.createClass({
       if (newGradeIdx !== -1) {
         if (oldGradeIdx !== -1) {
           // A grade was updated
-          resubmitMessage += '\n[' + assnId + '] data will be overwriten. Is that correct?';
+          resubmitMessage += '\n[' + assnId + '] data will be overwritten. Is that correct?';
           hasChanges = true;
         }
         if (!(this.isValidGrade(newGrades[newGradeIdx], 'autotest') && 
