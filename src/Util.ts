@@ -383,4 +383,40 @@ export class Helper {
             }
         });
     }
+
+    static filterApps(teamsArray: any[], studentsArray: any[], isAdmin: boolean): any[] {
+        Log.trace("Helper::addGrades(..) - start");
+        var apps: any[] = [];
+
+        teamsArray.forEach(function (team) {
+            var app: any = {};
+            app['name'] = team['appName'];
+            app['url'] = team['url'];
+            app['description'] = team['appDescription'];
+            app['comments'] = [];
+            (team['comments'] as any[]).forEach(function (comment) {
+                var filteredComment: any = {};
+                filteredComment['description'] = comment['description'];
+                filteredComment['ratting'] = comment['ratting'];
+                filteredComment['approved'] = comment['approved'];
+
+                if (isAdmin){
+                    var index = _.findIndex(studentsArray, {"sid": comment['sid']});
+                    if (index !== -1){
+                        var studentName: string = studentsArray[index].firstname + " " + studentsArray[index].lastname;
+                        filteredComment['sid'] = comment['sid'];
+                        filteredComment['student'] = studentName;
+                        filteredComment['approved'] = comment['approved'];
+                        app['comments'].push(filteredComment);
+                    }
+                } else if (!!filteredComment['approved']){
+                    app['comments'].push(filteredComment);
+                }
+            });
+            apps.push(app);
+        });
+
+        Log.trace("Helper::addGrades(..) - end");
+        return apps;
+    }
 }

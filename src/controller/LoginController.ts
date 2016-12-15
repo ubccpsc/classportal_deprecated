@@ -267,6 +267,7 @@ export default class LoginController {
         var myTeamIndex: number;
         var myGradesIndex: number;
         var namesArray: any[] = [];
+        var appsArray: any[] = [];
 
         async.waterfall([
                 function get_student_file_and_index(callback: any) {
@@ -374,6 +375,22 @@ export default class LoginController {
                         }
                         return callback(null);
                     }
+                },
+                function get_apps_and_comments(callback: any) {
+                    Log.trace("LoginController::loadStudentPortal| get_apps_and_comments");
+                    if (!!config["enable_app_store"]) {
+                        Helper.readJSON("teams.json", function (error: any, data: any) {
+                            if (!error) {
+                                appsArray = Helper.filterApps(data, studentsFile, false);
+                                return callback(null);
+                            } else {
+                                return callback("could not load teams file");
+                            }
+                        });
+                    } else {
+                        // No need to load apps and comments
+                        return callback(null);
+                    }
                 }
             ],
             function async_end(error: any, results: any) {
@@ -385,7 +402,8 @@ export default class LoginController {
                         "myTeamFile": studentsFile[myStudentIndex].hasTeam ? teamsFile[myTeamIndex] : "no team",
                         "myGradesFile": gradesFile[myGradesIndex],
                         "deliverablesFile": deliverablesFile,
-                        "namesArray": namesArray
+                        "namesArray": namesArray,
+                        "appsArray": appsArray
                     };
                     Log.trace("LoginController::loadStudentPortal| Success! Sending files.");
                     return parentCallback(null, response);
@@ -417,6 +435,7 @@ export default class LoginController {
         var gradesFile: any;
         var deliverablesFile: any;
         var namesArray: any[] = [];
+        var appsArray: any[] = [];
 
         async.waterfall([
                 function get_admins_file_and_index(callback: any) {
@@ -495,6 +514,22 @@ export default class LoginController {
                         }
                     }
                     return callback(null);
+                },
+                function get_apps_and_comments(callback: any) {
+                    Log.trace("LoginController::loadAdminPortal| get_apps_and_comments");
+                    if (!!config["enable_app_store"]) {
+                        Helper.readJSON("teams.json", function (error: any, data: any) {
+                            if (!error) {
+                                appsArray = Helper.filterApps(data, studentsFile, true);
+                                return callback(null);
+                            } else {
+                                return callback("could not load teams file");
+                            }
+                        });
+                    } else {
+                        // No need to load apps and comments
+                        return callback(null);
+                    }
                 }
             ],
             function async_end(error: any, results: any) {
@@ -508,7 +543,8 @@ export default class LoginController {
                         "teamsFile": teamsFile,
                         "gradesFile": gradesFile,
                         "deliverablesFile": deliverablesFile,
-                        "namesArray": namesArray
+                        "namesArray": namesArray,
+                        "appsArray": appsArray
                     };
                     Log.trace("LoginController::loadAdminPortal| Success! Sending files.");
                     return parentCallback(null, response);

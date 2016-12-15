@@ -76,13 +76,14 @@ export default class TeamController {
                 },
                 function add_team_entry(callback: any) {
                     Log.trace("TeamController::createTeam| add_team_entry");
-
+                    var empty: any[] = [];
                     var newTeam = {
                         "id": newTeamId,
                         "url": "",
                         "members": sidArray,
                         "appName": "",
-                        "appDescription": ""
+                        "appDescription": "",
+                        "comments": empty
                     };
                     if (!!config["enable_app_store"]) {
                         newTeam["url"] = url;
