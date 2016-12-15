@@ -11,6 +11,9 @@ export default React.createClass({
   handleSubmit: function (e) {
     e.preventDefault();
     var newTeamArray = this.state.newTeamArray;
+    var appName = this.state.appName;
+    var appDescription = this.state.appDescription;
+    var url = this.state.url;
     var alertMessage = "Forming team with students: ";
 
     //check for valid students
@@ -33,9 +36,19 @@ export default React.createClass({
       }
     }
 
+    if (config.enable_app_store){
+      if (typeof appName === "undefined" || typeof url === "undefined" || typeof appDescription === "undefined") {
+          alert("Error: Invalid app name, description, or url");
+          return;
+        }
+    }
+
     if (confirm(alertMessage)) {
       Ajax.createTeam(
         newTeamArray,
+        appName,
+        appDescription,
+        url,
         function onSuccess(response) {
           // console.log("CreateTeam.js| Success: " + response);
           alert("Success: Team " + response + " created!")
@@ -58,6 +71,30 @@ export default React.createClass({
       alert("Error: Bad selection");
     }
   },
+  setAppName: function (event) {
+    this.setState({ appName: event.target.value });
+  },
+  setAppDescription: function (event) {
+    this.setState({ appDescription: event.target.value });
+  },
+  setUrl: function (event) {
+    this.setState({ url: event.target.value });
+  },
+  renderAppFields: function () {
+    return (
+      <div id="app-team-fields">
+        <FormField>
+          <FormInput placeholder="App name" onChange={this.setAppName }/>
+        </FormField>
+        <FormField>
+          <FormInput multiline placeholder="App description"  onChange={this.setAppDescription}/>
+        </FormField>
+        <FormField>
+          <FormInput placeholder="Github url" onChange={this.setUrl }/>
+        </FormField>
+      </div>
+    )
+  },
   renderForm: function () {
     var oneOrMoreDropdowns = [];
 
@@ -73,6 +110,7 @@ export default React.createClass({
 
     return (
       <Form onSubmit={this.handleSubmit}>
+        {config.enable_app_store ? this.renderAppFields() : <br />}
         <FormField id="text-center">
           {oneOrMoreDropdowns}
           <Button size="sm" submit>Form Team</Button>
