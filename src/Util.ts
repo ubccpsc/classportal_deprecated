@@ -297,16 +297,16 @@ export class Helper {
                             Log.trace("Helper::addGrade(..) - writing to file");
                             fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
                                 if (!error) {
-                                    Log.error("Helper::addEntry(..) - success!");
+                                    Log.error("Helper::addGrade(..) - success!");
                                     return callback(null);
                                 } else {
-                                    Log.trace("Helper::::addEntry(..) - write error: " + error);
+                                    Log.trace("Helper::::addGrade(..) - write error: " + error);
 
                                     // create a backup
                                     try {
                                         fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
                                     } catch (err) {
-                                        Log.error('Helper::addEntry() - error creating backup: ' + err.message);
+                                        Log.error('Helper::addGrade() - error creating backup: ' + err.message);
                                     }
                                     return callback(error);
                                 }
@@ -326,6 +326,61 @@ export class Helper {
                 return callback(error, null);
             }
         });
+    }
 
+    // add or edit grade
+    static addGrades(student: any, callback: any) {
+        Log.trace("Helper::addGrades(..) - start");
+        var filename = "grades.json";
+        var path = pathToRoot.concat(config.private_folder, filename);
+
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                Log.trace("Helper::addGrades(..) - finding index of student in grades");
+                var studentIndex: number = _.findIndex(jsonFile, { "sid": student['sid'] });
+                if (studentIndex !== -1) {
+                    // check if grade for that assnId already exists
+                    Log.trace("Helper::addGrades(..) - finding index of grade in grades.grades");
+
+                    async.waterfall([
+                        function assign(cb: any) {
+                            Log.trace("Helper::addGrades(..) - assigning grades");
+                            jsonFile[studentIndex]['grades'] = student['grades'];
+                            return cb();
+                        }
+                    ], function write(error: any) {
+                        if (!error) {
+                            Log.trace("Helper::addGrades(..) - writing to file");
+                            fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
+                                if (!error) {
+                                    Log.error("Helper::addGrades(..) - success!");
+                                    return callback(null);
+                                } else {
+                                    Log.trace("Helper::::addGrades(..) - write error: " + error);
+
+                                    // create a backup
+                                    try {
+                                        fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
+                                    } catch (err) {
+                                        Log.error('Helper::addGrades() - error creating backup: ' + err.message);
+                                    }
+                                    return callback(error);
+                                }
+                            });
+                        } else {
+                            return callback("Failed to assign grades");
+                        }
+                    });
+
+                } else {
+                    Log.trace("Helper::addGrades(..) - error: student " + student['sid'] + " does not exist in grades.json");
+                    return callback(error, null);
+                }
+            }
+            else {
+                Log.trace("Helper::addGrades(..) - file read error");
+                return callback(error, null);
+            }
+        });
     }
 }

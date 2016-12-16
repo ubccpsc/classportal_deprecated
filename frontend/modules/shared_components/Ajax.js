@@ -78,8 +78,17 @@ module.exports = {
         });
     },
     //submit new team to be created
-    createTeam: function (namesArray, successCallback, errorCallback) {
+    createTeam: function (namesArray, appName, appDescription, url, successCallback, errorCallback) {
         // console.log("Ajax.js| Creating team..");
+        var teamData = { "newTeam": namesArray };
+        if (typeof appName !== "undefined" && 
+            typeof url !== "undefined" && 
+            typeof appDescription !== "undefined") {
+            teamData['url'] = url;
+            teamData['appName'] = appName;
+            teamData['appDescription'] = appDescription;
+        }
+        
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/createTeam",
@@ -88,9 +97,7 @@ module.exports = {
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
-            data: {
-                "newTeam": namesArray
-            },
+            data: teamData,
             dataType: "json",
             cache: false,
             success: successCallback,
@@ -189,6 +196,23 @@ module.exports = {
                 "grade": grade,
                 "comment": comment
             },
+            dataType: "json",
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
+    submitAllGrades: function (studentGrades, successCallback, errorCallback) {
+        // console.log("Ajax.js | Submitting news grades...");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/submitGrades",
+            headers: {
+                "username": localStorage.username,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: { "student" : studentGrades},
             dataType: "json",
             cache: false,
             success: successCallback,

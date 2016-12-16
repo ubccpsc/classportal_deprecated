@@ -462,4 +462,18 @@ export default class AdminController {
         });
     }
 
+    // update grades.json
+    static submitGrades(student: any, callback: any) {
+        Log.trace("AdminController::submitGrades(..) - start");
+
+        Helper.addGrades(student, function (error: any, data: any) {
+            if (!error) {
+                return callback(null, "success!");
+            } else {
+                // return error
+                return callback("grade submission not implemented");
+            }
+        });
+    }
+
 }

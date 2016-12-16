@@ -161,8 +161,11 @@ export default class RouteHandler {
         Log.trace("RouteHandler::createTeam| Creating new team");
         var username: string = req.header('username');
         var namesArray: any[] = req.params.newTeam;
+        var appName: string = req.params.appName;
+        var appDescription: string = req.params.appDescription;
+        var url: string = req.params.url;
 
-        TeamController.createTeam(username, namesArray, function (error: any, newTeamId: number) {
+        TeamController.createTeam(username, namesArray, appName, appDescription, url, function (error: any, newTeamId: number) {
             if (!error) {
                 Log.trace("RouteHandler::createTeam| Success: Created team " + newTeamId);
                 return res.send(200, newTeamId);
@@ -245,4 +248,26 @@ export default class RouteHandler {
         });
     }
 
+    /**
+     * Submit all the grades for a student.
+     * Handled by AdminController
+     *
+     * @param student
+     * @returns server response
+     */
+    static submitGrades(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var student: any = req.params.student;
+        Log.trace("RouteHandler::submitGrades(..) - " + student['sid']);
+
+        AdminController.submitGrades(student, function (error: any, response: boolean) {
+            if (!error) {
+                Log.trace("RouteHandler::submitGrades(..) - Success!");
+                return res.send(200, "success");
+            }
+            else {
+                Log.trace("RouteHandler::submitGrades(..) - Error:" + error);
+                return res.send(500, error);
+            }
+        });
+    }
 }
