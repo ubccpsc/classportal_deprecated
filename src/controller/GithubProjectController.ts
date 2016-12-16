@@ -694,8 +694,6 @@ export default class GithubProjectController {
                             sha = commit.sha;
                             lastDate = date;
                         }
-
-
                     }
                 }
 
@@ -1120,7 +1118,7 @@ try {
                 if (include) {
                     // processList.push(<any>gpc.getStats("CS310-2016Fall", toProcess.projectName));
                     let date: Date = null;
-                    date = new Date('2016-11-14T20:00:00Z'); // TS in Zulu!
+                    date = new Date('2016-12-02T20:00:00Z'); // TS in Zulu!
                     processList.push(<any>gpc.getLastSHA("CS310-2016Fall", toProcess.projectName, date));
                 } else {
                     Log.info("Excluding: " + toProcess.projectName);
@@ -1133,7 +1131,7 @@ try {
         }).then(function (commits: any[]) {
         Log.info('processList tasks complete; #: ' + commits.length);
         var commentList: any[] = [];
-        var msg = '@CPSC310bot #d3 (Automatic execution to check D3 test grade. Please remember to attend your lab for your retrospective meeting with your TA this week.)';
+        var msg = '@CPSC310bot #d3 (Automatic execution to check D3 portion of D5 test grade.)';
         var count = 0;
         for (var commit of commits as any) {
             count++;
