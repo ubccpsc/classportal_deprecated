@@ -12,7 +12,7 @@
 
 // import MemoryStore from '../src/controller/GitHubManager';
 import Log from "../src/Util";
-import GithubProjectController from "../src/batch/GithubProjectController";
+import GithubProjectController from "../src/batch/GitHubManager";
 
 var expect = require('chai').expect;
 
