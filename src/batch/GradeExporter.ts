@@ -14,9 +14,9 @@ import fs = require('fs');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
 
-export default class GradeExportController {
+export default class GradeExporter {
 
-    public readGrades() {
+    public export() {
         try {
             var path = pathToRoot.concat(config.private_folder, 'grades.json');
             Log.info('path: ' + path);
@@ -24,16 +24,13 @@ export default class GradeExportController {
             Log.info('grade data ready!');
 
             var data = JSON.parse(buf.toString());
-
             var spath = pathToRoot.concat(config.private_folder, 'students.json');
             Log.info('path: ' + path);
             var sbuf = fs.readFileSync(spath);
             var sdata = JSON.parse(sbuf.toString());
             Log.info('student data ready!');
 
-
             var rows: any = [];
-
             var delivs = ["d1", "d2", "d3", "d4", "d5", "lab", "mt", "final"];
             var rHead: any = [];
             rHead.push("Name");
@@ -53,7 +50,6 @@ export default class GradeExportController {
                 }
 
                 row.push(sid);
-
                 var sgrades = student.grades;
                 for (var d of delivs) {
                     var val: string|number = '';
@@ -75,13 +71,11 @@ export default class GradeExportController {
                 txt = txt.replace(']', '');
                 console.log(txt);
             }
-
-
         } catch (err) {
             Log.error('error: ' + err);
         }
     }
 }
 
-var gec = new GradeExportController();
-gec.readGrades();
+var gec = new GradeExporter();
+gec.export();

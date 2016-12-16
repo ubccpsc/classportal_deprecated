@@ -10,14 +10,14 @@
  */
 
 
-import MemoryStore from '../src/controller/GithubProjectController';
+// import MemoryStore from '../src/controller/GitHubManager';
 import Log from "../src/Util";
-import GithubProjectController from "../src/controller/GithubProjectController";
+import GithubProjectController from "../src/batch/GithubProjectController";
 
 var expect = require('chai').expect;
 
 
-describe("GithubProjectController", function () {
+describe("GitHubManager", function () {
 
     var controller: GithubProjectController;
 
