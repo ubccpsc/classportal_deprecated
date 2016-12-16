@@ -7,7 +7,13 @@ import GitHubManager from "./GitHubManager";
 import {GroupRepoDescription} from "./GitHubManager";
 import {GroupCommit} from "./GitHubManager";
 
-var gpc = new GitHubManager();
+
+// organization name
+// const ORG_NAME = "CS410-2015Fall";
+// const ORG_NAME = "CS310-2016Fall";
+const ORG_NAME = "CS310-2017Jan";
+
+var gpc = new GitHubManager(ORG_NAME);
 
 try {
     const PROJECT_PREFIX = 'cpsc310project_team';

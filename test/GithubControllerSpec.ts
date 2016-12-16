@@ -27,8 +27,13 @@ describe("GitHubManager", function () {
     let REPO_NAME2 = 'cpsc310project_rtholmes'; // MochaTestRepo2 // cpsc310project_rtholmes
     let TEAM_NAME2 = 'cpsc310project_rtholmes';
 
+    // organization name
+    // const ORG_NAME = "CS410-2015Fall";
+    // const ORG_NAME = "CS310-2016Fall";
+    const ORG_NAME = "CS310-2017Jan";
+
     beforeEach(function () {
-        controller = new GithubProjectController();
+        controller = new GithubProjectController(ORG_NAME);
     });
 
     // no assertions because we don't really care about repo deletion

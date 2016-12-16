@@ -35,9 +35,11 @@ export default class GitHubManager {
     private GITHUB_AUTH_TOKEN = config.githubcontroller_token;
     private GITHUB_USER_NAME = config.githubcontroller_user;
 
-    // private ORG_NAME = "CS410-2015Fall";
-    // private ORG_NAME = "CS310-2016Fall";
-    private ORG_NAME = "CS310-2016Jan";
+    private ORG_NAME: string;
+
+    constructor(orgName: string) {
+        this.ORG_NAME = orgName;
+    }
 
     /**
      * get group repo descriptions
@@ -882,20 +884,19 @@ export default class GitHubManager {
     }
 
 
-    completeProvision(inputGroup: GroupRepoDescription): Promise<GroupRepoDescription> {
+    completeProvision(inputGroup: GroupRepoDescription, importUrl: string, staffTeamName: string): Promise<GroupRepoDescription> {
         let that = this;
         Log.info("GitHubManager::completeProvision(..) - start: " + JSON.stringify(inputGroup));
         return new Promise(function (fulfill, reject) {
 
-            that.delay(inputGroup.teamIndex * 5000).then(function () {
-
+            const DELAY = 5000;
+            // slow down creation to avoid getting in trouble with GH
+            that.delay(inputGroup.teamIndex * DELAY).then(function () {
                 Log.info("GitHubManager::completeProvision(..) - creating project: " + inputGroup.projectName);
                 return that.createRepo(inputGroup.projectName);
             }).then(function (url: string) {
-
                 inputGroup.url = url;
-                let importUrl = 'https://github.com/CS310-2016Fall/cpsc310project';
-
+                // let importUrl = 'https://github.com/CS310-2016Fall/cpsc310project';
                 Log.info("GitHubManager::completeProvision(..) - project created; importing url: " + importUrl);
                 return that.importRepoToNewRepo(inputGroup.projectName, importUrl);
             }).then(function () {
@@ -913,25 +914,21 @@ export default class GitHubManager {
 
             }).then(function (teamId: number) {
                 Log.info("GitHubManager::completeProvision(..) - members added to team ( " + teamId + " ); adding team to project");
-                return that.addTeamToRepo(teamId, inputGroup.projectName, 'push');
-
+                const TEAM_PERMISSIONS = 'push';
+                return that.addTeamToRepo(teamId, inputGroup.projectName, TEAM_PERMISSIONS);
             }).then(function () {
                 Log.info("GitHubManager::completeProvision(..) - team added to repo; getting staff team number");
-                return that.getTeamNumber('310Staff');
+                // let staffTeamName = '310staff';
+                return that.getTeamNumber(staffTeamName);
             }).then(function (staffTeamNumber: number) {
-
                 Log.info("GitHubManager::completeProvision(..) - found staff team number ( " + staffTeamNumber + " ); adding staff to repo");
-                //let inputAsArray: GroupRepoDescription[] = [];
-                //inputAsArray.push(inputGroup);
-
-                return that.addTeamToRepo(staffTeamNumber, inputGroup.projectName, 'admin');
+                const STAFF_PERMISSIONS = 'admin';
+                return that.addTeamToRepo(staffTeamNumber, inputGroup.projectName, STAFF_PERMISSIONS);
             }).then(function () {
                 Log.info("GitHubManager::completeProvision(..) - admin staff added to repo; saving url");
-
                 return that.setGithubUrl(inputGroup.team, inputGroup.url);
             }).then(function () {
                 Log.info("GitHubManager::completeProvision(..) - process complete for: " + JSON.stringify(inputGroup));
-
                 fulfill(inputGroup);
             }).catch(function (err) {
                 Log.error("GitHubManager::completeProvision(..) - ERROR: " + err);
@@ -1031,270 +1028,270 @@ export default class GitHubManager {
  * @type {GitHubManager}
  */
 
-
-var gpc = new GitHubManager();
-
-try {
-    const PROJECT_PREFIX = 'cpsc310project_team';
-    const TEAM_PREFIX = 'cpsc310_team';
-
-    const D1_PREFIX = 'cpsc310d1public_team';
-    const D1_URL = 'https://github.com/CS310-2016Fall/cpsc310d1public';
-
-    let groupDataIn: GroupRepoDescription[];
-
-    gpc.getGroupDescriptions().then(
-        function (descriptions) {
-            Log.info('ProvisioningMain() - Available teams: ' + JSON.stringify(descriptions));
-
-            const clean = false;
-            if (clean) {
-                // really don't want to do this by accident! comment return if you actually want to clean
-                return;
-            }
-
-            // won't normally need this
-            //var testGroup: GroupRepoDescription = {team: 1, members: ['rthse2', 'mksarge']};
-            //descriptions.push(testGroup);
-
-            let groupsToProcess: GroupRepoDescription[] = [];
-            let completeGroups: GroupRepoDescription[] = [];
-            for (var descr of descriptions) {
-                descr.projectName = PROJECT_PREFIX + descr.team;
-                descr.teamName = TEAM_PREFIX + descr.team;
-
-                if (clean) {
-                    Log.info('ProvisioningMain() - Clean Team: ' + JSON.stringify(descr));
-                    groupsToProcess.push(descr);
-                } else {
-                    //if (descr.team === 1) {
-                    if (typeof descr.url === 'undefined' || descr.url === null || descr.url === "") {
-                        // if (descr.url.length > 5) { // for all provisioned repos
-                        Log.info('ProvisioningMain() - Prepared Team: ' + JSON.stringify(descr));
-                        groupsToProcess.push(descr);
-                    } else {
-                        Log.info('ProvisioningMain() - Skipped Team: ' + JSON.stringify(descr));
-                        // Log.info('ProvisioningMain() - Team Repo Created: ' + descr.team);
-                        completeGroups.push(descr);
-                    }
-//                    }
-                }
-            }
-
-            // set the index for available teams (used by timeout backoff)
-            for (var i = 0; i < groupsToProcess.length; i++) {
-                let grp = groupsToProcess[i];
-                grp.teamIndex = i;
-            }
-
-            Log.info("ProvisioningMain() - # Complete teams: " + completeGroups.length);
-
-            Log.info('ProvisioningMain() - # Teams to process: ' + groupsToProcess.length);
-            Log.info("ProvisioningMain() - Teams to process: " + JSON.stringify(completeGroups.length));
-
-            let processList: GroupRepoDescription[] = []; // this is really Promise<GroupRepoDescription>[]
-            for (var toProcess of groupsToProcess) {
-
-                if (clean) {
-                    // clean instead of provision
-                    processList.push(<any>gpc.completeClean(toProcess));
-                } else {
-                    // new project
-                    // processList.push(<any>gpc.completeProvision(toProcess));
-
-                    // test suite
-                    // processList.push(<any>gpc.provisionRepo(toProcess, D1_PREFIX + toProcess.team, D1_URL));
-                }
-            }
-
-
-            var excludes: any = [];
-            excludes = [];
-            for (var toProcess of completeGroups) {
-                //if (toProcess.projectName === 'cpsc310project_team12') {
-
-                var include = true;
-                for (var exclude of excludes) {
-                    if (toProcess.projectName.indexOf(exclude) >= 0) {
-                        include = false;
-                    }
-                }
-                if (include) {
-                    // processList.push(<any>gpc.getStats("CS310-2016Fall", toProcess.projectName));
-                    let date: Date = null;
-                    date = new Date('2016-12-02T20:00:00Z'); // TS in Zulu!
-                    processList.push(<any>gpc.getLastSHA("CS310-2016Fall", toProcess.projectName, date));
-                } else {
-                    Log.info("Excluding: " + toProcess.projectName);
-                }
-
-                // }
-            }
-
-            return Promise.all(processList);
-        }).then(function (commits: any[]) {
-        Log.info('processList tasks complete; #: ' + commits.length);
-        var commentList: any[] = [];
-        var msg = '@CPSC310bot #d3 (Automatic execution to check D3 portion of D5 test grade.)';
-        var count = 0;
-        for (var commit of commits as any) {
-            count++;
-            let delay = count * 1 * 60 * 1000;
-            Log.info("Ready to make comment on repo: " + commit.repoName + "; sha: " + commit.sha + "; delay: " + (delay / 1000 / 60 / 60).toFixed(2) + ' hours');
-
-            commentList.push(gpc.makeCommitComment("CS310-2016Fall", commit.repoName, commit.sha, msg, delay));
-        }
-        return Promise.all(commentList);
-
-    }).then(function (provisionedRepos: GroupRepoDescription[]) {
-        Log.info("ProvisioningMain() - Process complete for # projects: " + provisionedRepos.length);
-
-        for (var repo of provisionedRepos) {
-            Log.info("ProvisioningMain() - Repo: " + repo.url);
-        }
-        Log.info("ProvisioningMain() - Done.");
-    }).catch(function (err: any) {
-            Log.error('ProvisioningMain() - ERROR processing project creation chain: ' + err);
-        }
-    );
-} catch (err) {
-    Log.error('ProvisioningMain() - caught ERROR: ' + err);
-}
-/*
- let groupData: GroupRepoDescription[] = [];
- groupDataIn.push({team: 5, members: ['rtholmes', 'rthse2']});
- for (var gd of groupDataIn) {
- if (typeof gd.url === 'undefined' || gd.url === null) {
- gd.teamName = TEAM_PREFIX + gd.team;
- gd.projectName = PROJECT_PREFIX + gd.team;
- groupData.push(gd);
- }
- }*/
-
-
-/*
- let repoList: string[] = [];
- for (var i = 0; i < 3; i++) {
- repoList.push('cpsc310test_team' + i);
- }
- */
-
-/*
- var promises: Promise<any>[] = [];
- for (var data of groupData) {
- let repoName = PROJECT_PREFIX + data.team;
- promises.push(gpc.deleteRepo(repoName));
- }
- Promise.all(promises).then(function (succ) {
- Log.info('all projects deleted: ' + succ);
- }).catch(function (err) {
- Log.error('Error deleting projects: ' + err);
- });
- */
-
-// create the repos
-/*
- gpc.createAllRepos(groupData).then(function (res) {
- Log.info('All repos created: ' + JSON.stringify(res));
- }).catch(function (err) {
- Log.error('Error creating repos: ' + JSON.stringify(err));
- });
-
- // import the default project to the repos
- let importUrl = 'https://github.com/CS310-2016Fall/cpsc310project';
- gpc.importAllRepos(groupData, importUrl).then(function (res) {
- Log.info('All repos importing: ' + JSON.stringify(res));
- }).catch(function (err) {
- Log.error('Error importing repos: ' + JSON.stringify(err));
- });
- */
-
-/*
- gpc.createAllTeams(groupData, 'push').then(function (res) {
- Log.info('All teams created: ' + JSON.stringify(res));
-
- let promises: Promise<any>[] = [];
- for (var teamRec of res) {
- let id = teamRec.teamId;
- let name = teamRec.teamName;
- for (var gd of groupData) {
- if (gd.teamName === name) {
- promises.push(gpc.addMembersToTeam(id, gd.members));
- }
- }
- }
- return Promise.all(promises);
- }).then(function (teamsDone) {
- Log.info('All members successfully added to teams: ' + JSON.stringify(teamsDone));
- }).catch(function (err: any) {
- Log.error('Error creating teams: ' + err);
- });
- */
-
-/*
- // add the teams to the repos
- gpc.addTeamToRepos(groupData, '310Staff', 'admin').then(function (res) {
- Log.info('Adding team to repos success: ' + JSON.stringify(res));
- }).catch(function (err: any) {
- Log.info('Error adding team to repos: ' + err);
- });
- */
-
-
-
-
-
-/*
- // FOR IN CLASS DEMO ABOUT CALLBACKS
-
- var gpc: GitHubManager;
-
-
- if (typeof foo !== 'undefined' &&
- typeof foo.bar !== = 'undefined' &&
- typeof foo.bar.baz !== = 'undefined'
- ) {
-
- }
-
-
- var foo = {bar: 'fish'};
- Log.info(foo.bar);
-
-
- gpc.getGroupDescriptions(function (err, data) {
- if (err) {
- return;
- }
- let g = data[0];
- let repoName = g.projectName;
- gpc.createRepo(repoName, function (err, worked) {
- if (err) {
- return;
- }
- gpc.createTeam(g.teamName, g.members, function (err, teamId) {
- if (err) {
- // return
- }
- // assume only one member for now
- gpc.addMembersToTeam(teamId, members[0], function (err, success) {
-
- }
-
- }
- }
- )
- }
- )
- }
-
-
- })
- } catch
- (err)
- {
- Log.error('ProvisioningMain() - caught ERROR: ' + err);
- }
- */
-
-
+//
+// var gpc = new GitHubManager();
+//
+// try {
+//     // const PROJECT_PREFIX = 'cpsc310project_team';
+//     // const TEAM_PREFIX = 'cpsc310_team';
+//
+//     // const D1_PREFIX = 'cpsc310d1public_team';
+//     // const D1_URL = 'https://github.com/CS310-2016Fall/cpsc310d1public';
+//
+//     // let groupDataIn: GroupRepoDescription[];
+//
+//     gpc.getGroupDescriptions().then(
+//         function (descriptions) {
+//             Log.info('ProvisioningMain() - Available teams: ' + JSON.stringify(descriptions));
+//
+//             const clean = false;
+//             if (clean) {
+//                 // really don't want to do this by accident! comment return if you actually want to clean
+//                 return;
+//             }
+//
+//             // won't normally need this
+//             //var testGroup: GroupRepoDescription = {team: 1, members: ['rthse2', 'mksarge']};
+//             //descriptions.push(testGroup);
+//
+//             let groupsToProcess: GroupRepoDescription[] = [];
+//             let completeGroups: GroupRepoDescription[] = [];
+//             for (var descr of descriptions) {
+//                 descr.projectName = PROJECT_PREFIX + descr.team;
+//                 descr.teamName = TEAM_PREFIX + descr.team;
+//
+//                 if (clean) {
+//                     Log.info('ProvisioningMain() - Clean Team: ' + JSON.stringify(descr));
+//                     groupsToProcess.push(descr);
+//                 } else {
+//                     //if (descr.team === 1) {
+//                     if (typeof descr.url === 'undefined' || descr.url === null || descr.url === "") {
+//                         // if (descr.url.length > 5) { // for all provisioned repos
+//                         Log.info('ProvisioningMain() - Prepared Team: ' + JSON.stringify(descr));
+//                         groupsToProcess.push(descr);
+//                     } else {
+//                         Log.info('ProvisioningMain() - Skipped Team: ' + JSON.stringify(descr));
+//                         // Log.info('ProvisioningMain() - Team Repo Created: ' + descr.team);
+//                         completeGroups.push(descr);
+//                     }
+// //                    }
+//                 }
+//             }
+//
+//             // set the index for available teams (used by timeout backoff)
+//             for (var i = 0; i < groupsToProcess.length; i++) {
+//                 let grp = groupsToProcess[i];
+//                 grp.teamIndex = i;
+//             }
+//
+//             Log.info("ProvisioningMain() - # Complete teams: " + completeGroups.length);
+//
+//             Log.info('ProvisioningMain() - # Teams to process: ' + groupsToProcess.length);
+//             Log.info("ProvisioningMain() - Teams to process: " + JSON.stringify(completeGroups.length));
+//
+//             let processList: GroupRepoDescription[] = []; // this is really Promise<GroupRepoDescription>[]
+//             for (var toProcess of groupsToProcess) {
+//
+//                 if (clean) {
+//                     // clean instead of provision
+//                     processList.push(<any>gpc.completeClean(toProcess));
+//                 } else {
+//                     // new project
+//                     // processList.push(<any>gpc.completeProvision(toProcess));
+//
+//                     // test suite
+//                     // processList.push(<any>gpc.provisionRepo(toProcess, D1_PREFIX + toProcess.team, D1_URL));
+//                 }
+//             }
+//
+//
+//             var excludes: any = [];
+//             excludes = [];
+//             for (var toProcess of completeGroups) {
+//                 //if (toProcess.projectName === 'cpsc310project_team12') {
+//
+//                 var include = true;
+//                 for (var exclude of excludes) {
+//                     if (toProcess.projectName.indexOf(exclude) >= 0) {
+//                         include = false;
+//                     }
+//                 }
+//                 if (include) {
+//                     // processList.push(<any>gpc.getStats("CS310-2016Fall", toProcess.projectName));
+//                     let date: Date = null;
+//                     date = new Date('2016-12-02T20:00:00Z'); // TS in Zulu!
+//                     processList.push(<any>gpc.getLastSHA("CS310-2016Fall", toProcess.projectName, date));
+//                 } else {
+//                     Log.info("Excluding: " + toProcess.projectName);
+//                 }
+//
+//                 // }
+//             }
+//
+//             return Promise.all(processList);
+//         }).then(function (commits: any[]) {
+//         Log.info('processList tasks complete; #: ' + commits.length);
+//         var commentList: any[] = [];
+//         var msg = '@CPSC310bot #d3 (Automatic execution to check D3 portion of D5 test grade.)';
+//         var count = 0;
+//         for (var commit of commits as any) {
+//             count++;
+//             let delay = count * 1 * 60 * 1000;
+//             Log.info("Ready to make comment on repo: " + commit.repoName + "; sha: " + commit.sha + "; delay: " + (delay / 1000 / 60 / 60).toFixed(2) + ' hours');
+//
+//             commentList.push(gpc.makeCommitComment("CS310-2016Fall", commit.repoName, commit.sha, msg, delay));
+//         }
+//         return Promise.all(commentList);
+//
+//     }).then(function (provisionedRepos: GroupRepoDescription[]) {
+//         Log.info("ProvisioningMain() - Process complete for # projects: " + provisionedRepos.length);
+//
+//         for (var repo of provisionedRepos) {
+//             Log.info("ProvisioningMain() - Repo: " + repo.url);
+//         }
+//         Log.info("ProvisioningMain() - Done.");
+//     }).catch(function (err: any) {
+//             Log.error('ProvisioningMain() - ERROR processing project creation chain: ' + err);
+//         }
+//     );
+// } catch (err) {
+//     Log.error('ProvisioningMain() - caught ERROR: ' + err);
+// }
+// /*
+//  let groupData: GroupRepoDescription[] = [];
+//  groupDataIn.push({team: 5, members: ['rtholmes', 'rthse2']});
+//  for (var gd of groupDataIn) {
+//  if (typeof gd.url === 'undefined' || gd.url === null) {
+//  gd.teamName = TEAM_PREFIX + gd.team;
+//  gd.projectName = PROJECT_PREFIX + gd.team;
+//  groupData.push(gd);
+//  }
+//  }*/
+//
+//
+// /*
+//  let repoList: string[] = [];
+//  for (var i = 0; i < 3; i++) {
+//  repoList.push('cpsc310test_team' + i);
+//  }
+//  */
+//
+// /*
+//  var promises: Promise<any>[] = [];
+//  for (var data of groupData) {
+//  let repoName = PROJECT_PREFIX + data.team;
+//  promises.push(gpc.deleteRepo(repoName));
+//  }
+//  Promise.all(promises).then(function (succ) {
+//  Log.info('all projects deleted: ' + succ);
+//  }).catch(function (err) {
+//  Log.error('Error deleting projects: ' + err);
+//  });
+//  */
+//
+// // create the repos
+// /*
+//  gpc.createAllRepos(groupData).then(function (res) {
+//  Log.info('All repos created: ' + JSON.stringify(res));
+//  }).catch(function (err) {
+//  Log.error('Error creating repos: ' + JSON.stringify(err));
+//  });
+//
+//  // import the default project to the repos
+//  let importUrl = 'https://github.com/CS310-2016Fall/cpsc310project';
+//  gpc.importAllRepos(groupData, importUrl).then(function (res) {
+//  Log.info('All repos importing: ' + JSON.stringify(res));
+//  }).catch(function (err) {
+//  Log.error('Error importing repos: ' + JSON.stringify(err));
+//  });
+//  */
+//
+// /*
+//  gpc.createAllTeams(groupData, 'push').then(function (res) {
+//  Log.info('All teams created: ' + JSON.stringify(res));
+//
+//  let promises: Promise<any>[] = [];
+//  for (var teamRec of res) {
+//  let id = teamRec.teamId;
+//  let name = teamRec.teamName;
+//  for (var gd of groupData) {
+//  if (gd.teamName === name) {
+//  promises.push(gpc.addMembersToTeam(id, gd.members));
+//  }
+//  }
+//  }
+//  return Promise.all(promises);
+//  }).then(function (teamsDone) {
+//  Log.info('All members successfully added to teams: ' + JSON.stringify(teamsDone));
+//  }).catch(function (err: any) {
+//  Log.error('Error creating teams: ' + err);
+//  });
+//  */
+//
+// /*
+//  // add the teams to the repos
+//  gpc.addTeamToRepos(groupData, '310Staff', 'admin').then(function (res) {
+//  Log.info('Adding team to repos success: ' + JSON.stringify(res));
+//  }).catch(function (err: any) {
+//  Log.info('Error adding team to repos: ' + err);
+//  });
+//  */
+//
+//
+//
+//
+//
+// /*
+//  // FOR IN CLASS DEMO ABOUT CALLBACKS
+//
+//  var gpc: GitHubManager;
+//
+//
+//  if (typeof foo !== 'undefined' &&
+//  typeof foo.bar !== = 'undefined' &&
+//  typeof foo.bar.baz !== = 'undefined'
+//  ) {
+//
+//  }
+//
+//
+//  var foo = {bar: 'fish'};
+//  Log.info(foo.bar);
+//
+//
+//  gpc.getGroupDescriptions(function (err, data) {
+//  if (err) {
+//  return;
+//  }
+//  let g = data[0];
+//  let repoName = g.projectName;
+//  gpc.createRepo(repoName, function (err, worked) {
+//  if (err) {
+//  return;
+//  }
+//  gpc.createTeam(g.teamName, g.members, function (err, teamId) {
+//  if (err) {
+//  // return
+//  }
+//  // assume only one member for now
+//  gpc.addMembersToTeam(teamId, members[0], function (err, success) {
+//
+//  }
+//
+//  }
+//  }
+//  )
+//  }
+//  )
+//  }
+//
+//
+//  })
+//  } catch
+//  (err)
+//  {
+//  Log.error('ProvisioningMain() - caught ERROR: ' + err);
+//  }
+//  */
+//
+//

@@ -23,31 +23,30 @@ import {GroupRepoDescription} from "./GitHubManager";
  * @type {GitHubManager}
  */
 
+// organization name
+// const ORG_NAME = "CS410-2015Fall";
+// const ORG_NAME = "CS310-2016Fall";
+const ORG_NAME = "CS310-2017Jan";
 
-var gpc = new GitHubManager();
+// all projects will start with this (e.g., cpsc310project_team12)
+const PROJECT_PREFIX = 'cpsc310project_team';
+
+// all teams will start with this (e.g., cpsc310_team12)
+const TEAM_PREFIX = 'cpsc310_team';
+
+// the team containing all of the TAs
+const STAFF_TEAM = '310staff';
+
+// this is the
+const IMPORTURL = 'https://github.com/CS310-2016Fall/cpsc310project';
+
+// if we want to delete projects instead of creating them. be careful with this!
+const CLEAN = false;
+
+var gpc = new GitHubManager(ORG_NAME);
 
 try {
-    // all projects will start with this (e.g., cpsc310project_team12)
-    const PROJECT_PREFIX = 'cpsc310project_team';
 
-    // all teams will start with this (e.g., cpsc310_team12)
-    const TEAM_PREFIX = 'cpsc310_team';
-
-    // the team containing all of the TAs
-    const STAFF_TEAM = '310staff';
-
-    // this is the
-    const IMPORTURL = 'https://github.com/CS310-2016Fall/cpsc310project';
-
-    // if we want to delete projects instead of creating them. be careful with this!
-    const CLEAN = false;
-//    const D1_PREFIX = 'cpsc310d1public_team';
-//    const D1_URL = 'https://github.com/CS310-2016Fall/cpsc310d1public';
-
-//    let groupDataIn: GroupRepoDescription[];
-
-
-    // TODO: lots of refactoring needed; the constants above should be passed to GPC
 
     gpc.getGroupDescriptions().then(
         function (descriptions) {
@@ -100,7 +99,7 @@ try {
                     processList.push(<any>gpc.completeClean(toProcess));
                 } else {
                     // new project
-                    processList.push(<any>gpc.completeProvision(toProcess));
+                    processList.push(<any>gpc.completeProvision(toProcess, IMPORTURL, STAFF_TEAM));
 
                     // test suite
                     // processList.push(<any>gpc.provisionRepo(toProcess, D1_PREFIX + toProcess.team, D1_URL));
