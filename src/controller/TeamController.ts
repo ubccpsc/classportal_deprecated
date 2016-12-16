@@ -19,7 +19,7 @@ export default class TeamController {
      * @param
      * @returns
      */
-    static createTeam(username: string, namesArray: any[], parentCallback: any) {
+    static createTeam(username: string, namesArray: any[], appName: string, appDescription: string, url: string, parentCallback: any) {
         // store these variables here for repeated access in the async waterfall.
         var studentsFile: any;
         var teamsFile: any;
@@ -80,7 +80,14 @@ export default class TeamController {
                     var newTeam = {
                         "id": newTeamId,
                         "url": "",
-                        "members": sidArray
+                        "members": sidArray,
+                        "appName": "",
+                        "appDescription": ""
+                    };
+                    if (!!config["enable_app_store"]) {
+                        newTeam["url"] = url;
+                        newTeam["appName"] = appName;
+                        newTeam["appDescription"] = appDescription;
                     };
 
                     Helper.addEntry("teams.json", newTeam, function (error: any) {

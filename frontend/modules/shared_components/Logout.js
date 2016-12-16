@@ -1,7 +1,8 @@
 import React from 'react'
 import { Form, FormRow, FormField, FormInput, FormIconField, Glyph, Button, InputGroup } from 'elemental'
-import {browserHistory} from 'react-router'
+import {browserHistory, Link} from 'react-router'
 import Ajax from '../shared_components/Ajax'
+import config from 'config'
 
 export default React.createClass({
   logoutSubmit: function (event) {
@@ -43,6 +44,16 @@ export default React.createClass({
                 disabled />
             </FormIconField>
           </InputGroup.Section>
+          {config.enable_app_store &&
+            <InputGroup.Section>
+              <Link to="/apps" target="_blank">
+                <Button size="sm">
+                  <Glyph icon="package"/>&nbsp; App store
+                </Button>
+              </Link>
+            </InputGroup.Section>
+
+          }
           <InputGroup.Section>
             <Button size="sm" onClick={this.logoutSubmit}>
               <Glyph icon="sign-out"/>&nbsp; Log out

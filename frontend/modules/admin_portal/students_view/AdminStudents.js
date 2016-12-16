@@ -1,5 +1,8 @@
 import React from 'react'
-import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Glyph, Button, Modal, ModalHeader, ModalBody, ModalFooter, Dropdown } from 'elemental'
+import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Dropdown,
+    Glyph, Button,
+    Row, Col,
+    Modal, ModalHeader, ModalBody, ModalFooter } from 'elemental'
 import ContentModule from '../../shared_components/ContentModule'
 import Ajax from '../../shared_components/Ajax'
 import _ from 'lodash';
@@ -91,17 +94,25 @@ export default React.createClass({
     return delivs;
   },
   returnGradeAndComment: function (sid, assnId) {
+    var thisGrade = this.returnGradesForStudent(sid, assnId);
+    if (thisGrade !== undefined) {
+      return { 'grade': thisGrade.grade, 'comment': thisGrade.comment };
+    } else {
+      return "";
+    }
+  },
+  returnGradesForStudent: function (sid, assnId, placeholder) {
     var myGradesEntry = _.find(this.props.grades, { 'sid': sid });
     if (myGradesEntry !== undefined) {
       var thisGrade = _.find(myGradesEntry.grades, { 'assnId': assnId });
       if (thisGrade !== undefined) {
-        return { 'grade': thisGrade.grade, 'comment': thisGrade.comment };
-      } else {
-        return "";
-      }
-    } else {
-      return "";
+        return thisGrade;
+      } 
+    } else if (typeof placeholder === "undefined") {
+      return undefined;
     }
+    // construct a fake json for placeholders
+    return {autotest: placeholder, coverage: placeholder, retrospective: placeholder, grade: placeholder, comment: placeholder};
   },
   renderGrades: function () {
     var rows = [];
@@ -162,9 +173,61 @@ export default React.createClass({
     }
     return headers;
   },
+  renderModalGrades: function (sid) {
+    let grades = [];
+    for (let index = 0; index < this.props.deliverables.length; index++) {
+      let assignmentId = this.props.deliverables[index].id;
+      grades[index] = (
+        <Row>
+          <Col sm="10%">
+          <FormField>
+            <FormInput placeholder={assignmentId} disabled size="sm"/>
+          </FormField>
+          </Col>
+          <Col sm="15%">
+            <FormField>
+              <FormInput size="sm" 
+                onChange={this.setNewAutotest.bind(this, this.state.sid, assignmentId)}
+                placeholder={this.returnGradesForStudent(this.state.sid, assignmentId, "Auto test").autotest}/>
+            </FormField>
+          </Col>
+          <Col sm="15%">
+            <FormField>
+              <FormInput size="sm" 
+              onChange={this.setNewCoverage.bind(this, this.state.sid, assignmentId)}
+              placeholder={this.returnGradesForStudent(this.state.sid, assignmentId, "Coverage ").coverage}/>
+            </FormField>
+          </Col>
+          <Col sm="15%">
+            <FormField>
+              <FormInput size="sm"
+              onChange={this.setNewRetrospective.bind(this, this.state.sid, assignmentId)} 
+              placeholder={this.returnGradesForStudent(this.state.sid, assignmentId, "Retrospective").retrospective}/>
+            </FormField>
+          </Col>
+          <Col sm="15%">
+            <FormField>
+              <FormInput size="sm"
+              onChange={this.setNewGrade.bind(this, this.state.sid, assignmentId)} 
+              placeholder={this.returnGradesForStudent(this.state.sid, assignmentId, "Final grade").grade}/>
+            </FormField>
+          </Col>
+          <Col sm="30%">
+            <FormField label="Comment">
+              <FormInput multiline size="sm"
+              onChange={this.setNewComment.bind(this, this.state.sid, assignmentId)}
+              placeholder={this.returnGradesForStudent(this.state.sid, assignmentId, "Comment").comment}/>
+            </FormField>
+          </Col>
+        </Row>
+      );
+    }
+    return grades;
+  },
   openModal: function (sid, firstname, lastname, event) {
+    let that = this;
     this.setState({ 'sid': sid }, function () {
-      this.setState({ student: firstname + ' ' + lastname }, function () {
+      this.setState({ student: firstname + ' ' + lastname, grades: that.props.grades, studentGrade: {'sid': sid, grades: []} }, function () {
         this.setState({ modalIsOpen: true });
       });
     });
@@ -183,42 +246,59 @@ export default React.createClass({
   closeGradesModal: function () {
     this.setState({ gradesModalIsOpen: false });
   },
-  submitGrades: function () {
-    // check for valid assignment
-    if (!this.state.assnId) {
-      alert("Error: assignment field not set.");
-      return;
-    }
-
-    // convert grade from string to int
-    var intGrade = parseInt(this.state.grade, 10);
-
+  isValidGrade: function(grade, key) {
+    var intGrade = parseInt(grade[key], 10);
     // check for valid grade
     if (isNaN(intGrade) || intGrade < 0 || intGrade > 100) {
-      alert("Error: grade must by an integer between 0-100.");
-      return;
+      return false;
     }
-
+    return true;
+  },
+  submitGrades: function () {
     // confirm before submitting new grade
-    var submitMessage = "Please confirm new grade:\nStudent: " + this.state.student + "\nAssignment: " + this.state.assnId + "\nGrade: " + intGrade + "/100\nComment: " + this.state.comment;
-    var resubmitMessage = "This assignment has already been assigned a grade. Overwrite?";
+    var resubmitMessage = "This student has already been graded for assingments...\n";
 
     //check if student already has grade assigned
     var studentIndex = _.findIndex(this.props.grades, { "sid": this.state.sid });
-    var assnIndex = _.findIndex(this.props.grades[studentIndex].grades, { "assnId": this.state.assnId });
+    var oldGrades = this.props.grades[studentIndex].grades;
+    var newGrades = this.state.studentGrade.grades;
+    var data = { "sid": this.state.sid, grades: [] };
 
-    if (assnIndex !== -1) {
-      var oldGrade = this.props.grades[studentIndex].grades[assnIndex].grade;
-      var oldComment = this.props.grades[studentIndex].grades[assnIndex].comment;
-      if (!confirm(resubmitMessage + "\n\nPrevious:\nGrade: " + oldGrade + "\nComment: " + oldComment)) {
+    var hasChanges = false;
+    for (let index = 0; index < this.props.deliverables.length; index++) {
+      var assnId = this.props.deliverables[index].id;
+      var newGradeIdx = _.findIndex(newGrades, { "assnId": assnId });
+      var oldGradeIdx = _.findIndex(oldGrades, { "assnId": assnId });
+
+      if (newGradeIdx !== -1) {
+        if (oldGradeIdx !== -1) {
+          // A grade was updated
+          resubmitMessage += '\n[' + assnId + '] data will be overwritten. Is that correct?';
+          hasChanges = true;
+        }
+        if (!(this.isValidGrade(newGrades[newGradeIdx], 'autotest') && 
+               this.isValidGrade(newGrades[newGradeIdx], 'coverage') &&
+               this.isValidGrade(newGrades[newGradeIdx], 'retrospective') &&
+               this.isValidGrade(newGrades[newGradeIdx], 'grade'))){
+          alert("Error: [" +assnId+ "] grades must be integers between 0-100.");
+          return;
+        }
+
+        data.grades.push(newGrades[newGradeIdx]);
+      } else if (oldGradeIdx !== -1) {
+        // A grade that already exists and was not updated
+        data.grades.push(oldGrades[oldGradeIdx]);
+      }
+    }
+
+    if (hasChanges) {
+      if (!confirm(resubmitMessage)) {
         return;
       }
     }
-    Ajax.submitGrade(
-      this.state.sid,
-      this.state.assnId,
-      intGrade,
-      this.state.comment,
+    
+    Ajax.submitAllGrades(
+      data,
       function onSuccess() {
         // alert("Success!")
         this.closeModal();
@@ -243,11 +323,35 @@ export default React.createClass({
       }
     }
   },
-  setNewGrade: function (event) {
-    this.setState({ grade: event.target.value });
+  setNewStudentGrade: function(sid, assnId, event, key) {
+    let newStudentGrade = this.state.studentGrade;
+    var index = -1;
+    for (let i = 0; i < newStudentGrade.grades.length; i++){
+      if (newStudentGrade.grades[i].assnId === assnId){
+        index = i;
+        break;
+      }
+    }
+    if (index === -1){
+      newStudentGrade.grades.push({assnId: assnId});
+    }
+    newStudentGrade.grades[index][key] = event.target.value;
+    this.setState({ studentGrade: newStudentGrade });
   },
-  setNewComment: function (event) {
-    this.setState({ comment: event.target.value });
+  setNewAutotest: function (sid, assnId, event) {
+    this.setNewStudentGrade(sid, assnId, event, 'autotest');
+  },
+  setNewCoverage: function (sid, assnId, event) {
+    this.setNewStudentGrade(sid, assnId, event, 'coverage');
+  },
+  setNewRetrospective: function (sid, assnId, event) {
+    this.setNewStudentGrade(sid, assnId, event, 'retrospective');
+  },
+  setNewGrade: function (sid, assnId, event) {
+    this.setNewStudentGrade(sid, assnId, event, 'grade');
+  },
+  setNewComment: function (sid, assnId, event) {
+    this.setNewStudentGrade(sid, assnId, event, 'comment');
   },
   componentDidMount: function () {
     var delivs = this.props.deliverables;
@@ -282,22 +386,11 @@ export default React.createClass({
           </table>
         </div>
 
-        <Modal isOpen={this.state.modalIsOpen} onCancel={this.closeModal} backdropClosesModal>
-          <ModalHeader text="Edit Grades" showCloseButton onClose={this.closeModal} />
+        <Modal isOpen={this.state.modalIsOpen} onCancel={this.closeModal} width={825} backdropClosesModal>
+          <ModalHeader text={"Edit grades for :: " + this.state.student} showCloseButton onClose={this.closeModal} />
           <ModalBody>
-            <Form className="form" type="horizontal" >
-              <FormField label="Student">
-                <FormInput placeholder={this.state.student} disabled />
-              </FormField>
-              <FormField className="no-margin" label="Assn">
-                <FormSelect options={this.state.labelArray} firstOption="Select" onChange={this.handleSelectAssignment} />
-              </FormField>
-              <FormField label="Grade (%)" onChange={this.setNewGrade}>
-                <FormInput placeholder={this.state.grade} />
-              </FormField>
-              <FormField label="Comment" onChange={this.setNewComment}>
-                <FormInput multiline  placeholder={this.state.comment} />
-              </FormField>
+            <Form className="form" type="inline">
+              {this.renderModalGrades(this.state.sid)}
             </Form>
           </ModalBody>
           <ModalFooter>

@@ -76,6 +76,7 @@ export default class Server {
                 that.rest.post('/api/loadAdminPortal', requireAdmin, requireToken, RouteHandler.loadAdminPortal);
                 that.rest.post('/api/assignTeam', requireAdmin, requireToken, RouteHandler.assignTeam);
                 that.rest.post('/api/submitGrade', requireAdmin, requireToken, RouteHandler.submitGrade);
+                that.rest.post('/api/submitGrades', requireAdmin, requireToken, RouteHandler.submitGrades);
                 that.rest.post('/api/submitClasslist', requireAdmin, requireToken, RouteHandler.updateClasslist);
 
                 // serve static css and js files

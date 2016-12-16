@@ -3,6 +3,7 @@ import { Router, Route, browserHistory, IndexRoute, IndexRedirect } from 'react-
 import { render } from 'react-dom'
 import App from './modules/App'
 import StudentPortal from './modules/student_portal/StudentPortal'
+import AppsPortal from './modules/apps_portal/AppsPortal'
 import AdminPortal from './modules/admin_portal/AdminPortal'
 import AdminTeamsView from './modules/admin_portal/teams_view/AdminTeamsView'
 import AdminStudentsView from './modules/admin_portal/students_view/AdminStudentsView'
@@ -18,6 +19,7 @@ render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={StudentPortal} onEnter={requireStudentAuth}/>
+      <Route path="apps" component={AppsPortal} onEnter={requireStudentAuth}/>
       <Route path="login" component={LoginPage} onEnter={requireNoAuth} />
       <Route path="postlogin" component={PostloginPage} onEnter={requireNoAuth} />
       <Route path="register" component={RegisterPage} onEnter={requireNoAuth} />
