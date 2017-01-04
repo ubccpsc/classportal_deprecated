@@ -13,7 +13,6 @@ export default React.createClass({
     var newTeamArray = this.state.newTeamArray;
     var appName = this.state.appName;
     var appDescription = this.state.appDescription;
-    var url = this.state.url;
     var alertMessage = "Forming team with students: ";
 
     //check for valid students
@@ -37,8 +36,8 @@ export default React.createClass({
     }
 
     if (config.enable_app_store){
-      if (typeof appName === "undefined" || typeof url === "undefined" || typeof appDescription === "undefined") {
-          alert("Error: Invalid app name, description, or url");
+      if (typeof appName === "undefined" || typeof appDescription === "undefined") {
+          alert("Error: Invalid app name, description");
           return;
         }
     }
@@ -48,7 +47,6 @@ export default React.createClass({
         newTeamArray,
         appName,
         appDescription,
-        url,
         function onSuccess(response) {
           // console.log("CreateTeam.js| Success: " + response);
           alert("Success: Team " + response + " created!")
@@ -76,10 +74,7 @@ export default React.createClass({
   },
   setAppDescription: function (event) {
     this.setState({ appDescription: event.target.value });
-  },
-  setUrl: function (event) {
-    this.setState({ url: event.target.value });
-  },
+  },  
   renderAppFields: function () {
     return (
       <div id="app-team-fields">
@@ -88,9 +83,6 @@ export default React.createClass({
         </FormField>
         <FormField>
           <FormInput multiline placeholder="App description"  onChange={this.setAppDescription}/>
-        </FormField>
-        <FormField>
-          <FormInput placeholder="Github url" onChange={this.setUrl }/>
         </FormField>
       </div>
     )

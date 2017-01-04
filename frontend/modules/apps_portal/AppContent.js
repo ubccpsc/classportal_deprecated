@@ -17,7 +17,7 @@ export default React.createClass({
   getInitialState: function () {
     return { hideContent: false, app: this.props.app };
   },
-  showOrHide: function (e) {
+  showOrHide: function(e) {
     e.preventDefault;
     this.setState({ hideContent: !this.state.hideContent });
   },
@@ -34,10 +34,10 @@ export default React.createClass({
 
   },
   updateComments: function(){
-    // var submitMessage = "You are about to change the app's comments.\nThis will affect which comments students will be able to see or not. Are you sure?"
-    // if (!confirm(submitMessage)) {
-    //     return;
-    // }
+    var submitMessage = "You are about to change the app's comments.\nThis will affect which comments students will be able to see or not. Are you sure?"
+    if (!confirm(submitMessage)) {
+        return;
+    }
 
     var data = this.state.app.comments;
     var appID = this.state.app.id;
@@ -46,7 +46,6 @@ export default React.createClass({
     Ajax.updateComments(
       appID, data,
       function onSuccess() {
-        alert("Success!")
         window.location.reload(true);
       }.bind(this),
       function onError() {
@@ -84,7 +83,7 @@ export default React.createClass({
       }
 
       return (
-        <div>
+        <div id={commentId} key={commentId}>
           <Row style={display}>
             {toggleComment}
             <Col sm="80%" style={that.alignLeft()}>
@@ -110,7 +109,7 @@ export default React.createClass({
     };
     
     return (
-      <div style={ this.props.index % 2 == 0 ? grayLineStyle : whiteLineStyle }>
+      <div style={ this.props.index % 2 == 0 ? grayLineStyle : whiteLineStyle } id={this.state.app.id}>
         <Row style={{paddingTop: "10px"}}>
           <Col sm="20%">
             <h4>{this.state.app.name}</h4>
@@ -120,7 +119,7 @@ export default React.createClass({
           </Col>
           <Col sm="25%">
             <ButtonGroup>
-              <Button size="xs" onClick={this.state.openModal}><Glyph icon="thumbsup"/>&nbsp; Rate</Button>
+              <Button size="xs" onClick={this.props.openModal}><Glyph icon="thumbsup"/>&nbsp; Rate</Button>
               <Button size="xs" onClick={this.showOrHide}><Glyph icon="comment"/>&nbsp; Comments</Button>
               {this.props.admin && 
                 <Button size="xs" onClick={this.updateComments}><Glyph icon="check"/>&nbsp; Update</Button>

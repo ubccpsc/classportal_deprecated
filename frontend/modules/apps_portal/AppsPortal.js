@@ -89,8 +89,9 @@ export default React.createClass({
   renderApps: function() {
     var that = this;
     var apps = this.state.files.appsArray.map(function(app, i) {
+      var appKey = "app-"+app.id;
       return (
-        <AppContent app={app} index={i} admin={that.state.admin} openModal={that.setRattedApp.bind(that, app)}></AppContent>
+        <AppContent key={appKey} app={app} index={i} admin={that.state.admin} openModal={that.setRattedApp.bind(that, app)}></AppContent>
       )
     });
 
@@ -114,7 +115,7 @@ export default React.createClass({
 
                 <FormField label="Comments">
                   <FormInput multiline size="sm" placeholder="Your thoughts about this app" 
-                  onChange={this.setNewComment.bind(this)}/>
+                  onChange={this.setNewComment}/>
                 </FormField>
 
               </Form>

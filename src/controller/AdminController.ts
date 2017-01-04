@@ -490,6 +490,5 @@ export default class AdminController {
         });
 
         return callback(null, "success!");
-
     }
 }

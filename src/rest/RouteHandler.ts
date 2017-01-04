@@ -163,9 +163,8 @@ export default class RouteHandler {
         var namesArray: any[] = req.params.newTeam;
         var appName: string = req.params.appName;
         var appDescription: string = req.params.appDescription;
-        var url: string = req.params.url;
 
-        TeamController.createTeam(username, namesArray, appName, appDescription, url, function (error: any, newTeamId: number) {
+        TeamController.createTeam(username, namesArray, appName, appDescription, function (error: any, newTeamId: number) {
             if (!error) {
                 Log.trace("RouteHandler::createTeam| Success: Created team " + newTeamId);
                 return res.send(200, newTeamId);

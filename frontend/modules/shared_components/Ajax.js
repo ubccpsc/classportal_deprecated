@@ -78,13 +78,12 @@ module.exports = {
         });
     },
     //submit new team to be created
-    createTeam: function (namesArray, appName, appDescription, url, successCallback, errorCallback) {
+    createTeam: function (namesArray, appName, appDescription, successCallback, errorCallback) {
         // console.log("Ajax.js| Creating team..");
         var teamData = { "newTeam": namesArray };
         if (typeof appName !== "undefined" && 
             typeof url !== "undefined" && 
             typeof appDescription !== "undefined") {
-            teamData['url'] = url;
             teamData['appName'] = appName;
             teamData['appDescription'] = appDescription;
         }

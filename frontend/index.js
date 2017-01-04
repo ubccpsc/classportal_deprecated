@@ -6,6 +6,7 @@ import StudentPortal from './modules/student_portal/StudentPortal'
 import AppsPortal from './modules/apps_portal/AppsPortal'
 import AdminPortal from './modules/admin_portal/AdminPortal'
 import AdminTeamsView from './modules/admin_portal/teams_view/AdminTeamsView'
+import AdminAutotestView from './modules/admin_portal/autotest_view/AdminAutotestView'
 import AdminStudentsView from './modules/admin_portal/students_view/AdminStudentsView'
 import AdminDeliverablesView from './modules/admin_portal/delivs_view/AdminDeliverablesView'
 import LoginPage from './modules/login_page/LoginPage'
@@ -29,6 +30,7 @@ render((
         <Route path="teams" component={AdminTeamsView} onEnter={requireAdminAuth} />
         <Route path="students" component={AdminStudentsView} onEnter={requireAdminAuth} />
         <Route path="deliverables" component={AdminDeliverablesView} onEnter={requireAdminAuth} />
+        <Route path="autotest" component={AdminAutotestView} onEnter={requireAdminAuth} />
       </Route>
     </Route>
   </Router>
