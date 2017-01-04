@@ -476,4 +476,19 @@ export default class AdminController {
         });
     }
 
+    // update teams.json
+    static updateComments(appID: string, comments: any[], callback: any) {
+        Log.trace("AdminController::updateComments(..) - start");
+
+        Helper.updateComments(appID, comments, function (error: any, data: any) {
+            if (!error) {
+                return callback(null, "success!");
+            } else {
+                // return error
+                return callback("Error while submiting your comment");
+            }
+        });
+
+        return callback(null, "success!");
+    }
 }

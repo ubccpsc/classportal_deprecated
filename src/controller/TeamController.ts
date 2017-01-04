@@ -19,7 +19,7 @@ export default class TeamController {
      * @param
      * @returns
      */
-    static createTeam(username: string, namesArray: any[], appName: string, appDescription: string, url: string, parentCallback: any) {
+    static createTeam(username: string, namesArray: any[], appName: string, appDescription: string, parentCallback: any) {
         // store these variables here for repeated access in the async waterfall.
         var studentsFile: any;
         var teamsFile: any;
@@ -76,16 +76,17 @@ export default class TeamController {
                 },
                 function add_team_entry(callback: any) {
                     Log.trace("TeamController::createTeam| add_team_entry");
-
+                    var empty: any[] = [];
                     var newTeam = {
                         "id": newTeamId,
                         "url": "",
                         "members": sidArray,
                         "appName": "",
-                        "appDescription": ""
+                        "appDescription": "",
+                        "comments": empty
                     };
                     if (!!config["enable_app_store"]) {
-                        newTeam["url"] = url;
+                        newTeam["url"] = "";
                         newTeam["appName"] = appName;
                         newTeam["appDescription"] = appDescription;
                     };
@@ -215,4 +216,29 @@ export default class TeamController {
         );
     }
 
+    /**
+     * Submmit a comment to the app store
+     *
+     * @param username, appID, ratting, comment
+     * @returns
+     */
+    static submitComment(username: string, appID: string, ratting: string, comment: string, callback: any) {
+        Log.trace("AdminController::submitComment(..) - start");
+
+        Helper.checkEntry("students.json", {'username': username}, function (error: any, response: any) {
+            if (!error) {
+                Helper.addComment(response.sid, appID, ratting, comment, function (error: any, data: any) {
+                    if (!error) {
+                        return callback(null, "success!");
+                    } else {
+                        // return error
+                        return callback("Error while submiting your comment");
+                    }
+                });
+            } else {
+                Log.trace("AdminController::submitComment(..)| Error: Student is not enrolled.");
+                return callback("student is not enrolled", null);
+            }
+        });
+    }
 }

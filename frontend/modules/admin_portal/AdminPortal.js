@@ -48,6 +48,8 @@ export default React.createClass({
     }
 
     return (<Logout
+      app_path="/admin/apps" 
+      apps={this.state.files.appsArray}
       firstname={firstname}
       sid={prof ? "Prof" : "TA"}
       username={localStorage.username}/>);
@@ -61,19 +63,32 @@ export default React.createClass({
       return React.cloneElement(child, { "files": this.state.files });
     }.bind(this));
 
+    // TODO: this enables or disables the autotest tab
+    var navsSM = "1/3";
+    var enable_autotest = true;
+
+    if (enable_autotest) {
+      navsSM = "1/4";
+    } 
+
     return (
       <div>
         <div id="NavLinks">
           <Row>
-            <Col sm="1/3">
+            <Col sm={navsSM}>
               <NavLink to="/admin/teams" onlyActiveOnIndex={true}>Teams</NavLink>
             </Col>
-            <Col sm="1/3">
+            <Col sm={navsSM}>
               <NavLink to="/admin/students">Students</NavLink>
             </Col>
-            <Col sm="1/3">
+            <Col sm={navsSM}>
               <NavLink to="/admin/deliverables">Deliverables</NavLink>
             </Col>
+            {enable_autotest && 
+              <Col sm={navsSM}>
+              <NavLink to="/admin/autotest">Autotest</NavLink>
+              </Col>
+            }
           </Row>
         </div>
 

@@ -82,6 +82,7 @@ export default React.createClass({
         <td className="tg-yw4l" key={index} id={index === (this.props.deliverables.length - 1) ? "strongBorderRight" : ""}>
           {!!grade && (
             <Button
+              key={sid + ':' + firstname + ' ' + lastname}
               id={sid + ':' + firstname + ' ' + lastname}
               size="sm"
               className="button-text"
@@ -178,7 +179,7 @@ export default React.createClass({
     for (let index = 0; index < this.props.deliverables.length; index++) {
       let assignmentId = this.props.deliverables[index].id;
       grades[index] = (
-        <Row>
+        <Row key={"m"+index}>
           <Col sm="10%">
           <FormField>
             <FormInput placeholder={assignmentId} disabled size="sm"/>
