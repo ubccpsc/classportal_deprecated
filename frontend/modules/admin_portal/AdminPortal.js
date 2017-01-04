@@ -48,6 +48,8 @@ export default React.createClass({
     }
 
     return (<Logout
+      app_path="/admin/apps" 
+      apps={this.state.files.appsArray}
       firstname={firstname}
       sid={prof ? "Prof" : "TA"}
       username={localStorage.username}/>);

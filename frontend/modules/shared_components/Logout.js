@@ -46,7 +46,7 @@ export default React.createClass({
           </InputGroup.Section>
           {config.enable_app_store &&
             <InputGroup.Section>
-              <Link to="/apps" target="_blank">
+              <Link to={this.props.app_path} target="_blank">
                 <Button size="sm">
                   <Glyph icon="package"/>&nbsp; App store
                 </Button>

@@ -216,4 +216,29 @@ export default class TeamController {
         );
     }
 
+    /**
+     * Submmit a comment to the app store
+     *
+     * @param username, appID, ratting, comment
+     * @returns
+     */
+    static submitComment(username: string, appID: string, ratting: string, comment: string, callback: any) {
+        Log.trace("AdminController::submitComment(..) - start");
+
+        Helper.checkEntry("students.json", {'username': username}, function (error: any, response: any) {
+            if (!error) {
+                Helper.addComment(response.sid, appID, ratting, comment, function (error: any, data: any) {
+                    if (!error) {
+                        return callback(null, "success!");
+                    } else {
+                        // return error
+                        return callback("Error while submiting your comment");
+                    }
+                });
+            } else {
+                Log.trace("AdminController::submitComment(..)| Error: Student is not enrolled.");
+                return callback("student is not enrolled", null);
+            }
+        });
+    }
 }

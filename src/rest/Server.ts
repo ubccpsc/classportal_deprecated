@@ -71,6 +71,7 @@ export default class Server {
                 that.rest.post('/api/loadStudentPortal', requireToken, RouteHandler.loadStudentPortal);
                 that.rest.post('/api/createTeam', requireToken, RouteHandler.createTeam);
                 that.rest.post('/api/disbandTeam', requireToken, RouteHandler.disbandTeam);
+                that.rest.post('/api/submitComment', requireToken, RouteHandler.submitComment);
 
                 /* Routes acccessible by ADMIN users only */
                 that.rest.post('/api/loadAdminPortal', requireAdmin, requireToken, RouteHandler.loadAdminPortal);
@@ -78,6 +79,7 @@ export default class Server {
                 that.rest.post('/api/submitGrade', requireAdmin, requireToken, RouteHandler.submitGrade);
                 that.rest.post('/api/submitGrades', requireAdmin, requireToken, RouteHandler.submitGrades);
                 that.rest.post('/api/submitClasslist', requireAdmin, requireToken, RouteHandler.updateClasslist);
+                that.rest.post('/api/updateComments', requireAdmin, requireToken, RouteHandler.updateComments);
 
                 // serve static css and js files
                 that.rest.get(/\w+\.(?:(js)|(css)|(png))/, restify.serveStatic({

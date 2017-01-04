@@ -15,7 +15,8 @@ export default React.createClass({
         "myTeamFile": {},
         "myGradesFile": {},
         "deliverablesFile": {},
-        "namesArray": []
+        "namesArray": [],
+        "appsArray": []
       }
     };
   },
@@ -52,7 +53,8 @@ export default React.createClass({
   render: function () {
     return (
       <div>
-        <Logout firstname={this.state.files.myStudentFile.firstname} sid={this.state.files.myStudentFile.sid} username={localStorage.username}/>
+        <Logout firstname={this.state.files.myStudentFile.firstname} sid={this.state.files.myStudentFile.sid} 
+                username={localStorage.username} app_path="/apps" apps={this.state.files.appsArray}/>
         {this.state.loaded && this.renderTeamDisplay() }
         {this.state.loaded && (<Deliverables deliverables={this.state.files.deliverablesFile} grades={this.state.files.myGradesFile.grades}/>) }
       </div>

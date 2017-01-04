@@ -202,6 +202,26 @@ module.exports = {
             error: errorCallback
         });
     },
+    submitComment: function (appID, ratting, comment, successCallback, errorCallback) {
+        // console.log("Ajax.js| Submitting new grade..");
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/submitComment",
+            headers: {
+                "username": localStorage.username,
+                "token": localStorage.token
+            },
+            data: {
+                "appID": appID,
+                "ratting": ratting,
+                "comment": comment
+            },
+            dataType: "json",
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
     submitAllGrades: function (studentGrades, successCallback, errorCallback) {
         // console.log("Ajax.js | Submitting news grades...");
         $.ajax({
@@ -213,6 +233,28 @@ module.exports = {
                 "admin": localStorage.admin
             },
             data: { "student" : studentGrades},
+            dataType: "json",
+            cache: false,
+            success: successCallback,
+            error: errorCallback
+        });
+    },
+    updateComments: function (appID, comments, successCallback, errorCallback) {
+        // console.log("Ajax.js | Submitting news grades...");
+        console.log(appID);
+        console.log(comments);
+        $.ajax({
+            type: "POST",
+            url: "http://" + config.host + ":" + config.port + "/api/updateComments",
+            headers: {
+                "username": localStorage.username,
+                "token": localStorage.token,
+                "admin": localStorage.admin
+            },
+            data: { 
+                "appID": appID,
+                "comments": comments
+            },
             dataType: "json",
             cache: false,
             success: successCallback,

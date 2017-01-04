@@ -249,6 +249,32 @@ export default class RouteHandler {
     }
 
     /**
+     * Submit a new comment.
+     * Handled by AdminController
+     *
+     * @param student, ratting, appId, comment
+     * @returns server response
+     */
+    static submitComment(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var username: string = req.header('username');
+        var appID: string = req.params.appID;
+        var ratting: string = req.params.ratting;
+        var comment: string = req.params.comment;
+        Log.trace("RouteHandler::submitComment(..) - " + username + ", " + appID + ", " + ratting + ", " + comment);
+
+        TeamController.submitComment(username, appID, ratting, comment, function (error: any, response: boolean) {
+            if (!error) {
+                Log.trace("RouteHandler::submitComment(..) - Success!");
+                return res.send(200, "success");
+            }
+            else {
+                Log.trace("RouteHandler::submitComment(..) - Error:" + error);
+                return res.send(500, error);
+            }
+        });
+    }
+
+    /**
      * Submit all the grades for a student.
      * Handled by AdminController
      *
@@ -266,6 +292,31 @@ export default class RouteHandler {
             }
             else {
                 Log.trace("RouteHandler::submitGrades(..) - Error:" + error);
+                return res.send(500, error);
+            }
+        });
+    }
+
+    /**
+     * Update the comments of one app/team
+     * Handled by AdminController
+     *
+     * @param updated comments
+     * @returns server response
+     */
+    static updateComments(req: restify.Request, res: restify.Response, next: restify.Next) {
+        var appID: string = req.params.appID;
+        Log.trace("RouteHandler::updateComments(..) - " + appID);
+
+        var comments: any[] = req.params.comments;
+
+        AdminController.updateComments(appID, comments, function (error: any, response: boolean) {
+            if (!error) {
+                Log.trace("RouteHandler::updateComments(..) - Success!");
+                return res.send(200, "success");
+            }
+            else {
+                Log.trace("RouteHandler::updateComments(..) - Error:" + error);
                 return res.send(500, error);
             }
         });

@@ -25,6 +25,7 @@ render((
       <Route path="register" component={RegisterPage} onEnter={requireNoAuth} />
       <Route path="admin" component={AdminPortal} onEnter={requireAdminAuth} >
         <IndexRedirect to="teams" />
+        <Route path="apps" component={AppsPortal} onEnter={requireAdminAuth}/>
         <Route path="teams" component={AdminTeamsView} onEnter={requireAdminAuth} />
         <Route path="students" component={AdminStudentsView} onEnter={requireAdminAuth} />
         <Route path="deliverables" component={AdminDeliverablesView} onEnter={requireAdminAuth} />

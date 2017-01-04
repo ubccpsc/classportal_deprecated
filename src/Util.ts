@@ -392,6 +392,7 @@ export class Helper {
             var app: any = {};
             app['name'] = team['appName'];
             app['url'] = team['url'];
+            app['id'] = team['id'];
             app['description'] = team['appDescription'];
             app['comments'] = [];
             (team['comments'] as any[]).forEach(function (comment) {
@@ -418,5 +419,134 @@ export class Helper {
 
         Log.trace("Helper::addGrades(..) - end");
         return apps;
+    }
+
+    // add a comment
+    static addComment(sid: string, appID: string, ratting: string, comment: string, callback: any) {
+        Log.trace("Helper::addComment(..) - start");
+        var filename = "teams.json";
+        var path = pathToRoot.concat(config.private_folder, filename);
+
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                Log.trace("Helper::addComment(..) - finding index of app in teams");
+                var appIndex: number = _.findIndex(jsonFile, { "id": parseInt(appID) });
+                if (appIndex !== -1) {
+                    // check if grade for that assnId already exists
+
+
+                    async.waterfall([
+                        function assign(cb: any) {
+                                Log.trace("Helper::addComment(..) - adding new comment");
+                                var newComment = {
+                                    sid: sid,
+                                    description: comment,
+                                    approved: false,
+                                    ratting: ratting
+                                };
+                                jsonFile[appIndex].comments.push(newComment);
+
+                            return cb();
+                        }
+                    ], function write(error: any) {
+                        if (!error) {
+                            Log.trace("Helper::addComment(..) - writing to file");
+                            fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
+                                if (!error) {
+                                    Log.error("Helper::addComment(..) - success!");
+                                    return callback(null);
+                                } else {
+                                    Log.trace("Helper::::addComment(..) - write error: " + error);
+
+                                    // create a backup
+                                    try {
+                                        fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
+                                    } catch (err) {
+                                        Log.error('Helper::addComment() - error creating backup: ' + err.message);
+                                    }
+                                    return callback(error);
+                                }
+                            });
+                        } else {
+                            return callback("Failed to assign grades");
+                        }
+                    });
+
+                } else {
+                    Log.trace("Helper::addComment(..) - error: app " + appID + " does not exist in teams.json");
+                    return callback("App " + appID + " does not exist", null);
+                }
+            }
+            else {
+                Log.trace("Helper::addComment(..) - file read error");
+                return callback(error, null);
+            }
+        });
+    }
+
+    // update comments
+    static updateComments(appID: string, comments: any[], callback: any) {
+        Log.trace("Helper::updateComments(..) - start");
+        var filename = "teams.json";
+        var path = pathToRoot.concat(config.private_folder, filename);
+
+        Helper.readJSON(filename, function (error: any, jsonFile: any) {
+            if (!error) {
+                Log.trace("Helper::updateComments(..) - finding index of app in teams");
+                var appIndex: number = _.findIndex(jsonFile, { "id": parseInt(appID) });
+                if (appIndex !== -1) {
+                    // check if grade for that assnId already exists
+
+                    var updateComments: any[] = [];
+                    comments.forEach(function (comment: any) {
+                        updateComments.push(function update(cb: any) {
+                            var commentIndex: number = _.findIndex(jsonFile[appIndex].comments, {
+                                "sid": comment.sid,
+                                "description": comment.description,
+                                "ratting": parseInt(comment.ratting)
+                            });
+                            if (commentIndex !== -1) {
+                                Log.trace("Helper::updateComments(..) - updating comment");
+                                jsonFile[appIndex].comments[commentIndex].approved = comment.approved.toLowerCase() === 'true';
+                            }
+
+                            return cb();
+                        })
+                    });
+
+                    async.waterfall(updateComments, function write(error: any) {
+                        if (!error) {
+                            Log.trace("Helper::updateComments(..) - writing to file");
+                            fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
+                                if (!error) {
+                                    Log.error("Helper::updateComments(..) - success!");
+                                    return callback(null);
+                                } else {
+                                    Log.trace("Helper::::updateComments(..) - write error: " + error);
+
+                                    // create a backup
+                                    try {
+                                        fs.createReadStream(path).pipe(fs.createWriteStream(path + "_" + new Date().getTime()));
+                                    } catch (err) {
+                                        Log.error('Helper::updateComments() - error creating backup: ' + err.message);
+                                    }
+                                    return callback(error);
+                                }
+                            });
+                        } else {
+                            return callback("Failed to update comments");
+                        }
+                    });
+
+                } else {
+                    Log.trace("Helper::updateComments(..) - error: app " + appID + " does not exist in teams.json");
+                    return callback("App " + appID + " does not exist", null);
+                }
+            }
+            else {
+                Log.trace("Helper::updateComments(..) - file read error");
+                return callback(error, null);
+            }
+        });
     }
 }
