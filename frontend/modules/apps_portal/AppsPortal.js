@@ -49,11 +49,9 @@ export default React.createClass({
   },
   setNewComment: function (event) {
     var comment = event.target.value;
-    console.log(comment);
     this.setState({ comment: comment });
   },
   setRattedApp: function(currentApp) {
-    console.log(currentApp);
     this.setState({ modalIsOpen: true, app: currentApp });
   },
   closeModal: function () {
@@ -73,17 +71,15 @@ export default React.createClass({
     Ajax.submitComment(
       this.state.app.id, this.state.ratting, this.state.comment,
       function onSuccess() {
-        alert("Comment submitted.")
         this.closeModal();
         window.location.reload(true);
       }.bind(this),
       function onError() {
-        alert("Error submitting comment.")
+        alert("Error submitting comment.");
       }.bind(this),
     );
   },
   setRatting: function(nextValue) {
-    console.log(nextValue);
     this.setState({ratting: nextValue});
   },
   renderApps: function() {
