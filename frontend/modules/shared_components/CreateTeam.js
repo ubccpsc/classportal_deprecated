@@ -16,6 +16,7 @@ export default React.createClass({
     var alertMessage = "Forming team with students: ";
 
     //check for valid students
+    var count = 0;
     for (var i = 0; i < config.team_size; i++) {
       //check that there actually is a selected student at this index 
       if (!!newTeamArray[i] && typeof newTeamArray[i] === 'string') {
@@ -23,16 +24,17 @@ export default React.createClass({
         //check that this student was not previously selected
         for (var j = 0; j < i; j++) {
           if (newTeamArray[i] === newTeamArray[j]) {
-            alert("Error: Invalid team.");
+            alert("Error: Invalid team. Non unique team members: "+newTeamArray[i]);
             return;
           }
         }
         alertMessage += newTeamArray[i] + " ";
+        count++;
       }
-      else {
-        alert("Error: Invalid team.");
+      else if (count < config.min_team_size) {
+        alert("Error: Invalid team. Leave empty selections at the end.");
         return;
-      }
+      } 
     }
 
     if (config.enable_app_store){
@@ -103,8 +105,13 @@ export default React.createClass({
     return (
       <Form onSubmit={this.handleSubmit}>
         {config.enable_app_store ? this.renderAppFields() : <br />}
-        <FormField id="text-center">
+        <FormField id="drop-downs">
           {oneOrMoreDropdowns}
+        </FormField>
+        <FormField id="team-info">
+          <p>Minimun number of students per team: <strong>{config.min_team_size}</strong></p>
+        </FormField>
+        <FormField id="text-center">
           <Button size="sm" submit>Form Team</Button>
         </FormField>
       </Form>);
