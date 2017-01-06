@@ -203,7 +203,8 @@ describe("GitHubManager", function () {
     it("Should be able to add webhook to repo", function () {
         let targetRepo = REPO_NAME2;
 
-        return controller.addWebhook(targetRepo).then(function (retVal) {
+        let webhookURL = 'http://localhost:1234/';
+        return controller.addWebhook(targetRepo, webhookURL).then(function (retVal) {
             Log.test('Repo hook status: ' + JSON.stringify(retVal));
             expect(retVal).not.to.be.null;
         }).catch(function (err: any) {

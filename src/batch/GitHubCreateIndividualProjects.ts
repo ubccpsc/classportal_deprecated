@@ -8,28 +8,27 @@ import GitHubManager from "./GitHubManager";
 import {GroupRepoDescription} from "./GitHubManager";
 
 /**
- * Steps required to configure a course. The first 1-7 are all async.
+ * Steps required to configure a course for individual repos.
  *
- * 0. Get the data about the github usernames, repos, and teams.
+ * 0. Get the data about the github usernames, repos.
  * 1. Create N project repos.
  * 2. Import base repo into each project repo. (optional; often helpful for getting started)
  * 3. Add webhook to each project repo. (optional; needed for autotest)
- * 4. Create M student teams.
- * 5. Add the right students to each team.
- * 6. Add the student team to the project repo.
- * 7. Add the course staff team to the project repo.
- * 8. Report back what has been created.
+ * 4. Add the student to the project repo as a collaborator.
+ * 5. Add the course staff team to the project repo.
+ * 6. Report back what has been created.
  *
  * @type {GitHubManager}
  */
 
 // organization name
-// const ORG_NAME = "CS410-2015Fall";
-// const ORG_NAME = "CS310-2016Fall";
-const ORG_NAME = "CS310-2017Jan";
+// const ORG_NAME = 'CS410-2015Fall';
+// const ORG_NAME = 'CS310-2016Fall';
+const ORG_NAME = 'CS310-2017Jan';
 
 // all projects will start with this (e.g., cpsc310project_team12)
 const PROJECT_PREFIX = 'cpsc310project_team';
+const PROJECT_PREFIX_INDIVIDUAL = 'cpsc310d0_';
 
 // all teams will start with this (e.g., cpsc310_team12)
 const TEAM_PREFIX = 'cpsc310_team';
@@ -37,8 +36,11 @@ const TEAM_PREFIX = 'cpsc310_team';
 // the team containing all of the TAs
 const STAFF_TEAM = '310staff';
 
+// the endpoint for AutoTest (null if you do not want these)
+const WEBHOOK_ENDPOINT = 'http://skaha.cs.ubc.ca:11311/submit';
+
 // this is the
-const IMPORTURL = 'https://github.com/CS310-2016Fall/cpsc310project';
+const IMPORTURL = 'https://github.com/CS310-2017Jan/bootstrap-d0';
 
 // if we want to delete projects instead of creating them. be careful with this!
 const CLEAN = false;
@@ -46,9 +48,7 @@ const CLEAN = false;
 var gpc = new GitHubManager(ORG_NAME);
 
 try {
-
-
-    gpc.getGroupDescriptions().then(
+    gpc.getIndividualDescriptions().then(
         function (descriptions) {
             Log.info('ProvisioningMain() - Available teams: ' + JSON.stringify(descriptions));
 
@@ -60,8 +60,9 @@ try {
             let groupsToProcess: GroupRepoDescription[] = [];
             let completeGroups: GroupRepoDescription[] = [];
             for (var descr of descriptions) {
-                descr.projectName = PROJECT_PREFIX + descr.team;
-                descr.teamName = TEAM_PREFIX + descr.team;
+                descr.projectName = PROJECT_PREFIX_INDIVIDUAL + descr.team;
+                //descr.teamName = TEAM_PREFIX + descr.team;
+                descr.teamName = descr.team + '';
 
                 if (CLEAN) {
                     Log.info('ProvisioningMain() - Team to Clean: ' + JSON.stringify(descr));
@@ -99,8 +100,10 @@ try {
                     processList.push(<any>gpc.completeClean(toProcess));
                 } else {
                     // new project
-                    processList.push(<any>gpc.completeProvision(toProcess, IMPORTURL, STAFF_TEAM));
+                    // processList.push(<any>gpc.completeTeamProvision(toProcess, IMPORTURL, STAFF_TEAM, WEBHOOK_ENDPOINT));
 
+                    Log.info("ProvisioningMain() - Individual to process: " + JSON.stringify(completeGroups.length));
+                    processList.push(<any>gpc.completeIndividualProvision(toProcess, IMPORTURL, STAFF_TEAM, WEBHOOK_ENDPOINT));
                     // test suite
                     // processList.push(<any>gpc.provisionRepo(toProcess, D1_PREFIX + toProcess.team, D1_URL));
                 }
