@@ -16,6 +16,8 @@ NPM run scripts have been set up for most common tasks:
 
 If you encounter an error during `configure` you might need to install typings globally (`sudo npm install -g typings`).
 
+If you encounter ```Error: Cannot find module 'classportal/config.json'``` it is probably because your portal is not in a directory called ```classportal``` (it is fine to have it in a subdir (like ```310portal/classportal/```).
+
 ## Configuring the install
 In the project's root directory, a configuration file `/config.json` is needed. A sample file `/sample-config.json` is provided to expose the structure. To fully populate this file you will need to create a new Github OAuth application. You can do this here: https://github.com/settings/applications/ While creating the application, set the callback url to be  ```SERVERNAME/postlogin``` In ```/config.json``` set ```client_id``` and ```client_secret``` to the values from the OAuth page on Github.
 
@@ -23,7 +25,9 @@ You will also need a personal authentication token on Github for the Github proj
 
 If you're configuring the data for the first time; in `/priv':
 
+```
 echo [] > tokens.json; echo [] > grades.json; echo [] > teams.json; echo [] > students.json; cp ../sampleData/deliverables.json .
+```
 
 Make sure to change `frontend/public/index.html` title tag to reflect the same code present in the `titlebar` property in `config.json` 
 
