@@ -609,10 +609,14 @@ export default class GitHubManager {
 
         return new Promise(function (fulfill, reject) {
 
+            var destinationRepo = 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + targetRepo + '/import';
+            Log.info("GitHubManager::importRepoToNewRepo(..) - destination repo: " + destinationRepo + '; import repo: ' + importRepoUrl);
+
+            // https://developer.github.com/v3/migration/source_imports/
             // PUT /repos/:owner/:repo/import
             let opts = {
                 method:  'PUT',
-                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + targetRepo + '/import',
+                uri:     destinationRepo,
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
                     'User-Agent':    ctx.GITHUB_USER_NAME,
