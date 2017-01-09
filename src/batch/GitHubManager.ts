@@ -1084,7 +1084,7 @@ export default class GitHubManager {
         Log.info("GitHubManager::completeIndividualProvision(..) - start: " + JSON.stringify(inputGroup));
         return new Promise(function (fulfill, reject) {
 
-            const DELAY = 5000;
+            const DELAY = 10000;
             // slow down creation to avoid getting in trouble with GH
             that.delay(inputGroup.teamIndex * DELAY).then(function () {
                 Log.info("GitHubManager::completeIndividualProvision(..) - creating project: " + inputGroup.projectName);
@@ -1134,7 +1134,12 @@ export default class GitHubManager {
                 Log.info("GitHubManager::completeIndividualProvision(..) - process complete for: " + JSON.stringify(inputGroup));
                 fulfill(inputGroup);
             }).catch(function (err) {
+                Log.error("******");
+                Log.error("******");
+                Log.error("Input Description: " + JSON.stringify(inputGroup));
                 Log.error("GitHubManager::completeIndividualProvision(..) - ERROR: " + err);
+                Log.error("******");
+                Log.error("******");
                 inputGroup.url = "";
                 reject(err);
             });
