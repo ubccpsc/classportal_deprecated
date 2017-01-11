@@ -22,7 +22,7 @@ export default React.createClass({
   loadAdminPortal: function () {
     Ajax.loadAdminPortal(
       function onSuccess(response) {
-        // console.log("AdminPortal.js| Retrieved files: " + JSON.stringify(response, null, 2));
+        console.log("AdminPortal.js| Retrieved files: " + JSON.stringify(response, null, 2));
         this.setState({ files: response }, function () {
           //verify files exist and are a proper format here
           if (1) {
