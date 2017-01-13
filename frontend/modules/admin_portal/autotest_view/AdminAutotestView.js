@@ -4,8 +4,6 @@ import data from 'dashboard';
 import Dashboard from './Dashboard'
 import DataParser from './DataParser'
 
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-
 import {
     Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Dropdown,
     Glyph, Button, ButtonGroup,

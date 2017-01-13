@@ -4,7 +4,6 @@ import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Dropdow
     Glyph, Button, ButtonGroup,
     Row, Col,
     Modal, ModalHeader, ModalBody, ModalFooter } from 'elemental'
-import ReactTooltip from 'react-tooltip'
 
 export default React.createClass({
 
