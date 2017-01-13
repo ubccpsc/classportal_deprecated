@@ -24,23 +24,24 @@ import {GroupRepoDescription} from "./GitHubManager";
 // organization name
 // const ORG_NAME = 'CS410-2015Fall';
 // const ORG_NAME = 'CS310-2016Fall';
-const ORG_NAME = 'CS310-2017Jan';
+// const ORG_NAME = 'CS310-2017Jan';
+const ORG_NAME = 'ubc-cpsc411-2016w2';
 
 // all projects will start with this (e.g., cpsc310project_team12)
 const PROJECT_PREFIX = 'cpsc310project_team';
-const PROJECT_PREFIX_INDIVIDUAL = 'cpsc310d0_';
+const PROJECT_PREFIX_INDIVIDUAL = 'cpsc411a1_';
 
 // all teams will start with this (e.g., cpsc310_team12)
-const TEAM_PREFIX = 'cpsc310_team';
+const TEAM_PREFIX = 'cpsc411_team';
 
 // the team containing all of the TAs
-const STAFF_TEAM = '310staff';
+const STAFF_TEAM = 'Staff';
 
 // the endpoint for AutoTest (null if you do not want these)
-const WEBHOOK_ENDPOINT = 'http://skaha.cs.ubc.ca:11311/submit';
+const WEBHOOK_ENDPOINT = 'http://skaha.cs.ubc.ca:11412/submit'; // not used for now, just for testing?
 
 // this is the
-const IMPORTURL = 'https://github.com/CS310-2017Jan/bootstrap-d0';
+const IMPORTURL = 'https://github.com/ubc-cpsc411-2016w2/assignment1';
 
 // if we want to delete projects instead of creating them. be careful with this!
 const CLEAN = false;
