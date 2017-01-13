@@ -10,7 +10,8 @@ module.exports = {
   },
 
   externals: {
-    'config': JSON.stringify(require('./config.json'))
+    'config': JSON.stringify(require('./config.json')),
+    'dashboard': JSON.stringify(require('./priv/data.json'))
   },
 
  plugins: process.env.NODE_ENV === 'production' ? [
