@@ -1025,7 +1025,8 @@ export default class GitHubManager {
         return new Promise(function (fulfill, reject) {
             let teamId = -1;
             ctx.listTeams().then(function (teamList: any) {
-                Log.trace("GitHubManager::getTeamNumber(..) - all teams: " + JSON.stringify(teamList));
+                // this is pretty verbose once we have many teams
+                // Log.trace("GitHubManager::getTeamNumber(..) - all teams: " + JSON.stringify(teamList));
                 for (var team of teamList) {
                     if (team.name === teamName) {
                         teamId = team.id;
@@ -1139,7 +1140,14 @@ export default class GitHubManager {
                 Log.info("GitHubManager::completeTeamProvision(..) - process complete for: " + JSON.stringify(inputGroup));
                 fulfill(inputGroup);
             }).catch(function (err) {
+                // Log.error("GitHubManager::completeTeamProvision(..) - ERROR: " + err);
+                Log.error("******");
+                Log.error("******");
+                Log.error("Input Description: " + JSON.stringify(inputGroup));
                 Log.error("GitHubManager::completeTeamProvision(..) - ERROR: " + err);
+                Log.error("******");
+                Log.error("******");
+
                 inputGroup.url = "";
                 reject(err);
             });
