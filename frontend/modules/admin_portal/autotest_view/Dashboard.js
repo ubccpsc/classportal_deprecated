@@ -4,7 +4,6 @@ import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Dropdow
     Glyph, Button, ButtonGroup,
     Row, Col,
     Modal, ModalHeader, ModalBody, ModalFooter } from 'elemental'
-import ReactTooltip from 'react-tooltip'
 
 export default React.createClass({
 
@@ -48,7 +47,7 @@ export default React.createClass({
         <Col sm="5%">{this.props.np}</Col>
         <Col sm="5%">{this.props.nf}</Col>
         <Col sm="5%">{this.props.ns}</Col>
-        <Col sm="28%">{this.renderResults()}<ReactTooltip /></Col>
+        <Col sm="28%">{this.renderResults()}</Col>
       </Row>
     )
   }

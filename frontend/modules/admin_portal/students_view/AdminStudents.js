@@ -277,10 +277,7 @@ export default React.createClass({
           resubmitMessage += '\n[' + assnId + '] data will be overwritten. Is that correct?';
           hasChanges = true;
         }
-        if (!(this.isValidGrade(newGrades[newGradeIdx], 'autotest') && 
-               this.isValidGrade(newGrades[newGradeIdx], 'coverage') &&
-               this.isValidGrade(newGrades[newGradeIdx], 'retrospective') &&
-               this.isValidGrade(newGrades[newGradeIdx], 'grade'))){
+        if (!(this.isValidGrade(newGrades[newGradeIdx], 'grade'))){
           alert("Error: [" +assnId+ "] grades must be integers between 0-100.");
           return;
         }
@@ -335,6 +332,7 @@ export default React.createClass({
     }
     if (index === -1){
       newStudentGrade.grades.push({assnId: assnId});
+      index = newStudentGrade.grades.length - 1;
     }
     newStudentGrade.grades[index][key] = event.target.value;
     this.setState({ studentGrade: newStudentGrade });

@@ -1,10 +1,8 @@
 import React from 'react';
 import ContentModule from '../../shared_components/ContentModule';
-import data from 'dashboard';
 import Dashboard from './Dashboard'
 import DataParser from './DataParser'
-
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import axios from 'axios'
 
 import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Dropdown,
     Glyph, Button, ButtonGroup,
@@ -13,11 +11,31 @@ import { Form, FormRow, FormField, FormInput, FormIconField, FormSelect, Dropdow
 
 
 export default React.createClass({
+  loadDashboardData: function() {
+    var client = axios.create({
+      baseURL: 'http://skaha.cs.ubc.ca:11312',
+      timeout: 1000,
+      headers: {"Authorization": "Basic " + btoa("autodash:OUi73u9Cn04153O87VFF")}
+    });
+
+    var that = this;
+
+    client.get('/results/_design/all/_view/byDateDeliverableTeam').then(function (response) {
+      var rows = DataParser.process_dashboard_rows(response.data.rows);
+      console.log(rows);
+      that.setState({ loaded: true, rows: rows });
+    }).catch(function (error) {
+      that.setState({ loaded: true });
+    });
+  },
+  componentDidMount: function () {
+    this.loadDashboardData();
+  },
   getInitialState: function () {
-  	var processed_rows = DataParser.process_dashboard_rows(data.rows);
     return {
-    	rows: processed_rows,
-    	sort: {}
+    	rows: [],
+    	sort: {},
+      loaded: false
     }
   },
   sortByDate: function () {
@@ -26,7 +44,7 @@ export default React.createClass({
   	if (typeof sort['date'] === 'undefined') {
   		sort['date'] = { desc: true};
   	} else {
-		sort['date'].desc = !sort['date'].desc;
+		  sort['date'].desc = !sort['date'].desc;
   	}
 
   	var rows = this.state.rows;
@@ -99,7 +117,8 @@ export default React.createClass({
 
     return (
 		<ContentModule id="admin-autotest-module" title={"Autotest"} initialHideContent={false}>
-		<Row style={headerLineStyle}>
+      {this.state.loaded &&
+		    <Row style={headerLineStyle}>
 	        <Col sm="10%"><a style={sortable} onClick={this.sortByDate}>Date</a></Col>
 	        <Col sm="20%">Repo</Col>
 	        <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'nsec', 2)}>#Sec</a></Col>
@@ -111,9 +130,10 @@ export default React.createClass({
 	        <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'nskip', 8)}>#S</a></Col>
 	        <Col sm="28%">Results</Col>
       	</Row>
+      }
 	      
         <div>
-			{this.renderDashboard()}
+			{this.state.loaded && this.renderDashboard()}
 			<br></br>
         </div>
 	    </ContentModule>
