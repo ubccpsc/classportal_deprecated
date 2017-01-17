@@ -182,7 +182,7 @@ module.exports = {
             if (annotated.length > 0) {
                 //var result = [dStr, user, repo, duration, rate, pass, fail, skipped, reason, annotated];
                 // ["Date", "Commit", "#Sec", "%", "% pass", "% cover", "#P", "#F", "#S", "Results"];
-                var result = [dStr, repo, duration, finalGrade, rate, coverRate, pass, fail, skipped, annotated, row.timestamp, row.stdioUrl];
+                var result = [dStr, repo, duration, finalGrade, rate, coverRate, pass, fail, skipped, annotated, row.timestamp, row.stdioUrl, row.commitUrl];
                 if (lastOnly === true) {
                     var include = true;
                     for (var l = 0; l < results.length; l++) {

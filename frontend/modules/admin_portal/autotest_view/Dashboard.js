@@ -89,7 +89,7 @@ export default React.createClass({
         return (
             <Row style={ this.props.index % 2 == 0 ? grayLineStyle : whiteLineStyle }>
                 <Col sm="10%">{this.renderDate()}</Col>
-                <Col sm="20%">{this.props.repo}</Col>
+                <Col sm="20%"><a href={this.props.commit}>{this.props.repo}</a></Col>
                 <Col sm="5%">{this.props.sec}</Col>
                 <Col sm="7%">{this.props.overall}</Col>
                 <Col sm="7%">{this.props.pass}</Col>

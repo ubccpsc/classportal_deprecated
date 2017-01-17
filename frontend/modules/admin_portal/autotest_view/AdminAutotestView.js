@@ -100,6 +100,7 @@ export default React.createClass({
                     results={autotest_data[9]}
                     ts={autotest_data[10]}
                     details={autotest_data[11]}
+                    commit={autotest_data[12]}
                     key={dkey}></Dashboard>
             )
         });
