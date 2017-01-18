@@ -126,6 +126,19 @@ export default class TeamValidator {
                 }
             }
 
+            // make sure all people on teams have their hasTeam flag set to true
+            for (let team of teamData) {
+                // this is out of an abundance of caution; just make sure all students in teams have this flag set
+                for (var memberSid of team.members) {
+                    var sIndex: number = _.findIndex(studentData, {"sid": memberSid});
+                    // Log.trace('sid index: ' + sIndex + "; hasTeam: " + studentData[sIndex].hasTeam);
+                    if (studentData[sIndex].hasTeam === false) {
+                        Log.info("Student in team but flag was false: " + JSON.stringify(studentData[sIndex]) + "; team: " + JSON.stringify(team));
+                        studentData[sIndex].hasTeam = true;
+                    }
+                }
+            }
+
             Log.info("teams length: " + teamData.length);
             Log.info("student length: " + studentData.length);
 
