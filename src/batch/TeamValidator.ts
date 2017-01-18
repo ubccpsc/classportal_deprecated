@@ -3,18 +3,18 @@
  */
 
 import Log from "../Util";
-var request = require('request');
 var config = require('../../config.json');
 
-import {Helper} from "../Util";
-import async = require('async');
 import _ = require('lodash');
 import fs = require('fs');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
 
+/**
+ * There is currently a bug whereby students can be put in multiple groups (e.g., if they form the teams at the same time).
+ * This deletes the extra groups. It is probably a good idea to run this from time to time, especially before any GitHub projects are created.
+ */
 export default class TeamValidator {
-
 
     public validateTeams(deleteHighest: boolean) {
         try {
@@ -32,7 +32,6 @@ export default class TeamValidator {
             var tbuf = fs.readFileSync(tpath);
             var teamData = JSON.parse(tbuf.toString());
             Log.info('team data ready!');
-
 
             let noTeam = 0;
             let bigTeam = 0;
@@ -139,72 +138,12 @@ export default class TeamValidator {
             }
 
             Log.info("Done");
-            /*
-             var updatedGrades: any[] = [];
-
-             for (var row of inData.rows) {
-             var github: string = row.key;
-             var newGrade = row.value;
-             var newGradeRecord = {
-             assnId: deliverableId,
-             autotest: row.value.testGrade + "",
-             comment: "",
-             coverage: row.value.coverGrade + "",
-             grade: row.value.finalGrade + "",
-             retrospective: ""
-             };
-
-             var sid = this.getStudentForGithub(github, studentData);
-             if (sid > 0) {
-             var gradeRows = this.getGradesForStudent(sid, gradeData);
-
-             var found = false;
-             for (var g of gradeRows) {
-             if (g.assnId === deliverableId) {
-             // g.assnId = // stays the same
-             g.autotest = newGradeRecord.autotest;
-             g.comment = newGradeRecord.comment;
-             g.coverage = newGradeRecord.coverage;
-             g.grade = Math.round(Number(newGradeRecord.grade));
-             g.retrospective = newGradeRecord.retrospective;
-             found = true;
-             Log.trace('updating record for: ' + sid);
-             }
-
-             }
-             if (found === false) {
-             Log.trace('adding new record for: ' + sid);
-             gradeRows.push(newGradeRecord);
-             }
-             var gradeRecord = {sid: sid + "", grades: gradeRows};
-             updatedGrades.push(gradeRecord);
-             Log.trace('current grade record: ' + JSON.stringify(gradeRecord));
-
-             Log.trace('current grade record complete');
-             } else {
-             // student not in student file (happens if course is dropped)
-             }
-             }
-             // Log.trace('row: ' + JSON.stringify(row));
-             Log.trace('updating record set');
-             Helper.addGrades(updatedGrades, function () {
-             Log.trace('add record done');
-             });
-             Log.trace('updating record set sent');
-
-             for (var grade of gradeData) {
-             //Log.info('grade: ' + JSON.stringify(grade));
-             //Helper.addGrades()
-             }
-
-             // write gradeData back to disk
-             //Log.trace('done, need to write');
-             */
         } catch (err) {
             Log.error('error: ' + err);
         }
     }
 }
 
+// The only thing to change is the boolean to validateTeams which specifies whether the changes should be written to disk.
 var tv = new TeamValidator();
 tv.validateTeams(false);
