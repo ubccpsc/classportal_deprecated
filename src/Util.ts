@@ -134,7 +134,7 @@ export class Helper {
         });
     }
 
-    /** 
+    /**
      * Add new entry to a JSON array of objects.
      */
     static addEntry(filename: string, newEntry: any, callback: any) {
@@ -211,10 +211,10 @@ export class Helper {
 
                     // use async library to ensure that the write happens AFTER the splice.
                     async.waterfall([
-                        function splice_array(cb: any) {
-                            jsonFile.splice(index, 1);
-                            return cb();
-                        }],
+                            function splice_array(cb: any) {
+                                jsonFile.splice(index, 1);
+                                return cb();
+                            }],
                         function write_file(err: any) {
                             fs.writeFile(path, JSON.stringify(jsonFile, null, 2), function (error: any) {
                                 if (error) {
@@ -248,7 +248,7 @@ export class Helper {
 
         Helper.readJSON(filename, function (error: any, jsonFile: any) {
             if (!error) {
-                var index: number = _.findIndex(jsonFile, { "username": username });
+                var index: number = _.findIndex(jsonFile, {"username": username});
                 var isAdmin: boolean = index !== -1;
                 Log.trace("Helper::isAdmin(..) - admin status: " + isAdmin);
                 return callback(null, isAdmin);
@@ -268,11 +268,11 @@ export class Helper {
         Helper.readJSON(filename, function (error: any, jsonFile: any) {
             if (!error) {
                 Log.trace("Helper::addGrade(..) - finding index of student in grades");
-                var studentIndex: number = _.findIndex(jsonFile, { "sid": sid });
+                var studentIndex: number = _.findIndex(jsonFile, {"sid": sid});
                 if (studentIndex !== -1) {
                     // check if grade for that assnId already exists
                     Log.trace("Helper::addGrade(..) - finding index of grade in grades.grades");
-                    var assnIndex: number = _.findIndex(jsonFile[studentIndex].grades, { "assnId": assnId });
+                    var assnIndex: number = _.findIndex(jsonFile[studentIndex].grades, {"assnId": assnId});
 
                     async.waterfall([
                         function assign(cb: any) {
@@ -284,8 +284,8 @@ export class Helper {
                             } else {
                                 Log.trace("Helper::addGrade(..) - assigning new grade");
                                 var newGrade = {
-                                    assnId: assnId,
-                                    grade: grade,
+                                    assnId:  assnId,
+                                    grade:   grade,
                                     comment: comment
                                 };
                                 jsonFile[studentIndex].grades.push(newGrade);
@@ -331,21 +331,37 @@ export class Helper {
     // add or edit grade
     static addGrades(student: any, callback: any) {
         Log.trace("Helper::addGrades(..) - start");
+        Log.trace("Helper::addGrades(..) - data: " + JSON.stringify(student));
         var filename = "grades.json";
         var path = pathToRoot.concat(config.private_folder, filename);
 
         Helper.readJSON(filename, function (error: any, jsonFile: any) {
             if (!error) {
                 Log.trace("Helper::addGrades(..) - finding index of student in grades");
-                var studentIndex: number = _.findIndex(jsonFile, { "sid": student['sid'] });
-                if (studentIndex !== -1) {
+                var studentIndex: number = _.findIndex(jsonFile, {"sid": student['sid']});
+                if (studentIndex !== -1 || Array.isArray(student)) {
                     // check if grade for that assnId already exists
                     Log.trace("Helper::addGrades(..) - finding index of grade in grades.grades");
 
                     async.waterfall([
                         function assign(cb: any) {
-                            Log.trace("Helper::addGrades(..) - assigning grades");
-                            jsonFile[studentIndex]['grades'] = student['grades'];
+                            if (Array.isArray(student)) {
+
+                                for (var s of student) {
+                                    // do many
+                                    Log.trace("Helper::addGrades(..) - assigning grades");
+                                    var studentIndex: number = _.findIndex(jsonFile, {"sid": s.sid});
+                                    if (studentIndex !== -1) {
+                                        Log.trace("Helper::addGrades(..) - assigning grade (set) for: " + s.sid);
+                                        jsonFile[studentIndex]['grades'] = s.grades;
+                                    } else {
+                                        Log.trace("Helper::addGrades(..) - assigning grades; missing grades row for: " + s.sid);
+                                    }
+                                }
+                            } else {
+                                Log.trace("Helper::addGrades(..) - assigning grade (single) for: " + student.sid);
+                                jsonFile[studentIndex]['grades'] = student['grades'];
+                            }
                             return cb();
                         }
                     ], function write(error: any) {
@@ -401,16 +417,16 @@ export class Helper {
                 filteredComment['ratting'] = comment['ratting'];
                 filteredComment['approved'] = comment['approved'];
 
-                if (isAdmin){
+                if (isAdmin) {
                     var index = _.findIndex(studentsArray, {"sid": comment['sid']});
-                    if (index !== -1){
+                    if (index !== -1) {
                         var studentName: string = studentsArray[index].firstname + " " + studentsArray[index].lastname;
                         filteredComment['sid'] = comment['sid'];
                         filteredComment['student'] = studentName;
                         filteredComment['approved'] = comment['approved'];
                         app['comments'].push(filteredComment);
                     }
-                } else if (!!filteredComment['approved']){
+                } else if (!!filteredComment['approved']) {
                     app['comments'].push(filteredComment);
                 }
             });
@@ -430,21 +446,21 @@ export class Helper {
         Helper.readJSON(filename, function (error: any, jsonFile: any) {
             if (!error) {
                 Log.trace("Helper::addComment(..) - finding index of app in teams");
-                var appIndex: number = _.findIndex(jsonFile, { "id": parseInt(appID) });
+                var appIndex: number = _.findIndex(jsonFile, {"id": parseInt(appID)});
                 if (appIndex !== -1) {
                     // check if grade for that assnId already exists
 
 
                     async.waterfall([
                         function assign(cb: any) {
-                                Log.trace("Helper::addComment(..) - adding new comment");
-                                var newComment = {
-                                    sid: sid,
-                                    description: comment,
-                                    approved: false,
-                                    ratting: ratting
-                                };
-                                jsonFile[appIndex].comments.push(newComment);
+                            Log.trace("Helper::addComment(..) - adding new comment");
+                            var newComment = {
+                                sid:         sid,
+                                description: comment,
+                                approved:    false,
+                                ratting:     ratting
+                            };
+                            jsonFile[appIndex].comments.push(newComment);
 
                             return cb();
                         }
@@ -493,7 +509,7 @@ export class Helper {
         Helper.readJSON(filename, function (error: any, jsonFile: any) {
             if (!error) {
                 Log.trace("Helper::updateComments(..) - finding index of app in teams");
-                var appIndex: number = _.findIndex(jsonFile, { "id": parseInt(appID) });
+                var appIndex: number = _.findIndex(jsonFile, {"id": parseInt(appID)});
                 if (appIndex !== -1) {
                     // check if grade for that assnId already exists
 
@@ -501,9 +517,9 @@ export class Helper {
                     comments.forEach(function (comment: any) {
                         updateComments.push(function update(cb: any) {
                             var commentIndex: number = _.findIndex(jsonFile[appIndex].comments, {
-                                "sid": comment.sid,
+                                "sid":         comment.sid,
                                 "description": comment.description,
-                                "ratting": parseInt(comment.ratting)
+                                "ratting":     parseInt(comment.ratting)
                             });
                             if (commentIndex !== -1) {
                                 Log.trace("Helper::updateComments(..) - updating comment");
