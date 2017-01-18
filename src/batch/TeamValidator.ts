@@ -102,19 +102,25 @@ export default class TeamValidator {
                     var teamToKeep = teamList[0];
                     var teamToRemove = teamList[1];
 
-                    Log.info("Keeping team: " + teamToKeep.id + "; removing team: " + teamToRemove.id);
+                    // make sure _all_ of the team members are the same!
+                    var allMembersSame = _.isEqual(teamToKeep.members.sort(), teamToRemove.members.sort());
 
-                    // remove from team list
-                    _.remove(teamData, function (n: any) {
-                        return n.id === teamToRemove.id;
-                    });
+                    if (allMembersSame === true) {
+                        Log.info("Keeping team: " + teamToKeep.id + "; removing team: " + teamToRemove.id);
 
+                        // remove from team list
+                        _.remove(teamData, function (n: any) {
+                            return n.id === teamToRemove.id;
+                        });
 
-                    // this is out of an abundance of caution; just make sure all students in teams have this flag set
-                    for (var memberSid of teamToKeep.members) {
-                        var sIndex: number = _.findIndex(studentData, {"sid": memberSid});
-                        // Log.trace('sid index: ' + sIndex + "; hasTeam: " + studentData[sIndex].hasTeam);
-                        studentData[sIndex].hasTeam = true;
+                        // this is out of an abundance of caution; just make sure all students in teams have this flag set
+                        for (var memberSid of teamToKeep.members) {
+                            var sIndex: number = _.findIndex(studentData, {"sid": memberSid});
+                            // Log.trace('sid index: ' + sIndex + "; hasTeam: " + studentData[sIndex].hasTeam);
+                            studentData[sIndex].hasTeam = true;
+                        }
+                    } else {
+                        Log.warn("All the team members are not the same!; data: " + JSON.stringify(teamList));
                     }
                 } else {
                     throw new Error("Cannot handle teams of size: " + teamList.length);
