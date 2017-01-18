@@ -73,8 +73,8 @@ export default class GradeAssigner {
                     assnId: deliverableId,
                     autotest: row.value.testGrade + "",
                     comment: "",
-                    coverage: row.value.coverGrade + "",
-                    grade: row.value.finalGrade + "",
+                    coverage: Math.min(Number(row.value.coverGrade), 100) + "", // coverage can't be > 100
+                    grade: Math.round(Number(row.value.finalGrade)) + "",
                     retrospective: ""
                 };
 
@@ -89,7 +89,7 @@ export default class GradeAssigner {
                             g.autotest = newGradeRecord.autotest;
                             g.comment = newGradeRecord.comment;
                             g.coverage = newGradeRecord.coverage;
-                            g.grade = Math.round(Number(newGradeRecord.grade));
+                            g.grade = newGradeRecord.grade;
                             g.retrospective = newGradeRecord.retrospective;
                             found = true;
                             Log.trace('updating record for: ' + sid);
