@@ -43,7 +43,7 @@ export default class GradeAssigner {
         throw new Error('Could not find grades for student');
     }
 
-    public assign(deliverableId: string, fName: string) {
+    public assign(deliverableId: string, fName: string, writeToDisk: boolean) {
         try {
 
             var inpath = pathToRoot.concat(config.private_folder, fName);
@@ -70,11 +70,11 @@ export default class GradeAssigner {
                 var github: string = row.key;
                 var newGrade = row.value;
                 var newGradeRecord = {
-                    assnId:        deliverableId,
-                    autotest:      row.value.testGrade + "",
-                    comment:       "",
-                    coverage:      row.value.coverGrade + "",
-                    grade:         row.value.finalGrade + "",
+                    assnId: deliverableId,
+                    autotest: row.value.testGrade + "",
+                    comment: "",
+                    coverage: row.value.coverGrade + "",
+                    grade: row.value.finalGrade + "",
                     retrospective: ""
                 };
 
@@ -111,18 +111,15 @@ export default class GradeAssigner {
             }
             // Log.trace('row: ' + JSON.stringify(row));
             Log.trace('updating record set');
-            Helper.addGrades(updatedGrades, function () {
-                Log.trace('add record done');
-            });
-            Log.trace('updating record set sent');
-
-            for (var grade of gradeData) {
-                //Log.info('grade: ' + JSON.stringify(grade));
-                //Helper.addGrades()
+            if (writeToDisk === true) {
+                Log.trace('Writing results to disk');
+                Helper.addGrades(updatedGrades, function () {
+                    Log.trace('add record done');
+                });
+            } else {
+                Log.warn('Results not written to disk (writeToDisk false)');
             }
-
-            // write gradeData back to disk
-            //Log.trace('done, need to write');
+            Log.trace('updating record set sent');
 
         } catch (err) {
             Log.error('error: ' + err);
@@ -131,4 +128,4 @@ export default class GradeAssigner {
 }
 
 var gec = new GradeAssigner();
-gec.assign('d0', 'd0grades.json');
+gec.assign('d0', 'd0grades.json', false);
