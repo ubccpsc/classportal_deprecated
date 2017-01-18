@@ -128,4 +128,4 @@ export default class GradeAssigner {
 }
 
 var gec = new GradeAssigner();
-gec.assign('d0', 'd0grades.json', false);
+gec.assign('d0', 'd0grades.json', true);

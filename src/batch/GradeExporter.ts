@@ -31,7 +31,7 @@ export default class GradeExporter {
             Log.info('student data ready!');
 
             var rows: any = [];
-            var delivs = ["d1", "d2", "d3", "d4", "d5", "lab", "mt", "final"];
+            var delivs = ["d0", "d1", "d2", "d3", "d4", "d5", "lab", "mt", "final"];
             var rHead: any = [];
             rHead.push("Name");
             rHead.push("st #");
