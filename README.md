@@ -76,3 +76,13 @@ To Send:
 
 To Receive:
 ```rsync -auvp priv/ HOST:PATHTOPORTAL/priv/```
+
+### Pulling branch up to master
+
+````
+git checkout master
+git merge -s ours dev_branch
+git checkout dev_branch
+git merge master
+```
+`
