@@ -268,7 +268,7 @@ export default class GitHubManager {
      */
     public createRepo(repoName: string): Promise<string> {
         let ctx = this;
-
+        let url = '';
         Log.info("GitHubManager::createRepo( " + repoName + " ) - start");
         return new Promise(function (fulfill, reject) {
             var options = {
@@ -291,8 +291,12 @@ export default class GitHubManager {
             };
 
             rp(options).then(function (body: any) {
-                let url = body.html_url;
-                Log.info("GitHubManager::createRepo(..) - success; url: " + url);
+                url = body.html_url;
+                Log.info("GitHubManager::createRepo(..) - success; url: " + url + "; delaying 5 seconds (so target is ready for import)");
+
+                return ctx.delay(5000);
+            }).then(function () {
+                Log.info("GitHubManager::provisionProject(..) - creating repo: " + repoName);
                 fulfill(url);
             }).catch(function (err: any) {
                 Log.error("GitHubManager::createRepo(..) - ERROR: " + JSON.stringify(err));
