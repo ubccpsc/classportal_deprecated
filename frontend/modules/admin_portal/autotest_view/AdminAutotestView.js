@@ -23,8 +23,12 @@ export default React.createClass({
         var that = this;
 
         client.get('/results/_design/all/_view/byDateDeliverableTeam').then(function (response) {
-            var rows = DataParser.process_dashboard_rows(response.data.rows);
-            console.log(rows);
+
+            var rows = response.data.rows;
+            console.log('loadDashboardData - received; #rows: ' + rows.length);
+            var rows = DataParser.process_dashboard_rows(rows);
+            console.log('loadDashboardData - processed');
+
             that.setState({loaded: true, rows: rows});
         }).catch(function (error) {
             that.setState({loaded: true});

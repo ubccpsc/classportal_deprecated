@@ -43,6 +43,8 @@ export default class GitHubManager {
 
     private ORG_NAME: string;
 
+    private DELAY_SEC = 5 * 1000;
+
     constructor(orgName: string) {
         this.ORG_NAME = orgName;
     }
@@ -294,9 +296,9 @@ export default class GitHubManager {
                 url = body.html_url;
                 Log.info("GitHubManager::createRepo(..) - success; url: " + url + "; delaying 5 seconds (so target is ready for import)");
 
-                return ctx.delay(5000);
+                return ctx.delay(ctx.DELAY_SEC);
             }).then(function () {
-                Log.info("GitHubManager::provisionProject(..) - creating repo: " + repoName);
+                Log.info("GitHubManager::provisionProject(..) - repo created: " + repoName);
                 fulfill(url);
             }).catch(function (err: any) {
                 Log.error("GitHubManager::createRepo(..) - ERROR: " + JSON.stringify(err));
@@ -1103,7 +1105,7 @@ export default class GitHubManager {
         Log.info("GitHubManager::completeTeamProvision(..) - start: " + JSON.stringify(inputGroup));
         return new Promise(function (fulfill, reject) {
 
-            const DELAY = 5000;
+            const DELAY = that.DELAY_SEC * 3; // 2 would be enough, but let's just be safe
             // slow down creation to avoid getting in trouble with GH
             that.delay(inputGroup.teamIndex * DELAY).then(function () {
                 Log.info("GitHubManager::completeTeamProvision(..) - creating project: " + inputGroup.projectName);
