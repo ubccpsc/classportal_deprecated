@@ -155,7 +155,6 @@ export default React.createClass({
                     </select>
                 </div>
 
-
                 {this.state.loaded &&
                 <Row style={headerLineStyle}>
                     <Col sm="10%"><a style={sortable} onClick={this.sortByDate}>Date</a></Col>
