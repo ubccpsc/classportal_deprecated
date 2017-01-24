@@ -196,7 +196,7 @@ module.exports = {
                     coverGrade: -1,
                     numPass: -1,
                     numFail: -1,
-                    numSkipped: -1,
+                    numSkip: -1,
                     testDetails: {}
                 };
 
@@ -211,7 +211,7 @@ module.exports = {
                 rowEntry.coverGrade = coverRate;
                 rowEntry.numPass = pass;
                 rowEntry.numFail = fail;
-                rowEntry.numSkipped = skipped;
+                rowEntry.numSkip = skipped;
                 rowEntry.testDetails = annotated;
 
                 if (lastOnly === true) {

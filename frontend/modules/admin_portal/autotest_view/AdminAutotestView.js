@@ -41,7 +41,6 @@ export default React.createClass({
         }
     },
     sortByDate: function () {
-        var timestamp_index = 10;
         var sort = this.state.sort;
         if (typeof sort['date'] === 'undefined') {
             sort['date'] = {desc: true};
@@ -51,17 +50,16 @@ export default React.createClass({
 
         var rows = this.state.rows;
         rows.sort(function (a, b) {
+            var tsKey = 'timestamp';
             if (sort['date'].desc) {
-                return b[timestamp_index] - a[timestamp_index];
+                return b[tsKey] - a[tsKey];
             } else {
-                return a[timestamp_index] - b[timestamp_index];
+                return a[tsKey] - b[tsKey];
             }
         });
-
         this.setState({sort: sort, rows: rows});
     },
     sortBy: function (key, index) {
-        var timestamp_index = 10;
         var sort = this.state.sort;
         if (typeof sort[key] === 'undefined') {
             sort[key] = {desc: true};
@@ -71,13 +69,31 @@ export default React.createClass({
 
         var rows = this.state.rows;
         rows.sort(function (a, b) {
-            if (sort[key].desc) {
-                return b[index] - a[index];
+            var aVal = a[key];
+            var bVal = b[key];
+
+            if (typeof aVal === 'string' && typeof bVal === 'string') {
+                if (sort[key].desc) {
+                    if (aVal < bVal) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    if (aVal > bVal) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
             } else {
-                return a[index] - b[index];
+                if (sort[key].desc) {
+                    return bVal - aVal;
+                } else {
+                    return aVal - bVal;
+                }
             }
         });
-
         this.setState({sort: sort, rows: rows});
     },
     renderDashboard: function () {
@@ -158,14 +174,14 @@ export default React.createClass({
                 {this.state.loaded &&
                 <Row style={headerLineStyle}>
                     <Col sm="10%"><a style={sortable} onClick={this.sortByDate}>Date</a></Col>
-                    <Col sm="20%">Repo</Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'nsec', 2)}>#Sec</a></Col>
-                    <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'poverall', 3)}>% overall</a></Col>
-                    <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'ppass', 4)}>% pass</a></Col>
-                    <Col sm="8%"><a style={sortable} onClick={this.sortBy.bind(this, 'pcover', 5)}>% cover</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'npass', 6)}>#P</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'nfail', 7)}>#F</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'nskip', 8)}>#S</a></Col>
+                    <Col sm="20%"><a style={sortable} onClick={this.sortBy.bind(this, 'repo', 2)}>Repo</a></Col>
+                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'duration', 2)}>#Sec</a></Col>
+                    <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'grade', 3)}>% overall</a></Col>
+                    <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'testGrade', 4)}>% pass</a></Col>
+                    <Col sm="8%"><a style={sortable} onClick={this.sortBy.bind(this, 'coverGrade', 5)}>% cover</a></Col>
+                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numPass', 6)}>#P</a></Col>
+                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numFail', 7)}>#F</a></Col>
+                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numSkip', 8)}>#S</a></Col>
                     <Col sm="28%">Results</Col>
                 </Row>
                 }
