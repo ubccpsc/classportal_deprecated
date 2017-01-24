@@ -9,7 +9,6 @@ import {
 
 export default React.createClass({
 
-
     renderResults: function () {
         var results = this.props.results;
         var dashboard_index = this.props.index;
@@ -30,11 +29,7 @@ export default React.createClass({
         var details = this.props.details;
 
         return (
-            // dStr = '<a href=\"javascript:;\" onclick=\"getStdIO(\'' + row.stdioUrl + '\');\">' + dStr + '</a>';
-            // <a href="javascript:;" onClick="getStdIO('{details}');"> {date}</a>
-            <a href="javascript:;" onClick={this.getStdIO}> {date}</a>
-            // <a href="javascript:;" onClick="getStdIO('{details}');"> {date}</a>
-            // <a href={date}>{date}</a>
+            <a href="javascript:;" onClick={this.getStdIO} key={details}> {date}</a>
         )
     },
     getStdIO: function () {
@@ -45,17 +40,8 @@ export default React.createClass({
         oReq.setRequestHeader("Authorization", "Basic " + btoa("autodash:OUi73u9Cn04153O87VFF"));
 
         oReq.onload = function () {
-            // parseJSON(oReq);
             var data = oReq.responseText;
-            // console.log(oReq.response);
 
-            // var data = "<p>This is 'myWindow'</p>";
-            /*
-             var myWindow = window.open("data:text/plain," + encodeURIComponent(data),
-             "_blank", "width=200,height=100");
-             myWindow.focus();
-             */
-            //document.open('text/plain');
             var newWindow = window.open('text/plain');
 
             data = data
@@ -68,9 +54,6 @@ export default React.createClass({
 
             // and then do
             newWindow.document.write(data);
-            //var uri = "data:text/html," + encodeURIComponent(data);
-            //var newWindow = window.open(uri);
-
         };
         oReq.send();
     },

@@ -45,7 +45,6 @@ export default React.createClass({
         }
     },
     sortByDate: function () {
-        var timestamp_index = 10;
         var sort = this.state.sort;
         if (typeof sort['date'] === 'undefined') {
             sort['date'] = {desc: true};
@@ -55,17 +54,16 @@ export default React.createClass({
 
         var rows = this.state.rows;
         rows.sort(function (a, b) {
+            var tsKey = 'timestamp';
             if (sort['date'].desc) {
-                return b[timestamp_index] - a[timestamp_index];
+                return b[tsKey] - a[tsKey];
             } else {
-                return a[timestamp_index] - b[timestamp_index];
+                return a[tsKey] - b[tsKey];
             }
         });
-
         this.setState({sort: sort, rows: rows});
     },
     sortBy: function (key, index) {
-        var timestamp_index = 10;
         var sort = this.state.sort;
         if (typeof sort[key] === 'undefined') {
             sort[key] = {desc: true};
@@ -75,41 +73,75 @@ export default React.createClass({
 
         var rows = this.state.rows;
         rows.sort(function (a, b) {
-            if (sort[key].desc) {
-                return b[index] - a[index];
+            var aVal = a[key];
+            var bVal = b[key];
+
+            if (typeof aVal === 'string' && typeof bVal === 'string') {
+                if (sort[key].desc) {
+                    if (aVal < bVal) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    if (aVal > bVal) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
             } else {
-                return a[index] - b[index];
+                if (sort[key].desc) {
+                    return bVal - aVal;
+                } else {
+                    return aVal - bVal;
+                }
             }
         });
-
         this.setState({sort: sort, rows: rows});
     },
     renderDashboard: function () {
 
-        var autotest_dashboard = this.state.rows.map(function (autotest_data, i) {
+        var autotest_dashboard = this.state.rows.map(function (data, i) {
             var dkey = "dashboard_" + i;
 
             return (
                 <Dashboard
                     index={i}
-                    date={autotest_data[0]}
-                    repo={autotest_data[1]}
-                    sec={autotest_data[2]}
-                    overall={autotest_data[3]}
-                    pass={autotest_data[4]}
-                    cover={autotest_data[5]}
-                    np={autotest_data[6]}
-                    nf={autotest_data[7]}
-                    ns={autotest_data[8]}
-                    results={autotest_data[9]}
-                    ts={autotest_data[10]}
-                    details={autotest_data[11]}
-                    commit={autotest_data[12]}
+                    // date={autotest_data[0]}
+                    date={data.date}
+                    // repo={autotest_data[1]}
+                    repo={data.repo}
+                    // sec={autotest_data[2]}
+                    sec={data.duration}
+                    // overall={autotest_data[3]}
+                    overall={data.grade}
+                    //pass={autotest_data[4]}
+                    pass={data.testGrade}
+                    //cover={autotest_data[5]}
+                    cover={data.coverGrade}
+                    //np={autotest_data[6]}
+                    np={data.numPass}
+                    //nf={autotest_data[7]}
+                    nf={data.numFail}
+                    //ns={autotest_data[8]}
+                    ns={data.numSkip}
+                    //results={autotest_data[9]}
+                    results={data.testDetails}
+                    //ts={autotest_data[10]}
+                    ts={data.timestamp}
+                    //details={autotest_data[11]}
+                    details={data.execUrl}
+                    //commit={autotest_data[12]}
+                    commit={data.commitUrl}
                     key={dkey}></Dashboard>
             )
         });
 
         return autotest_dashboard;
+    },
+    filterChange: function () {
+        console.log('AdminAutotestView::filterChange() - not handled');
     },
     render: function () {
 
@@ -127,35 +159,33 @@ export default React.createClass({
         return (
             <ContentModule id="admin-autotest-module" title={"Autotest"} initialHideContent={false}>
 
-                <p>
-                    <div>
-                        Last Run Only:
-                        <input id='optLast' type="checkbox" name="lastOnly" value="true" onchange="filterChange();" checked/>
+                <div>
+                    Last Run Only:
+                    <input id='optLast' type="checkbox" name="lastOnly" value="true" onChange={this.filterChange} checked/>
 
-                        Deliverable:
-                        <select id='optDeliv' name="deliverable" onchange="filterChange();">
-                            <option value="all">All</option>
-                            <option value="d0">D0</option>
-                            <option value="d1">D1</option>
-                            <option value="d2">D2</option>
-                            <option value="d3">D3</option>
-                            <option value="d4">D4</option>
-                            <option value="d5">D5</option>
-                        </select>
-                    </div>
-                </p>
+                    Deliverable:
+                    <select id='optDeliv' name="deliverable" onChange={this.filterChange}>
+                        <option value="all">All</option>
+                        <option value="d0">D0</option>
+                        <option value="d1">D1</option>
+                        <option value="d2">D2</option>
+                        <option value="d3">D3</option>
+                        <option value="d4">D4</option>
+                        <option value="d5">D5</option>
+                    </select>
+                </div>
 
                 {this.state.loaded &&
                 <Row style={headerLineStyle}>
                     <Col sm="10%"><a style={sortable} onClick={this.sortByDate}>Date</a></Col>
-                    <Col sm="20%">Repo</Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'nsec', 2)}>#Sec</a></Col>
-                    <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'poverall', 3)}>% overall</a></Col>
-                    <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'ppass', 4)}>% pass</a></Col>
-                    <Col sm="8%"><a style={sortable} onClick={this.sortBy.bind(this, 'pcover', 5)}>% cover</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'npass', 6)}>#P</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'nfail', 7)}>#F</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'nskip', 8)}>#S</a></Col>
+                    <Col sm="20%"><a style={sortable} onClick={this.sortBy.bind(this, 'repo', 2)}>Repo</a></Col>
+                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'duration', 2)}>#Sec</a></Col>
+                    <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'grade', 3)}>% overall</a></Col>
+                    <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'testGrade', 4)}>% pass</a></Col>
+                    <Col sm="8%"><a style={sortable} onClick={this.sortBy.bind(this, 'coverGrade', 5)}>% cover</a></Col>
+                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numPass', 6)}>#P</a></Col>
+                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numFail', 7)}>#F</a></Col>
+                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numSkip', 8)}>#S</a></Col>
                     <Col sm="28%">Results</Col>
                 </Row>
                 }
