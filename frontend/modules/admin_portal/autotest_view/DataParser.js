@@ -43,7 +43,7 @@ module.exports = {
             row = row.value;
 
             var date = new Date(row.timestamp);
-            console.log('considering timestamp: ' + date + '; after: ' + after);
+            // console.log('considering timestamp: ' + date + '; after: ' + after);
             var ts = date.getTime();
             if (ts > until.getTime()) {
                 console.log('trimmed result (after until): ' + date);
@@ -55,12 +55,14 @@ module.exports = {
                 continue;
             }
 
-            if (hideStaff === true) {
-                if (row.executor === 'rtholmes' || row.executor === 'nickbradley' || row.executor === 'vivianig	') {
-                    console.log('trimmed result (staff): ' + row.executor);
-                    continue;
-                }
-            }
+            /*
+             if (hideStaff === true) {
+             if (row.executor === 'rtholmes' || row.executor === 'nickbradley' || row.executor === 'vivianig	') {
+             console.log('trimmed result (staff): ' + row.executor);
+             continue;
+             }
+             }
+             */
 
             if (deliverable !== null) {
                 if (deliverable !== row.deliverable) {
@@ -135,7 +137,7 @@ module.exports = {
             var passTests = row.passTests.length;
             var skipTests = row.skipTests.length;
             var failedTests = row.failedTests.length;
-            var totalTests = passTests + skipTests + failedTests;
+            // var totalTests = passTests + skipTests + failedTests;
 
             var finalGrade = row.grade;
             var coverRate = row.coverageGrade;
@@ -177,17 +179,15 @@ module.exports = {
                 annotated.push({name: name, colour: colour, state: state});
             }
 
-            //if (annotated.length === 45 || annotated.length === 50 || annotated.length === 15 || annotated.length === 35 || annotated.length === 25) {
             if (annotated.length > 0) {
-                //var result = [dStr, user, repo, duration, rate, pass, fail, skipped, reason, annotated];
-                // ["Date", "Commit", "#Sec", "%", "% pass", "% cover", "#P", "#F", "#S", "Results"];
-                var result = [dStr, repo, duration, finalGrade, rate, coverRate, pass, fail, skipped, annotated, row.timestamp, row.stdioUrl, row.commitUrl];
 
+                var result = [dStr, repo, duration, finalGrade, rate, coverRate, pass, fail, skipped, annotated, row.timestamp, row.stdioUrl, row.commitUrl];
                 // dummy entry so we know what everything is
                 var rowEntry = {
                     timestamp: -1,
                     date: '',
                     repo: '',
+                    deliverable: '',
                     execUrl: '',
                     commitUrl: '',
                     duration: -1,
@@ -203,6 +203,7 @@ module.exports = {
                 rowEntry.timestamp = row.timestamp;
                 rowEntry.date = dStr;
                 rowEntry.repo = repo;
+                rowEntry.deliverable = row.deliverable;
                 rowEntry.execUrl = row.stdioUrl;
                 rowEntry.commitUrl = row.commitUrl;
                 rowEntry.duration = duration;
@@ -233,10 +234,7 @@ module.exports = {
             } else {
                 console.log('skipping row; total: ' + annotated.length + '; p: ' + pass + '; f: ' + fail + '; skip: ' + skipped);
             }
-            // console.log("ts: "+ts+"; by: "+user+"; on: "+repo+"; rate: "+rate);
         }
-        // console.log(results);
-        //return results;
         return entries;
     }
 };
