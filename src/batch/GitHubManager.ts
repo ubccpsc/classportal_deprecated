@@ -296,7 +296,7 @@ export default class GitHubManager {
 
                 return ctx.delay(5000);
             }).then(function () {
-                Log.info("GitHubManager::provisionProject(..) - creating repo: " + repoName);
+                Log.info("GitHubManager::provisionProject(..) - repo created: " + repoName);
                 fulfill(url);
             }).catch(function (err: any) {
                 Log.error("GitHubManager::createRepo(..) - ERROR: " + JSON.stringify(err));

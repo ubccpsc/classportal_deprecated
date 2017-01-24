@@ -32,7 +32,7 @@ export default React.createClass({
         return (
             // dStr = '<a href=\"javascript:;\" onclick=\"getStdIO(\'' + row.stdioUrl + '\');\">' + dStr + '</a>';
             // <a href="javascript:;" onClick="getStdIO('{details}');"> {date}</a>
-            <a href="javascript:;" onClick={this.getStdIO}> {date}</a>
+            <a href="javascript:;" onClick={this.getStdIO} key={details}> {date}</a>
             // <a href="javascript:;" onClick="getStdIO('{details}');"> {date}</a>
             // <a href={date}>{date}</a>
         )

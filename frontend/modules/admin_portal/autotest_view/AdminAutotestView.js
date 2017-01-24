@@ -82,30 +82,46 @@ export default React.createClass({
     },
     renderDashboard: function () {
 
-        var autotest_dashboard = this.state.rows.map(function (autotest_data, i) {
+        var autotest_dashboard = this.state.rows.map(function (data, i) {
             var dkey = "dashboard_" + i;
 
             return (
                 <Dashboard
                     index={i}
-                    date={autotest_data[0]}
-                    repo={autotest_data[1]}
-                    sec={autotest_data[2]}
-                    overall={autotest_data[3]}
-                    pass={autotest_data[4]}
-                    cover={autotest_data[5]}
-                    np={autotest_data[6]}
-                    nf={autotest_data[7]}
-                    ns={autotest_data[8]}
-                    results={autotest_data[9]}
-                    ts={autotest_data[10]}
-                    details={autotest_data[11]}
-                    commit={autotest_data[12]}
+                    // date={autotest_data[0]}
+                    date={data.date}
+                    // repo={autotest_data[1]}
+                    repo={data.repo}
+                    // sec={autotest_data[2]}
+                    sec={data.duration}
+                    // overall={autotest_data[3]}
+                    overall={data.grade}
+                    //pass={autotest_data[4]}
+                    pass={data.testGrade}
+                    //cover={autotest_data[5]}
+                    cover={data.coverGrade}
+                    //np={autotest_data[6]}
+                    np={data.numPass}
+                    //nf={autotest_data[7]}
+                    nf={data.numFail}
+                    //ns={autotest_data[8]}
+                    ns={data.numSkip}
+                    //results={autotest_data[9]}
+                    results={data.testDetails}
+                    //ts={autotest_data[10]}
+                    ts={data.timestamp}
+                    //details={autotest_data[11]}
+                    details={data.execUrl}
+                    //commit={autotest_data[12]}
+                    commit={data.commitUrl}
                     key={dkey}></Dashboard>
             )
         });
 
         return autotest_dashboard;
+    },
+    filterChange: function () {
+        console.log('AdminAutotestView::filterChange() - not handled');
     },
     render: function () {
 
@@ -123,23 +139,22 @@ export default React.createClass({
         return (
             <ContentModule id="admin-autotest-module" title={"Autotest"} initialHideContent={false}>
 
-                <p>
-                    <div>
-                        Last Run Only:
-                        <input id='optLast' type="checkbox" name="lastOnly" value="true" onchange="filterChange();" checked/>
+                <div>
+                    Last Run Only:
+                    <input id='optLast' type="checkbox" name="lastOnly" value="true" onChange={this.filterChange} checked/>
 
-                        Deliverable:
-                        <select id='optDeliv' name="deliverable" onchange="filterChange();">
-                            <option value="all">All</option>
-                            <option value="d0">D0</option>
-                            <option value="d1">D1</option>
-                            <option value="d2">D2</option>
-                            <option value="d3">D3</option>
-                            <option value="d4">D4</option>
-                            <option value="d5">D5</option>
-                        </select>
-                    </div>
-                </p>
+                    Deliverable:
+                    <select id='optDeliv' name="deliverable" onChange={this.filterChange}>
+                        <option value="all">All</option>
+                        <option value="d0">D0</option>
+                        <option value="d1">D1</option>
+                        <option value="d2">D2</option>
+                        <option value="d3">D3</option>
+                        <option value="d4">D4</option>
+                        <option value="d5">D5</option>
+                    </select>
+                </div>
+
 
                 {this.state.loaded &&
                 <Row style={headerLineStyle}>
