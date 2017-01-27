@@ -194,7 +194,24 @@ export default React.createClass({
                     {this.state.loaded && this.renderDashboard()}
                     <br></br>
                 </div>
+
+                <div>
+                    <h2>AutoTest Statistics</h2>
+                    <span><b>Average</b> <span id="bucketAvg"></span></span><br/><br/>
+                    <span>00-10% <span id="bucket0"></span></span><br/>
+                    <span>10-20% <span id="bucket1"></span></span><br/>
+                    <span>20-30% <span id="bucket2"></span></span><br/>
+                    <span>30-40% <span id="bucket3"></span></span><br/>
+                    <span>40-50% <span id="bucket4"></span></span><br/>
+                    <span>50-60% <span id="bucket5"></span></span><br/>
+                    <span>60-70% <span id="bucket6"></span></span><br/>
+                    <span>70-80% <span id="bucket7"></span></span><br/>
+                    <span>80-90% <span id="bucket8"></span></span><br/>
+                    <span>90-99% <span id="bucket9"></span></span><br/>
+                    <span>100% <span id="bucket10"></span></span><br/>
+                </div>
+
             </ContentModule>
         )
-    }
-})
+    } // render
+}) // create class

@@ -93,42 +93,9 @@ module.exports = {
                 sec = "0" + sec;
             }
             var dStr = month + "/" + day + " @ " + hour + ":" + min + ":" + sec;
-            // http://skaha.cs.ubc.ca:8079/_utils/document.html?cpsc310/b0866bbc3ad3517242091b9dfa001cc9
-            // dStr = '<a href="http://skaha.cs.ubc.ca:8079/_utils/document.html?cpsc310/' + docId + '">' + dStr + '</a>';
-            // dStr = '<a href=\"' + row.stdioUrl + '\" onclick="makeCall(row.stdioUrl);">' + dStr + '</a>';
-            // dStr = '<a href=\"javascript:;\" onclick=\"getStdIO(\'' + row.stdioUrl + '\');\">' + dStr + '</a>';
 
-
-            // var userText = row.executor;
-            var userText = "N/A"; // TODO: lots of hacking here
-            // var user = '<a href="https://github.com/' + userText + '">' + userText + '</a>';
-            var user = '';
-            if (obfuscate) {
-                user = CryptoJS.MD5(user) + '';// '&lt;hidden&gt;'
-                user = user.substring(0, 8);
-            }
-
-            /*
-             var repo = row.commitUrl;
-             var repoText = repo;
-             if (repo.startsWith('cpsc310project_')) {
-             repoText = repo.substring(15, repo.length);
-             } else if (repo === 'cpsc310project-priv') {
-             repoText = 'solution';
-             } else if (repo === 'rtholmes-mvp') {
-             repoText = 'mvp';
-             } else {
-             repoText = repoText.substring(repoText.indexOf('2017Jan') + 9, 100);
-             repoText = repoText.substring(repoText.indexOf('_') + 1, 100);
-             repoText = repoText.substring(0, repoText.indexOf('/'));
-             user = repoText;
-             }
-             // repo = '<a href="https://github.com/CS310-2016Fall/' + repo + '">_' + repoText + '_</a>';
-             repo = repoText;
-             */
             var repo = row.repoName;
             if (obfuscate) {
-                // repo = strhash(repo); //'&lt;hidden&gt;'
                 repo = CryptoJS.MD5(repo) + '';
                 repo = repo.substring(0, 8);
             }
@@ -137,7 +104,6 @@ module.exports = {
             var passTests = row.passTests.length;
             var skipTests = row.skipTests.length;
             var failedTests = row.failedTests.length;
-            // var totalTests = passTests + skipTests + failedTests;
 
             var finalGrade = row.grade;
             var coverRate = row.coverageGrade;
@@ -235,6 +201,49 @@ module.exports = {
                 console.log('skipping row; total: ' + annotated.length + '; p: ' + pass + '; f: ' + fail + '; skip: ' + skipped);
             }
         }
+
+        this.processEntries(entries);
         return entries;
+    },
+    processEntries: function (entries) {
+
+        var myData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var total = 0;
+        var num = 0;
+        for (var r of entries) {
+            //if (r[2].indexOf('team') > 0) { // only look at student projects for histogram
+            // if (r[1].indexOf('310') > 0) { // only look at student projects for histogram
+            if (true) {
+                if (Number.isFinite(r.grade)) {
+                    num++;
+                    total += r.grade;
+                    var index = Math.floor(r.grade / 10);
+                    //if (index === 10) {
+                    //    index = 9;
+                    // }
+                    // console.log('b index: ' + index + "; data: " + JSON.stringify(myData));
+                    myData[index] = myData[index] + 1;
+                    // console.log('a index: ' + index + "; data: " + JSON.stringify(myData));
+                }
+            }
+        }
+
+        console.log('Histogram: ' + JSON.stringify(myData));
+        var totalProjects = 0;
+        for (var i = 0; i < myData.length; i++) {
+            totalProjects = totalProjects + myData[i];
+        }
+
+        for (var i = 0; i < myData.length; i++) {
+            var perc = '0 %';
+            if (myData[i] > 0) {
+                perc = ( (myData[i] / totalProjects) * 100 ).toFixed(1) + ' %';
+            }
+            document.getElementById('bucket' + i).innerHTML = myData[i] + ' of ' + totalProjects + ' ( ' + perc + ' )';
+            console.log("Histogram Bucket: " + i * 10 + ' %; ' + myData[i] + ' of ' + totalProjects + ' ( ' + perc + ' )');
+        }
+        console.log("Avg: " + (total / totalProjects ).toFixed(1) + ' ( # ' + totalProjects + ' )');
+        document.getElementById('bucketAvg').innerHTML = (total / totalProjects ).toFixed(1) + ' ( # ' + totalProjects + ' )';
+
     }
 };
