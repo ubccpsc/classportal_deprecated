@@ -208,7 +208,7 @@ export default React.createClass({
                     <span>70-80% <span id="bucket7"></span></span><br/>
                     <span>80-90% <span id="bucket8"></span></span><br/>
                     <span>90-99% <span id="bucket9"></span></span><br/>
-                    <span>100% <span id="bucket10"></span></span><br/>
+                    <span>100% <span id="bucket10"></span></span><br/><br/>
                 </div>
 
             </ContentModule>
