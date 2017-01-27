@@ -41,7 +41,9 @@ export default React.createClass({
         return {
             rows: [],
             sort: {},
-            loaded: false
+            loaded: false,
+            lastOnly: true,
+            deliverable: "d1"
         }
     },
     sortByDate: function () {
@@ -140,11 +142,24 @@ export default React.createClass({
 
         return autotest_dashboard;
     },
-    filterChange: function () {
-        console.log('AdminAutotestView::filterChange() - not handled');
+    lastOnlyChange: function (event) {
+        console.log('AdminAutotestView::lastOnlyChange()');
+        var that = this;
+
+        this.setState({lastOnly: event.target.checked}, function () {
+            console.log('AdminAutotestView::lastOnlyChange() - cb');
+        });
+    },
+    deliverableChange: function (event) {
+        console.log('AdminAutotestView::deliverableChange()');
+        var that = this;
+        this.setState({deliverable: event.target.value}, function () {
+            console.log('AdminAutotestView::deliverableChange() - cb');
+            // that.renderDashboard();
+        });
     },
     render: function () {
-
+        console.log('AdminAutotestView::render()');
         var headerLineStyle = {
             backgroundColor: "#002145",
             paddingTop: "5px",
@@ -156,15 +171,16 @@ export default React.createClass({
             color: "white"
         };
 
+        console.log("current state; lastOnly " + this.state.lastOnly + '; deliv: ' + this.state.deliverable);
         return (
             <ContentModule id="admin-autotest-module" title={"Autotest"} initialHideContent={false}>
 
                 <div>
                     Last Run Only:
-                    <input id='optLast' type="checkbox" name="lastOnly" value="true" onChange={this.filterChange} checked/>
+                    <input id='optLast' type="checkbox" name="lastOnly" checked={this.state.lastOnly} onChange={this.lastOnlyChange}/>
 
                     Deliverable:
-                    <select id='optDeliv' name="deliverable" onChange={this.filterChange}>
+                    <select id='optDeliv' name="deliverable" value={this.state.deliv} onChange={this.deliverableChange}>
                         <option value="all">All</option>
                         <option value="d0">D0</option>
                         <option value="d1">D1</option>
