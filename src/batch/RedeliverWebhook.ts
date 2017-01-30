@@ -15,7 +15,6 @@ import GitHubManager from "./GitHubManager";
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
 
-
 export default class RedeliverWebhook {
 
     public redeliver(orgName: string, repoName: string) {
@@ -29,9 +28,8 @@ export default class RedeliverWebhook {
     }
 }
 
-
-if (process.argv.length < 2) {
-    Log.warn("node src/batch/RedeliverWebook <TEAM NUMBER>");
+if (process.argv.length < 3) {
+    Log.warn("Correct command: node src/batch/RedeliverWebook <TEAM NUMBER>");
 } else {
     let teamNum = process.argv[2];
 
