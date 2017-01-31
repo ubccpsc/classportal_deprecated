@@ -29,9 +29,9 @@ export default React.createClass({
         });
       }.bind(this),
       function onError(xhr, status, error) {
-        if (status == 401) {
+        if (xhr.status == 401) {
           localStorage.clear();
-          _reactRouter.browserHistory.push("/login");
+          window.location.pathname = 'login';
         }
         console.log("error loading files");
       }.bind(this)

@@ -27,14 +27,19 @@ export default React.createClass({
           //verify files exist and are a proper format here
           if (1) {
             this.setState({ loaded: true });
-          }
-          else {
+          } else {
             alert("Error loading files for user " + localStorage.username + "!");
           }
         });
       }.bind(this),
       function onError(xhr, status, error) {
-        console.log("AdminPortal.js| Error getting files!");
+          if (xhr.status == 401) {
+              console.log("AdminPortal.js| Auth error 401!");
+              localStorage.clear();
+              window.location.pathname = 'login';
+          } else {
+              console.log("AdminPortal.js| Error getting files!");
+          }
       }.bind(this)
     )
   },
@@ -48,7 +53,7 @@ export default React.createClass({
     }
 
     return (<Logout
-      app_path="/admin/apps" 
+      app_path="/admin/apps"
       apps={this.state.files.appsArray}
       firstname={firstname}
       sid={prof ? "Prof" : "TA"}
@@ -69,7 +74,7 @@ export default React.createClass({
 
     if (enable_autotest) {
       navsSM = "1/4";
-    } 
+    }
 
     return (
       <div>
@@ -84,7 +89,7 @@ export default React.createClass({
             <Col sm={navsSM}>
               <NavLink to="/admin/deliverables">Deliverables</NavLink>
             </Col>
-            {enable_autotest && 
+            {enable_autotest &&
               <Col sm={navsSM}>
               <NavLink to="/admin/autotest">Autotest</NavLink>
               </Col>
