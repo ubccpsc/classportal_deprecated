@@ -181,8 +181,7 @@ export default class LoginController {
                     Log.error("LoginController::login| end_async: error: " + error);
                     return parentCallback("error", null);
                 }
-            }
-        );
+            });
     }
 
     static logout(username: string, callback: any) {
@@ -243,8 +242,7 @@ export default class LoginController {
                     Log.error("LoginController::checkRegistration| error: " + error);
                     return parentCallback(error, null);
                 }
-            }
-        );
+            });
     }
 
     /**
@@ -414,8 +412,7 @@ export default class LoginController {
                     Log.error("LoginController::loadStudentPortal| Error: " + error);
                     return parentCallback(true, null);
                 }
-            }
-        );
+            });
     }
 
     /**
@@ -557,8 +554,7 @@ export default class LoginController {
                     Log.error("LoginController::loadAdminPortal| Error: " + error);
                     return parentCallback(true, null);
                 }
-            }
-        );
+            });
     }
 
 }
