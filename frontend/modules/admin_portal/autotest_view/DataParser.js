@@ -244,6 +244,5 @@ module.exports = {
         }
         console.log("Avg: " + (total / totalProjects ).toFixed(1) + ' ( # ' + totalProjects + ' )');
         document.getElementById('bucketAvg').innerHTML = (total / totalProjects ).toFixed(1) + ' ( # ' + totalProjects + ' )';
-
     }
 };
