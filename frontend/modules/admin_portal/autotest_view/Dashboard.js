@@ -37,7 +37,7 @@ export default React.createClass({
         console.log("getStdIO( " + url + " )");
         var oReq = new XMLHttpRequest();
         oReq.open("GET", url);
-        oReq.setRequestHeader("Authorization", "Basic " + btoa("autodash:OUi73u9Cn04153O87VFF"));
+        oReq.setRequestHeader("Authorization", "Basic " + btoa(localStorage.getItem('autodash')));
 
         oReq.onload = function () {
             var data = oReq.responseText;
