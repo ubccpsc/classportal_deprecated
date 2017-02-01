@@ -159,4 +159,4 @@ export default class TeamValidator {
 
 // The only thing to change is the boolean to validateTeams which specifies whether the changes should be written to disk.
 var tv = new TeamValidator();
-tv.validateTeams(false);
+tv.validateTeams(true);
