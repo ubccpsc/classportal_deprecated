@@ -24,6 +24,7 @@ export default React.createClass({
         }
     },
     sendAuthCode: function () {
+        console.log('PostLoginPage::sendAuthCode');
         this.getAuthCode(window.location.href, function (authcode) {
             Ajax.login(
                 localStorage.csid ? localStorage.csid : "",
@@ -35,7 +36,7 @@ export default React.createClass({
                     var username = response.username;
                     var token = response.token;
 
-                    //clear any previously saved values in localstorage
+                    //clear any previously saved values in localStorage
                     localStorage.clear();
 
                     if (!!username & !!token) {
@@ -75,8 +76,7 @@ export default React.createClass({
                             browserHistory.push("/");
                         }, 2500);
                     });
-                }.bind(this)
-            )
+                }.bind(this));
         }.bind(this));
     },
     componentDidMount: function () {

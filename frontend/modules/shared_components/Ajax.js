@@ -80,14 +80,14 @@ module.exports = {
     //submit new team to be created
     createTeam: function (namesArray, appName, appDescription, successCallback, errorCallback) {
         // console.log("Ajax.js| Creating team..");
-        var teamData = { "newTeam": namesArray };
-        if (typeof appName !== "undefined" && 
-            typeof url !== "undefined" && 
+        var teamData = {"newTeam": namesArray};
+        if (typeof appName !== "undefined" &&
+            typeof url !== "undefined" &&
             typeof appDescription !== "undefined") {
             teamData['appName'] = appName;
             teamData['appDescription'] = appDescription;
         }
-        
+
         $.ajax({
             type: "POST",
             url: "http://" + config.host + ":" + config.port + "/api/createTeam",
@@ -231,7 +231,7 @@ module.exports = {
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
-            data: { "student" : studentGrades},
+            data: {"student": studentGrades},
             dataType: "json",
             cache: false,
             success: successCallback,
@@ -250,7 +250,7 @@ module.exports = {
                 "token": localStorage.token,
                 "admin": localStorage.admin
             },
-            data: { 
+            data: {
                 "appID": appID,
                 "comments": comments
             },

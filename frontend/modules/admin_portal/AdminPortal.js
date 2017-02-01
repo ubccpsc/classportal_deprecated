@@ -23,6 +23,7 @@ export default React.createClass({
     Ajax.loadAdminPortal(
       function onSuccess(response) {
         // console.log("AdminPortal.js| Retrieved files: " + JSON.stringify(response, null, 2));
+        localStorage.setItem('autodash', response.autodash);
         this.setState({ files: response }, function () {
           //verify files exist and are a proper format here
           if (1) {
