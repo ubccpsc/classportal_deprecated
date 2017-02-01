@@ -29,6 +29,10 @@ export default React.createClass({
         });
       }.bind(this),
       function onError(xhr, status, error) {
+        if (xhr.status == 401) {
+          localStorage.clear();
+          window.location.pathname = 'login';
+        }
         console.log("error loading files");
       }.bind(this)
     )
@@ -53,10 +57,10 @@ export default React.createClass({
   render: function () {
     return (
       <div>
-        <Logout firstname={this.state.files.myStudentFile.firstname} sid={this.state.files.myStudentFile.sid} 
-                username={localStorage.username} app_path="/apps" apps={this.state.files.appsArray}/>
-        {this.state.loaded && this.renderTeamDisplay() }
-        {this.state.loaded && (<Deliverables deliverables={this.state.files.deliverablesFile} grades={this.state.files.myGradesFile.grades}/>) }
+        <Logout firstname={this.state.files.myStudentFile.firstname} sid={this.state.files.myStudentFile.sid}
+          username={localStorage.username} app_path="/apps" apps={this.state.files.appsArray} />
+        {this.state.loaded && this.renderTeamDisplay()}
+        {this.state.loaded && (<Deliverables deliverables={this.state.files.deliverablesFile} grades={this.state.files.myGradesFile.grades} />)}
       </div>
     )
   }

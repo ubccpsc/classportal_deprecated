@@ -119,9 +119,9 @@ export default class GitHubManager {
                             }, function add_new_group_repo_description(error: any) {
                                 if (!error) {
                                     var newGroupRepoDescription: GroupRepoDescription = {
-                                        team:    teamsFile[i].id,
+                                        team: teamsFile[i].id,
                                         members: usernamesArray,
-                                        url:     teamsFile[i].url
+                                        url: teamsFile[i].url
                                     };
                                     returnVal.push(newGroupRepoDescription);
                                 } else {
@@ -193,9 +193,9 @@ export default class GitHubManager {
                             }
 
                             var newGroupRepoDescription: GroupRepoDescription = {
-                                team:    student.username,
+                                team: student.username,
                                 members: usernamesArray,
-                                url:     url
+                                url: url
                             };
                             returnVal.push(newGroupRepoDescription);
                         }
@@ -274,22 +274,22 @@ export default class GitHubManager {
         Log.info("GitHubManager::createRepo( " + repoName + " ) - start");
         return new Promise(function (fulfill, reject) {
             var options = {
-                method:  'POST',
-                uri:     'https://api.github.com/orgs/' + ctx.ORG_NAME + '/repos',
+                method: 'POST',
+                uri: 'https://api.github.com/orgs/' + ctx.ORG_NAME + '/repos',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/json'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/json'
                 },
-                body:    {
-                    name:          repoName,
-                    private:       true,
-                    has_issues:    true,
-                    has_wiki:      false,
+                body: {
+                    name: repoName,
+                    private: true,
+                    has_issues: true,
+                    has_wiki: false,
                     has_downloads: false,
-                    auto_init:     false
+                    auto_init: false
                 },
-                json:    true
+                json: true
             };
 
             rp(options).then(function (body: any) {
@@ -321,12 +321,12 @@ export default class GitHubManager {
         return new Promise(function (fulfill, reject) {
 
             var options = {
-                method:  'DELETE',
-                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName,
+                method: 'DELETE',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName,
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/json'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/json'
                 }
             };
 
@@ -366,12 +366,12 @@ export default class GitHubManager {
                 }
 
                 var options = {
-                    method:  'DELETE',
-                    uri:     'https://api.github.com/teams/' + teamId,
+                    method: 'DELETE',
+                    uri: 'https://api.github.com/teams/' + teamId,
                     headers: {
                         'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                        'User-Agent':    ctx.GITHUB_USER_NAME,
-                        'Accept':        'application/json'
+                        'User-Agent': ctx.GITHUB_USER_NAME,
+                        'Accept': 'application/json'
                     }
                 };
                 Log.info("GitHubManager::deleteTeam(..) - deleting team; id: " + teamId);
@@ -409,15 +409,15 @@ export default class GitHubManager {
         return new Promise(function (fulfill, reject) {
 
             var options = {
-                method:                  'GET',
-                uri:                     'https://api.github.com/orgs/' + ctx.ORG_NAME + '/teams?per_page=100',
-                headers:                 {
+                method: 'GET',
+                uri: 'https://api.github.com/orgs/' + ctx.ORG_NAME + '/teams?per_page=100',
+                headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/json'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/json'
                 },
                 resolveWithFullResponse: true,
-                json:                    true
+                json: true
             };
 
             rp(options).then(function (fullResponse: any) {
@@ -524,18 +524,18 @@ export default class GitHubManager {
         return new Promise(function (fulfill, reject) {
 
             var options = {
-                method:  'POST',
-                uri:     'https://api.github.com/orgs/' + ctx.ORG_NAME + '/teams',
+                method: 'POST',
+                uri: 'https://api.github.com/orgs/' + ctx.ORG_NAME + '/teams',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/json'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/json'
                 },
-                body:    {
-                    name:       teamName,
+                body: {
+                    name: teamName,
                     permission: permission
                 },
-                json:    true
+                json: true
             };
 
             rp(options).then(function (body: any) {
@@ -563,17 +563,17 @@ export default class GitHubManager {
         return new Promise(function (fulfill, reject) {
 
             var options = {
-                method:  'PUT',
-                uri:     'https://api.github.com/teams/' + teamId + '/repos/' + ctx.ORG_NAME + '/' + repoName,
+                method: 'PUT',
+                uri: 'https://api.github.com/teams/' + teamId + '/repos/' + ctx.ORG_NAME + '/' + repoName,
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/json'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/json'
                 },
-                body:    {
+                body: {
                     permission: permission
                 },
-                json:    true
+                json: true
             };
 
             rp(options).then(function (body: any) {
@@ -604,14 +604,14 @@ export default class GitHubManager {
                 Log.info("GitHubManager::addMembersToTeam(..) - adding member: " + member);
 
                 let opts = {
-                    method:  'PUT',
-                    uri:     'https://api.github.com/teams/' + teamId + '/memberships/' + member,
+                    method: 'PUT',
+                    uri: 'https://api.github.com/teams/' + teamId + '/memberships/' + member,
                     headers: {
                         'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                        'User-Agent':    ctx.GITHUB_USER_NAME,
-                        'Accept':        'application/json'
+                        'User-Agent': ctx.GITHUB_USER_NAME,
+                        'Accept': 'application/json'
                     },
-                    json:    true
+                    json: true
                 };
                 promises.push(rp(opts));
             }
@@ -641,17 +641,17 @@ export default class GitHubManager {
 
             var options = {
                 method: 'PUT',
-                uri:    'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/collaborators/' + userName,
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/collaborators/' + userName,
 
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/json'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/json'
                 },
-                body:    {
+                body: {
                     permission: permission
                 },
-                json:    true
+                json: true
             };
 
             rp(options).then(function (body: any) {
@@ -684,17 +684,17 @@ export default class GitHubManager {
             // https://developer.github.com/v3/migration/source_imports/
             // PUT /repos/:owner/:repo/import
             let opts = {
-                method:  'PUT',
-                uri:     destinationRepo,
+                method: 'PUT',
+                uri: destinationRepo,
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/vnd.github.barred-rock-preview'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/vnd.github.barred-rock-preview'
                 },
-                body:    {
+                body: {
                     vcs_url: importRepoUrl
                 },
-                json:    true
+                json: true
             };
 
             rp(opts).then(function (results: any) {
@@ -715,14 +715,14 @@ export default class GitHubManager {
 
             // GET /repos/:owner/:repo/import
             let opts = {
-                method:  'GET',
-                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/import',
+                method: 'GET',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/import',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/vnd.github.barred-rock-preview'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/vnd.github.barred-rock-preview'
                 },
-                json:    true
+                json: true
             };
 
             rp(opts).then(function (results: any) {
@@ -749,18 +749,18 @@ export default class GitHubManager {
 
             // PATCH /repos/:owner/:repo/import
             let opts = {
-                method:  'PATCH',
-                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/import',
+                method: 'PATCH',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/import',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME,
-                    'Accept':        'application/vnd.github.barred-rock-preview'
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/vnd.github.barred-rock-preview'
                 },
-                body:    {
+                body: {
                     "vcs_username": "foo",
                     "vcs_password": "bar"
                 },
-                json:    true
+                json: true
             };
 
             rp(opts).then(function (results: any) {
@@ -781,22 +781,22 @@ export default class GitHubManager {
 
             // POST /repos/:owner/:repo/hooks
             let opts = {
-                method:  'POST',
-                uri:     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/hooks',
+                method: 'POST',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/hooks',
                 headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME
+                    'User-Agent': ctx.GITHUB_USER_NAME
                 },
-                body:    {
-                    "name":   "web",
+                body: {
+                    "name": "web",
                     "active": true,
                     "events": ["commit_comment", "push"],
                     "config": {
-                        "url":          webhookEndpoint, // "http://skaha.cs.ubc.ca:8080/submit",
+                        "url": webhookEndpoint, // "http://skaha.cs.ubc.ca:8080/submit",
                         "content_type": "json"
                     }
                 },
-                json:    true
+                json: true
             };
 
             if (webhookEndpoint !== null) {
@@ -813,6 +813,56 @@ export default class GitHubManager {
         });
     }
 
+    /**
+     * Redelivers the latest webhook payload for a repo.
+     *
+     * @param repoName
+     * @returns {Promise<{}>}
+     */
+    public redeliverWebhook(repoName: string): Promise<string> {
+        let ctx = this;
+
+        Log.info("GitHubManager::redeliverWebhook(..) - start");
+        return new Promise(function (fulfill, reject) {
+
+            var options = {
+                method: 'GET',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + "/hooks",
+                headers: {
+                    'Authorization': ctx.GITHUB_AUTH_TOKEN,
+                    'User-Agent': ctx.GITHUB_USER_NAME,
+                    'Accept': 'application/json'
+                }
+            };
+
+            rp(options).then(function (body: any) {
+                Log.info("GitHubManager::redeliverWebhook(..) - success; body: " + body);
+                let bodyObj = JSON.parse(body);
+                let testUrl = bodyObj[0].test_url;
+
+                var optionsInner = {
+                    method: 'POST',
+                    uri: testUrl,
+                    headers: {
+                        'Authorization': ctx.GITHUB_AUTH_TOKEN,
+                        'User-Agent': ctx.GITHUB_USER_NAME,
+                        'Accept': 'application/json'
+                    }
+                };
+                rp(optionsInner).then(function (innerBody: any) {
+                    Log.info("GitHubManager::redeliverWebhook(..) - inner success; body: " + innerBody);
+                    fulfill(innerBody);
+                }).catch(function (innerErr: any) {
+                    Log.error("GitHubManager::redeliverWebhook(..) - inner ERROR: " + JSON.stringify(innerErr));
+                    reject(innerErr);
+                });
+            }).catch(function (err: any) {
+                Log.error("GitHubManager::redeliverWebhook(..) - ERROR: " + JSON.stringify(err));
+                reject(err);
+            });
+
+        });
+    }
 
     public getStats(orgName: string, repoName: string): Promise<{}> {
         let ctx = this;
@@ -822,15 +872,15 @@ export default class GitHubManager {
 
             // POST /repos/:owner/:repo/hooks
             let opts = {
-                method:                  'GET',
-                uri:                     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/stats/commit_activity',
+                method: 'GET',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/stats/commit_activity',
                 // uri:                     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/stats/contributors',
-                headers:                 {
+                headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME
+                    'User-Agent': ctx.GITHUB_USER_NAME
                 },
-                body:                    {},
-                json:                    true,
+                body: {},
+                json: true,
                 resolveWithFullResponse: true
             };
 
@@ -870,15 +920,15 @@ export default class GitHubManager {
 
             // GET /repos/:owner/:repo/commits
             let opts = {
-                method:                  'GET',
-                uri:                     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/commits',
+                method: 'GET',
+                uri: 'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/commits',
                 // uri:                     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/stats/contributors',
-                headers:                 {
+                headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME
+                    'User-Agent': ctx.GITHUB_USER_NAME
                 },
-                body:                    {},
-                json:                    true,
+                body: {},
+                json: true,
                 resolveWithFullResponse: true
             };
 
@@ -943,17 +993,17 @@ export default class GitHubManager {
             // Log.info("GitHubManager::makeCommitComment(..) - url: " + url);
             // POST /repos/:owner/:repo/commits/:sha/comments
             let opts = {
-                method:                  'POST',
-                uri:                     url,
+                method: 'POST',
+                uri: url,
                 // uri:                     'https://api.github.com/repos/' + ctx.ORG_NAME + '/' + repoName + '/stats/contributors',
-                headers:                 {
+                headers: {
                     'Authorization': ctx.GITHUB_AUTH_TOKEN,
-                    'User-Agent':    ctx.GITHUB_USER_NAME
+                    'User-Agent': ctx.GITHUB_USER_NAME
                 },
-                body:                    {
+                body: {
                     body: msg
                 },
-                json:                    true,
+                json: true,
                 resolveWithFullResponse: true
             };
 
@@ -1183,22 +1233,22 @@ export default class GitHubManager {
                 Log.info("GitHubManager::completeIndividualProvision(..) - webhook added; adding user: " + inputGroup.members[0]);
                 return that.addCollaboratorToRepo(inputGroup.members[0], inputGroup.projectName, 'push');
                 /*
-                // don't need teams for individual repos
+                 // don't need teams for individual repos
 
-            .then(function () {
-                Log.info("GitHubManager::completeIndividualProvision(..) - webhook added; creating team: " + inputGroup.teamName);
-                return that.createTeam(inputGroup.teamName, 'push');
+                 .then(function () {
+                 Log.info("GitHubManager::completeIndividualProvision(..) - webhook added; creating team: " + inputGroup.teamName);
+                 return that.createTeam(inputGroup.teamName, 'push');
 
-            }).then(function (teamDeets: any) {
-                var teamId = teamDeets.teamId;
-                Log.info("GitHubManager::completeIndividualProvision(..) - team created ( " + teamId + " ) ; adding members: " + JSON.stringify(inputGroup.members));
-                return that.addMembersToTeam(teamId, inputGroup.members);
+                 }).then(function (teamDeets: any) {
+                 var teamId = teamDeets.teamId;
+                 Log.info("GitHubManager::completeIndividualProvision(..) - team created ( " + teamId + " ) ; adding members: " + JSON.stringify(inputGroup.members));
+                 return that.addMembersToTeam(teamId, inputGroup.members);
 
-            }).then(function (teamId: number) {
-                Log.info("GitHubManager::completeIndividualProvision(..) - members added to team ( " + teamId + " ); adding team to project");
-                const TEAM_PERMISSIONS = 'push';
-                return that.addTeamToRepo(teamId, inputGroup.projectName, TEAM_PERMISSIONS);
-                */
+                 }).then(function (teamId: number) {
+                 Log.info("GitHubManager::completeIndividualProvision(..) - members added to team ( " + teamId + " ); adding team to project");
+                 const TEAM_PERMISSIONS = 'push';
+                 return that.addTeamToRepo(teamId, inputGroup.projectName, TEAM_PERMISSIONS);
+                 */
             }).then(function () {
                 Log.info("GitHubManager::completeIndividualProvision(..) - person added to repo; getting staff team number for: " + staffTeamName);
                 // let staffTeamName = '310staff';

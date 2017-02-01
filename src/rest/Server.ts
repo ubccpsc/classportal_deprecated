@@ -140,7 +140,7 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
                 }
                 else {
                     Log.error("checkToken| Error: Tokens do not match (" + token + ":" + servertoken + ") Returning..");
-                    return res.send(500, "bad request");
+                    return res.send(401, "bad request");
                 }
             }
             else {
@@ -151,7 +151,7 @@ function requireToken(req: restify.Request, res: restify.Response, next: restify
     }
     else {
         Log.error("checkToken| Error: Bad request. Returning..");
-        return res.send(500, "bad request");
+        return res.send(401, "bad request");
     }
 }
 
