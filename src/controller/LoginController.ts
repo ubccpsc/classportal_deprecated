@@ -102,7 +102,10 @@ export default class LoginController {
                                     var newUserIndex = _.findIndex(file, {'csid': csid, 'sid': sid});
                                     if (newUserIndex >= 0) {
                                         Log.trace("LoginController::login| First time login! Updating student file");
-                                        Helper.updateEntry("students.json", {'csid': csid, 'sid': sid}, {"username": persistUsername}, function (error: any) {
+                                        Helper.updateEntry("students.json", {
+                                            'csid': csid,
+                                            'sid': sid
+                                        }, {"username": persistUsername}, function (error: any) {
                                             if (!error) {
                                                 Log.trace("LoginController::login| create_user: success");
                                                 return callback(null);
@@ -178,8 +181,7 @@ export default class LoginController {
                     Log.error("LoginController::login| end_async: error: " + error);
                     return parentCallback("error", null);
                 }
-            }
-        );
+            });
     }
 
     static logout(username: string, callback: any) {
@@ -240,8 +242,7 @@ export default class LoginController {
                     Log.error("LoginController::checkRegistration| error: " + error);
                     return parentCallback(error, null);
                 }
-            }
-        );
+            });
     }
 
     /**
@@ -411,8 +412,7 @@ export default class LoginController {
                     Log.error("LoginController::loadStudentPortal| Error: " + error);
                     return parentCallback(true, null);
                 }
-            }
-        );
+            });
     }
 
     /**
@@ -436,6 +436,7 @@ export default class LoginController {
         var deliverablesFile: any;
         var namesArray: any[] = [];
         var appsArray: any[] = [];
+        var autodash = config.autotest_auth;
 
         async.waterfall([
                 function get_admins_file_and_index(callback: any) {
@@ -544,7 +545,8 @@ export default class LoginController {
                         "gradesFile": gradesFile,
                         "deliverablesFile": deliverablesFile,
                         "namesArray": namesArray,
-                        "appsArray": appsArray
+                        "appsArray": appsArray,
+                        "autodash": autodash
                     };
                     Log.trace("LoginController::loadAdminPortal| Success! Sending files.");
                     return parentCallback(null, response);
@@ -552,8 +554,7 @@ export default class LoginController {
                     Log.error("LoginController::loadAdminPortal| Error: " + error);
                     return parentCallback(true, null);
                 }
-            }
-        );
+            });
     }
 
 }

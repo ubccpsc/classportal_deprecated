@@ -19,7 +19,7 @@ export default React.createClass({
         var client = axios.create({
             baseURL: 'http://skaha.cs.ubc.ca:11312',
             timeout: 10000,
-            headers: {"Authorization": "Basic " + btoa("autodash:OUi73u9Cn04153O87VFF")}
+            headers: {"Authorization": "Basic " + btoa(localStorage.getItem('autodash'))}
         });
 
         var that = this;
@@ -33,6 +33,9 @@ export default React.createClass({
             that.setState({loaded: true, rows: rows});
         }).catch(function (err) {
             console.log('AdminAutoTestView::loadDashboardData() - ERROR: ' + err.message);
+            // the password in config.autotest_dashboard is probably incorrect
+            // window.alert('AutoDash not configured correctly');
+            document.getElementById('autoDashStats').innerHTML = '<h1>AutoDash not configured</h1>';
             that.setState({loaded: true});
         });
     },
@@ -213,7 +216,7 @@ export default React.createClass({
                     <br></br>
                 </div>
 
-                <div>
+                <div id="autoDashStats">
                     <h2>AutoTest Statistics</h2>
                     <span><b>Average</b> <span id="bucketAvg"></span></span><br/><br/>
                     <span>00-10% <span id="bucket0"></span></span><br/>
