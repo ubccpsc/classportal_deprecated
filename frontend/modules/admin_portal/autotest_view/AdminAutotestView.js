@@ -14,23 +14,25 @@ import {
 
 export default React.createClass({
     loadDashboardData: function () {
+        console.log('AdminAutoTestView::loadDashboardData() - start');
+        var start = new Date().getTime();
         var client = axios.create({
             baseURL: 'http://skaha.cs.ubc.ca:11312',
-            timeout: 1000,
+            timeout: 10000,
             headers: {"Authorization": "Basic " + btoa("autodash:OUi73u9Cn04153O87VFF")}
         });
 
         var that = this;
 
         client.get('/results/_design/all/_view/byDateDeliverableTeam').then(function (response) {
-
             var rows = response.data.rows;
-            console.log('loadDashboardData - received; #rows: ' + rows.length);
+            console.log('AdminAutoTestView::loadDashboardData() - received; #rows: ' + rows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
             var rows = DataParser.process_dashboard_rows(rows);
-            console.log('loadDashboardData - processed');
+            console.log('AdminAutoTestView::loadDashboardData() - processed');
 
             that.setState({loaded: true, rows: rows});
-        }).catch(function (error) {
+        }).catch(function (err) {
+            console.log('AdminAutoTestView::loadDashboardData() - ERROR: ' + err.message);
             that.setState({loaded: true});
         });
     },
