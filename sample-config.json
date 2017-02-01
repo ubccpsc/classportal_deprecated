@@ -5,6 +5,7 @@
   "client_secret": "",
   "githubcontroller_token": "",
   "githubcontroller_user": "",
+  "autotest_auth": "user:pass",
   "host": "",
   "port": "",
   "team_size": "",
