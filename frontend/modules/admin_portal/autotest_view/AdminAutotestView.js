@@ -25,12 +25,13 @@ export default React.createClass({
         var that = this;
 
         client.get('/results/_design/all/_view/byDateDeliverableTeam').then(function (response) {
-            var rows = response.data.rows;
-            console.log('AdminAutoTestView::loadDashboardData() - received; #rows: ' + rows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
-            var rows = DataParser.process_dashboard_rows(rows);
+            var rawRows = response.data.rows;
+            console.log('AdminAutoTestView::loadDashboardData() - received; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
+
+            var rows = DataParser.process_dashboard_rows(rawRows, that.state.lastOnly, that.state.deliv, that.state.ts);
             console.log('AdminAutoTestView::loadDashboardData() - processed');
 
-            that.setState({loaded: true, rows: rows});
+            that.setState({loaded: true, rows: rows, rawRows: rawRows});
         }).catch(function (err) {
             console.log('AdminAutoTestView::loadDashboardData() - ERROR: ' + err.message);
             // the password in config.autotest_dashboard is probably incorrect
@@ -40,6 +41,11 @@ export default React.createClass({
         });
     },
     componentDidMount: function () {
+        console.log('AdminAutoTestView::componentDidMount()');
+        this.loadDashboardData();
+    },
+    componentWillReceiveProps: function () {
+        console.log('AdminAutoTestView::componentWillReceiveProps()');
         this.loadDashboardData();
     },
     getInitialState: function () {
@@ -48,7 +54,8 @@ export default React.createClass({
             sort: {},
             loaded: false,
             lastOnly: true,
-            deliverable: "d1"
+            deliv: "d1",
+            ts: 'Jan 1, 2020 @ 23:59:59'
         }
     },
     sortByDate: function () {
@@ -116,7 +123,9 @@ export default React.createClass({
         this.setState({sort: sort, rows: rows});
     },
     renderDashboard: function () {
-
+        console.log('AdminAutotestView::renderDashboard()');
+        // this starts an infinite loop, don't do this here!
+        // this.loadDashboardData();
         var autotest_dashboard = this.state.rows.map(function (data, i) {
             var dkey = "dashboard_" + i;
 
@@ -161,15 +170,37 @@ export default React.createClass({
 
         this.setState({lastOnly: event.target.checked}, function () {
             console.log('AdminAutotestView::lastOnlyChange() - cb');
+            //that.state.loaded && that.renderDashboard();
+            that.update();
         });
     },
     deliverableChange: function (event) {
         console.log('AdminAutotestView::deliverableChange()');
         var that = this;
-        this.setState({deliverable: event.target.value}, function () {
+        this.setState({deliv: event.target.value}, function () {
             console.log('AdminAutotestView::deliverableChange() - cb');
             // that.renderDashboard();
+            //that.state.loaded && that.renderDashboard();
+            that.update();
         });
+    },
+    tsChange: function (event) {
+        console.log('AdminAutotestView::tsChange()');
+        var that = this;
+        this.setState({ts: event.target.value}, function () {
+            console.log('AdminAutotestView::tsChange() - cb');
+            // that.renderDashboard();
+            //that.state.loaded && that.renderDashboard();
+            that.update();
+        });
+    },
+    update: function () {
+        console.log('AdminAutotestView::update()');
+        var that = this;
+        var rows = DataParser.process_dashboard_rows(that.state.rawRows, that.state.lastOnly, that.state.deliv, that.state.ts);
+        console.log('AdminAutoTestView::loadDashboardData() - processed');
+
+        that.setState({loaded: true, rows: rows});
     },
     render: function () {
         console.log('AdminAutotestView::render()');
@@ -184,23 +215,41 @@ export default React.createClass({
             color: "white"
         };
 
-        console.log("current state; lastOnly " + this.state.lastOnly + '; deliv: ' + this.state.deliverable);
+        console.log("current state; lastOnly " + this.state.lastOnly + '; deliv: ' + this.state.deliv + '; ts: ' + this.state.ts);
         return (
             <ContentModule id="admin-autotest-module" title={"Autotest"} initialHideContent={false}>
 
                 <div>
-                    Last Run Only:
-                    <input id='optLast' type="checkbox" name="lastOnly" checked={this.state.lastOnly} onChange={this.lastOnlyChange}/>
-
+                    <div style={{display: 'none'}}>
+                        Last Run Only:
+                        <input id='optLast' type="checkbox" name="lastOnly" checked={this.state.lastOnly} onChange={this.lastOnlyChange}/>
+                    </div>
                     Deliverable:
-                    <select id='optDeliv' name="deliverable" value={this.state.deliv} onChange={this.deliverableChange}>
-                        <option value="all">All</option>
-                        <option value="d0">D0</option>
+                    <select id='optDeliv' name="deliv" value={this.state.deliv} onChange={this.deliverableChange}>
                         <option value="d1">D1</option>
                         <option value="d2">D2</option>
                         <option value="d3">D3</option>
                         <option value="d4">D4</option>
                         <option value="d5">D5</option>
+                    </select>
+
+                    Date Cutoff:
+                    <select id='optTs' name="ts" value={this.state.ts} onChange={this.tsChange}>
+                        <option value="all">N/A</option>
+                        <option value="Feb 6, 2017 @ 23:59:59">Feb 6, 2017 @ 23:59:59</option>
+                        <option value="Feb 5, 2017 @ 23:59:59">Feb 5, 2017 @ 23:59:59</option>
+                        <option value="Feb 4, 2017 @ 23:59:59">Feb 4, 2017 @ 23:59:59</option>
+                        <option value="Feb 3, 2017 @ 23:59:59">Feb 3, 2017 @ 23:59:59</option>
+                        <option value="Feb 2, 2017 @ 23:59:59">Feb 2, 2017 @ 23:59:59</option>
+                        <option value="Feb 1, 2017 @ 23:59:59">Feb 1, 2017 @ 23:59:59</option>
+                        <option value="Jan 31, 2017 @ 23:59:59">Jan 31, 2017 @ 23:59:59</option>
+                        <option value="Jan 30, 2017 @ 23:59:59">Jan 30, 2017 @ 23:59:59</option>
+                        <option value="Jan 29, 2017 @ 23:59:59">Jan 29, 2017 @ 23:59:59</option>
+                        <option value="Jan 28, 2017 @ 23:59:59">Jan 28, 2017 @ 23:59:59</option>
+                        <option value="Jan 27, 2017 @ 23:59:59">Jan 27, 2017 @ 23:59:59</option>
+                        <option value="Jan 26, 2017 @ 23:59:59">Jan 26, 2017 @ 23:59:59</option>
+                        <option value="Jan 25, 2017 @ 23:59:59">Jan 25, 2017 @ 23:59:59</option>
+                        <option value="Jan 24, 2017 @ 23:59:59">Jan 24, 2017 @ 23:59:59</option>
                     </select>
                 </div>
 

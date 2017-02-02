@@ -16,7 +16,7 @@ module.exports = {
         });
         return rows;
     },
-    process_dashboard_rows: function (rows) {
+    process_dashboard_rows: function (rows, lastOnlyFilter, delivFilter, tsFilter) {
         rows = this.sort_dashboard_rows(rows);
         var results = [];
         var entries = [];
@@ -31,9 +31,17 @@ module.exports = {
         var after = new Date(0); // epoch
         var sortCol = 0;
 
-        if (document.getElementById('optLast') !== null) {
-            lastOnly = document.getElementById('optLast').checked;
+        if (typeof lastOnly !== 'undefined') {
+            lastOnly = lastOnlyFilter;
         }
+        if (typeof delivFilter !== 'undefined') {
+            deliverable = delivFilter;
+        }
+        if (typeof tsFilter !== 'undefined') {
+            until = new Date(tsFilter);
+        }
+
+        console.log('process_dashboard_rows(.., ' + lastOnly + ', ' + deliverable + ', ' + tsFilter + ' ( ' + until + ' )');
 
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
