@@ -83,6 +83,14 @@ export default React.createClass({
             var aVal = a[key];
             var bVal = b[key];
 
+            // if values are numbers, convert them so ordering works correctly
+            if (!isNaN(aVal)) {
+                aVal = Number(aVal);
+            }
+            if (!isNaN(bVal)) {
+                bVal = Number(bVal);
+            }
+
             if (typeof aVal === 'string' && typeof bVal === 'string') {
                 if (sort[key].desc) {
                     if (aVal < bVal) {
