@@ -77,9 +77,10 @@ export default React.createClass({
                 <Col sm="7%">{this.props.overall}</Col>
                 <Col sm="7%">{this.props.pass}</Col>
                 <Col sm="8%">{this.props.cover}</Col>
-                <Col sm="5%">{this.props.np}</Col>
-                <Col sm="5%">{this.props.nf}</Col>
-                <Col sm="5%">{this.props.ns}</Col>
+                <Col sm="3%">{this.props.np}</Col>
+                <Col sm="3%">{this.props.nf}</Col>
+                <Col sm="3%">{this.props.ns}</Col>
+                <Col sm="6%">{this.props.loc}</Col>
                 <Col sm="28%">{this.renderResults()}</Col>
             </Row>
         )

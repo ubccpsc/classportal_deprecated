@@ -171,6 +171,7 @@ module.exports = {
                     numPass: -1,
                     numFail: -1,
                     numSkip: -1,
+                    loc: -1,
                     testDetails: {}
                 };
 
@@ -187,6 +188,7 @@ module.exports = {
                 rowEntry.numPass = pass;
                 rowEntry.numFail = fail;
                 rowEntry.numSkip = skipped;
+                rowEntry.loc = row.loc.total;
                 rowEntry.testDetails = annotated;
 
                 if (lastOnly === true) {

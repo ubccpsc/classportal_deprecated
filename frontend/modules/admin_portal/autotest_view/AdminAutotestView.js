@@ -132,31 +132,19 @@ export default React.createClass({
             return (
                 <Dashboard
                     index={i}
-                    // date={autotest_data[0]}
                     date={data.date}
-                    // repo={autotest_data[1]}
                     repo={data.repo}
-                    // sec={autotest_data[2]}
                     sec={data.duration}
-                    // overall={autotest_data[3]}
                     overall={data.grade}
-                    //pass={autotest_data[4]}
                     pass={data.testGrade}
-                    //cover={autotest_data[5]}
                     cover={data.coverGrade}
-                    //np={autotest_data[6]}
                     np={data.numPass}
-                    //nf={autotest_data[7]}
                     nf={data.numFail}
-                    //ns={autotest_data[8]}
                     ns={data.numSkip}
-                    //results={autotest_data[9]}
+                    loc={data.loc}
                     results={data.testDetails}
-                    //ts={autotest_data[10]}
                     ts={data.timestamp}
-                    //details={autotest_data[11]}
                     details={data.execUrl}
-                    //commit={autotest_data[12]}
                     commit={data.commitUrl}
                     key={dkey}></Dashboard>
             )
@@ -261,9 +249,10 @@ export default React.createClass({
                     <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'grade', 3)}>% overall</a></Col>
                     <Col sm="7%"><a style={sortable} onClick={this.sortBy.bind(this, 'testGrade', 4)}>% pass</a></Col>
                     <Col sm="8%"><a style={sortable} onClick={this.sortBy.bind(this, 'coverGrade', 5)}>% cover</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numPass', 6)}>#P</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numFail', 7)}>#F</a></Col>
-                    <Col sm="5%"><a style={sortable} onClick={this.sortBy.bind(this, 'numSkip', 8)}>#S</a></Col>
+                    <Col sm="3%"><a style={sortable} onClick={this.sortBy.bind(this, 'numPass', 6)}>#P</a></Col>
+                    <Col sm="3%"><a style={sortable} onClick={this.sortBy.bind(this, 'numFail', 7)}>#F</a></Col>
+                    <Col sm="3%"><a style={sortable} onClick={this.sortBy.bind(this, 'numSkip', 8)}>#S</a></Col>
+                    <Col sm="6%"><a style={sortable} onClick={this.sortBy.bind(this, 'loc', 9)}>#LOC</a></Col>
                     <Col sm="28%">Results</Col>
                 </Row>
                 }
