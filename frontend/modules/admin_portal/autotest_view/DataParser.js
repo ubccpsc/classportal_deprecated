@@ -218,16 +218,27 @@ module.exports = {
     processEntries: function (entries) {
 
         var myData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var gradeList = [];
         var total = 0;
         var num = 0;
+        var numPassing = 0;
+        var numFailing = 0;
         for (var r of entries) {
             //if (r[2].indexOf('team') > 0) { // only look at student projects for histogram
             // if (r[1].indexOf('310') > 0) { // only look at student projects for histogram
             if (true) {
                 if (Number.isFinite(r.grade)) {
+                    var grade = Number(r.grade);
+
                     num++;
-                    total += r.grade;
-                    var index = Math.floor(r.grade / 10);
+                    total += grade;
+                    var index = Math.floor(grade / 10);
+                    gradeList.push(grade);
+                    if (grade >= 50) {
+                        numPassing++;
+                    } else {
+                        numFailing++;
+                    }
                     //if (index === 10) {
                     //    index = 9;
                     // }
@@ -254,5 +265,14 @@ module.exports = {
         }
         console.log("Avg: " + (total / totalProjects ).toFixed(1) + ' ( # ' + totalProjects + ' )');
         document.getElementById('bucketAvg').innerHTML = (total / totalProjects ).toFixed(1) + ' ( # ' + totalProjects + ' )';
+
+        gradeList = gradeList.sort(function (a, b) {
+            return a - b;
+        });
+        var median = gradeList[Math.ceil(gradeList.length / 2)];
+
+        document.getElementById('bucketMedian').innerHTML = median;
+        document.getElementById('bucketPassing').innerHTML = numPassing;
+        document.getElementById('bucketFailing').innerHTML = numFailing;
     }
 };

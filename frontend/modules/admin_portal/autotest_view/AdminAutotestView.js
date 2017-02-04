@@ -265,6 +265,9 @@ export default React.createClass({
                 <div id="autoDashStats">
                     <h2>AutoTest Statistics</h2>
                     <span><b>Average</b> <span id="bucketAvg"></span></span><br/><br/>
+                    <span><b>Median</b> <span id="bucketMedian"></span></span><br/><br/>
+                    <span><b># Passing</b> <span id="bucketPassing"></span></span><br/><br/>
+                    <span><b># Failing</b> <span id="bucketFailing"></span></span><br/><br/>
                     <span>00-10% <span id="bucket0"></span></span><br/>
                     <span>10-20% <span id="bucket1"></span></span><br/>
                     <span>20-30% <span id="bucket2"></span></span><br/>
