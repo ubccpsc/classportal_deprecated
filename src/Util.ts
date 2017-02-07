@@ -346,11 +346,10 @@ export class Helper {
                     async.waterfall([
                         function assign(cb: any) {
                             if (Array.isArray(student)) {
-
                                 for (var s of student) {
                                     // do many
                                     Log.trace("Helper::addGrades(..) - assigning grades");
-                                    var studentIndex: number = _.findIndex(jsonFile, {"sid": s.sid});
+                                    let studentIndex: number = _.findIndex(jsonFile, {"sid": s.sid});
                                     if (studentIndex !== -1) {
                                         Log.trace("Helper::addGrades(..) - assigning grade (set) for: " + s.sid);
                                         jsonFile[studentIndex]['grades'] = s.grades;
@@ -360,7 +359,8 @@ export class Helper {
                                 }
                             } else {
                                 Log.trace("Helper::addGrades(..) - assigning grade (single) for: " + student.sid);
-                                jsonFile[studentIndex]['grades'] = student['grades'];
+                                let studentIndex: number = _.findIndex(jsonFile, {"sid": student.sid});
+                                jsonFile[studentIndex]['grades'] = student.grades; //student['grades'];
                             }
                             return cb();
                         }
