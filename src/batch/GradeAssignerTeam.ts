@@ -158,5 +158,5 @@ if (process.argv.length < 4) {
     let gradeFile = process.argv[3];
 
     var gec = new GradeAssigner();
-    gec.assign(delivId, gradeFile, true);
+    gec.assign(delivId, gradeFile, false);
 }
