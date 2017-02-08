@@ -9,12 +9,15 @@ NPM run scripts have been set up for most common tasks:
 * Clean: `npm run clean`
 * Install: `npm install`
 * Configure: `npm run configure`
-* Test: `npm run test`
-* Test + coverage: `npm run cover` (HTML reports in `./coverage/lcov-report/index.html`)
-* Run webpack-dev-server (allows live reloading of front-end code): `npm run start:dev`
-* Run production server: `npm run build` then `npm run start:prod`
+* Run server: `npm run build` then `npm run start:prod`. If you are debugging you will have to relaunch this after every change (unless you can fix the command below).
+* Not currently working: Run webpack-dev-server (allows live reloading of front-end code): `npm run start:dev`
 
 If you encounter an error during `configure` you might need to install typings globally (`sudo npm install -g typings`).
+
+If you want to run the tests you can do:
+
+* Test: `npm run test`
+* Test + coverage: `npm run cover` (HTML reports in `./coverage/lcov-report/index.html`)
 
 If you encounter ```Error: Cannot find module 'classportal/config.json'``` it is probably because your portal is not in a directory called ```classportal``` (it is fine to have it in a subdir (like ```310portal/classportal/```).
 
@@ -79,10 +82,33 @@ To Receive:
 
 ### Pulling branch up to master
 
-````
+```
 git checkout master
 git merge -s ours dev_branch
 git checkout dev_branch
 git merge master
 ```
-`
+
+## Developing Portal
+
+This seems like a lot of steps but should take less than 5 minutes to accomplish.
+
+1. Configure your resources:
+  * cp the `sampleData/` dir into `priv/` (`cp -r sampleData/ priv/`).
+  * Add yourself to the `priv/admins.json` file if you want to use the portal as an admin. Your GitHub id should be your `username`.
+  * If you want to log in as a student, you will need to set the `username` field in `students.json` to a username you can log into GitHub with.
+
+2. Set your configuration:
+  * Copy the sample config: `cp sample-config.json config.json`
+  * Edit `config.json`. The only fields you will _need_ to set are `client_id` and `client_secret`, these correspond to a GitHub OAuth token. To generate thse tokens:
+     1. Visit the [New Application](https://github.com/settings/applications/new) page in GitHub. 
+     1. For 'Homepage URL' enter: `http://localhost:8080`. For 'Callback URL' enter: `http://localhost:8080/postlogin`.
+     1. Tap Register.
+     1. Copy the client id and client secret to your `config.json` file.     
+
+3. Build and start the server
+    * Clean: `npm run clean`
+    * Install: `npm install`
+    * Configure: `npm run configure`
+    * Build code (redo aver any change to a TS file): `npm run build` 
+    * Run server: `npm run start:prod`. If you are debugging you will have to relaunch this after every change.
