@@ -334,7 +334,7 @@ export default React.createClass({
       newStudentGrade.grades.push({assnId: assnId});
       index = newStudentGrade.grades.length - 1;
     }
-    newStudentGrade.grades[index][key] = event.target.value;
+    newStudentGrade.grades[index][key] = parseFloat(event.target.value).toFixed(1);
     this.setState({ studentGrade: newStudentGrade });
   },
   setNewAutotest: function (sid, assnId, event) {
