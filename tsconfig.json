@@ -1,20 +1,19 @@
 {
   "compilerOptions": {
+    "target": "es2015",
     "module": "commonjs",
-    "target": "ES5",
-    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
     "removeComments": true,
-    "preserveConstEnums": true,
-    "sourceMap": true
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "preserveConstEnums": true
   },
   "filesGlob": [
-    "/typings/index.d.ts",
-    "/src/**/*.ts",
-    "/test/**/*.ts"
+    "/src",
+    "/test"
   ],
   "exclude": [
-    "node_modules",
-    "bower_components",
-    "lib/"
+    "node_modules"
   ]
 }
