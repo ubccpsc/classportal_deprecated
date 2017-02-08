@@ -66,11 +66,10 @@
     "webpack-dev-server": "^1.14.1"
   },
   "scripts": {
-    "clean": "rm -rf ./typings/; rm -rf ./node_modules/;",
-    "configure": "npm install; typings install --global;",
-    "build": "tsc",
-    "test": "mocha -c",
-    "cover": "istanbul cover _mocha",
+    "lint": "node_modules/.bin/tslint --project .",
+    "build": "node_modules/.bin/tsc",
+    "test": "npm run lint; npm run build && node_modules/.bin/_mocha \"test/**/*.spec.js\"",
+    "cover": "npm run lint; npm run build && node_modules/.bin/istanbul cover node_modules/.bin/_mocha \"test/**/*.spec.js\"",
     "start": "npm run build && node src/App.js"
   }
 }
