@@ -67,7 +67,7 @@
     ],
     "ter-max-len": [
       true,
-      100
+      150
     ],
     "object-curly-spacing": [
       true,

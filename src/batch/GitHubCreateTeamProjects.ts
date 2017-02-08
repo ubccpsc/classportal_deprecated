@@ -3,9 +3,9 @@
  */
 
 
-import Log from "../Util";
-import GitHubManager from "./GitHubManager";
-import {GroupRepoDescription} from "./GitHubManager";
+import Log from '../Util';
+import GitHubManager from './GitHubManager';
+import { GroupRepoDescription } from './GitHubManager';
 
 /**
  * Steps required to configure a course. The first 1-7 are all async.
@@ -46,83 +46,83 @@ const IMPORTURL = 'https://github.com/CS310-2017Jan/bootstrap';
 // if we want to delete projects instead of creating them. be careful with this!
 const CLEAN = false;
 
-var gpc = new GitHubManager(ORG_NAME);
+let gpc = new GitHubManager(ORG_NAME);
 
 try {
-    gpc.getGroupDescriptions().then(
-        function (descriptions) {
-            Log.info('ProvisioningMain() - Available teams: ' + JSON.stringify(descriptions));
+  gpc.getGroupDescriptions().then(
+    function (descriptions) {
+      Log.info('ProvisioningMain() - Available teams: ' + JSON.stringify(descriptions));
 
 
-            // won't normally need this
-            //var testGroup: GroupRepoDescription = {team: 1, members: ['rthse2', 'mksarge']};
-            //descriptions.push(testGroup);
+      // won't normally need this
+      // var testGroup: GroupRepoDescription = {team: 1, members: ['rthse2', 'mksarge']};
+      // descriptions.push(testGroup);
 
-            let groupsToProcess: GroupRepoDescription[] = [];
-            let completeGroups: GroupRepoDescription[] = [];
-            for (var descr of descriptions) {
-                descr.projectName = PROJECT_PREFIX + descr.team;
-                descr.teamName = TEAM_PREFIX + descr.team;
+      let groupsToProcess: GroupRepoDescription[] = [];
+      let completeGroups: GroupRepoDescription[] = [];
+      for (let descr of descriptions) {
+        descr.projectName = PROJECT_PREFIX + descr.team;
+        descr.teamName = TEAM_PREFIX + descr.team;
 
-                if (CLEAN) {
-                    Log.info('ProvisioningMain() - Team to Clean: ' + JSON.stringify(descr));
-                    groupsToProcess.push(descr);
-                } else {
-                    //if (descr.team === 1) {
-                    if (typeof descr.url === 'undefined' || descr.url === null || descr.url === "") {
-                        // if (descr.url.length > 5) { // for all provisioned repos
-                        Log.info('ProvisioningMain() - Prepared Team: ' + JSON.stringify(descr));
-                        groupsToProcess.push(descr);
-                    } else {
-                        Log.info('ProvisioningMain() - Skipped Team: ' + JSON.stringify(descr));
-                        // Log.info('ProvisioningMain() - Team Repo Created: ' + descr.team);
-                        completeGroups.push(descr);
-                    }
-//                    }
-                }
-            }
-
-            // set the index for available teams (used by timeout backoff)
-            for (var i = 0; i < groupsToProcess.length; i++) {
-                let grp = groupsToProcess[i];
-                grp.teamIndex = i;
-            }
-
-            Log.info("ProvisioningMain() - # Complete teams: " + completeGroups.length);
-            Log.info('ProvisioningMain() - # Teams to process: ' + groupsToProcess.length);
-            Log.info("ProvisioningMain() - Teams to process: " + JSON.stringify(completeGroups.length));
-
-            let processList: GroupRepoDescription[] = []; // this is really Promise<GroupRepoDescription>[]
-            for (var toProcess of groupsToProcess) {
-
-                if (CLEAN) {
-                    // clean instead of provision
-                    processList.push(<any>gpc.completeClean(toProcess));
-                } else {
-                    // new project
-                    processList.push(<any>gpc.completeTeamProvision(toProcess, IMPORTURL, STAFF_TEAM, WEBHOOK_ENDPOINT));
-
-                    // test suite
-                    // processList.push(<any>gpc.provisionRepo(toProcess, D1_PREFIX + toProcess.team, D1_URL));
-                }
-            }
-
-            return Promise.all(processList);
-
-        }).then(function (provisionedRepos: GroupRepoDescription[]) {
-
-        Log.info("ProvisioningMain() - Process complete for # projects: " + provisionedRepos.length);
-
-        for (var repo of provisionedRepos) {
-            Log.info("ProvisioningMain() - Repo: " + repo.url);
+        if (CLEAN) {
+          Log.info('ProvisioningMain() - Team to Clean: ' + JSON.stringify(descr));
+          groupsToProcess.push(descr);
+        } else {
+          // if (descr.team === 1) {
+          if (typeof descr.url === 'undefined' || descr.url === null || descr.url === '') {
+            // if (descr.url.length > 5) { // for all provisioned repos
+            Log.info('ProvisioningMain() - Prepared Team: ' + JSON.stringify(descr));
+            groupsToProcess.push(descr);
+          } else {
+            Log.info('ProvisioningMain() - Skipped Team: ' + JSON.stringify(descr));
+            // Log.info('ProvisioningMain() - Team Repo Created: ' + descr.team);
+            completeGroups.push(descr);
+          }
+          //                    }
         }
-        Log.info("ProvisioningMain() - Done.");
+      }
+
+      // set the index for available teams (used by timeout backoff)
+      for (let i = 0; i < groupsToProcess.length; i++) {
+        let grp = groupsToProcess[i];
+        grp.teamIndex = i;
+      }
+
+      Log.info('ProvisioningMain() - # Complete teams: ' + completeGroups.length);
+      Log.info('ProvisioningMain() - # Teams to process: ' + groupsToProcess.length);
+      Log.info('ProvisioningMain() - Teams to process: ' + JSON.stringify(completeGroups.length));
+
+      let processList: GroupRepoDescription[] = []; // this is really Promise<GroupRepoDescription>[]
+      for (let toProcess of groupsToProcess) {
+
+        if (CLEAN) {
+          // clean instead of provision
+          processList.push(<any>gpc.completeClean(toProcess));
+        } else {
+          // new project
+          processList.push(<any>gpc.completeTeamProvision(toProcess, IMPORTURL, STAFF_TEAM, WEBHOOK_ENDPOINT));
+
+          // test suite
+          // processList.push(<any>gpc.provisionRepo(toProcess, D1_PREFIX + toProcess.team, D1_URL));
+        }
+      }
+
+      return Promise.all(processList);
+
+    }).then(function (provisionedRepos: GroupRepoDescription[]) {
+
+      Log.info('ProvisioningMain() - Process complete for # projects: ' + provisionedRepos.length);
+
+      for (let repo of provisionedRepos) {
+        Log.info('ProvisioningMain() - Repo: ' + repo.url);
+      }
+      Log.info('ProvisioningMain() - Done.');
     }).catch(function (err: any) {
-            Log.error('ProvisioningMain() - ERROR processing project creation chain: ' + err);
-        }
+      Log.error('ProvisioningMain() - ERROR processing project creation chain: ' + err);
+    }
     );
 } catch (err) {
-    Log.error('ProvisioningMain() - caught ERROR: ' + err);
+  Log.error('ProvisioningMain() - caught ERROR: ' + err);
 }
 
 

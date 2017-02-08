@@ -11,41 +11,41 @@ import Team from '../model/Team';
 // module portal.store {
 export interface Store {
 
-    getAdmin(id:string):Admin;
+  getAdmin(id: string): Admin;
 
-    saveAdmin(admin:Admin):void;
+  saveAdmin(admin: Admin): void;
 
-    getStudent(id:string):Student;
+  getStudent(id: string): Student;
 
-    getStudents():Student[];
+  getStudents(): Student[];
 
-    /**
-     * Add a new student to the store. If Student.getId() exists in store already it will be overwritten.
-     *
-     * @param student
-     */
-    saveStudent(student:Student):void;
+  /**
+   * Add a new student to the store. If Student.getId() exists in store already it will be overwritten.
+   *
+   * @param student
+   */
+  saveStudent(student: Student): void;
 
-    getTeam(teamId:string):Team;
+  getTeam(teamId: string): Team;
 
-    getTeams():Team[];
+  getTeams(): Team[];
 
-    saveTeam(team:Team):void;
+  saveTeam(team: Team): void;
 
-    getDeliverable(deliverableId:string):Deliverable;
+  getDeliverable(deliverableId: string): Deliverable;
 
-    getDeliverables():Deliverable[];
+  getDeliverables(): Deliverable[];
 
-    saveDeliverable(deliverable:Deliverable):void;
+  saveDeliverable(deliverable: Deliverable): void;
 
-    getGrades(student:Student):Grade[];
+  getGrades(student: Student): Grade[];
 
-    /**
-     * Add a new grade to the store. If a grade with the same student and deliverable already exists in store it will be overwritten.
-     *
-     * @param grade
-     */
-    saveGrade(grade:Grade):void;
+  /**
+   * Add a new grade to the store. If a grade with the same student and deliverable already exists in store it will be overwritten.
+   *
+   * @param grade
+   */
+  saveGrade(grade: Grade): void;
 }
 export default Store;
-//}
+// }

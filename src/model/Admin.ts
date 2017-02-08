@@ -4,50 +4,52 @@
 
 
 // import Deliverable from './Team';
-//import Grade from './Grade';
+// import Grade from './Grade';
 // import Student from './Student';
 import Team from './Team';
 
-//module portal {
+// module portal {
 export default class Admin {
 
-    /**
-     * Can be anything.
-     *
-     * 310: we will use github id
-     */
-    public id:string;
-    public name:string;
+  /**
+   * Can be anything.
+   *
+   * 310: we will use github id
+   */
+  public id: string;
+  public name: string;
 
 
-    /**
-     * The teams the admin is responsible for. More than one Admin can be responsible for the same team. If this is empty, the admin is responsible for all teams.
-     *
-     * @type {Array}
-     */
-    public teams:Team[] = [];
+  /**
+   * The teams the admin is responsible for.
+   * More than one Admin can be responsible for the same team.
+   * If this is empty, the admin is responsible for all teams.
+   *
+   * @type {Array}
+   */
+  public teams: Team[] = [];
 
-    constructor(id:string, name:string, teams:Team[]) {
-        this.id = id;
-        this.name = name;
-        if (teams === null) {
-            teams = [];
-        }
-        this.teams = teams;
+  constructor(id: string, name: string, teams: Team[]) {
+    this.id = id;
+    this.name = name;
+    if (teams === null) {
+      teams = [];
     }
+    this.teams = teams;
+  }
 
-    /*
-    getTeams():Team[] {
-        return this.teams;
-    }
+  /*
+  getTeams():Team[] {
+      return this.teams;
+  }
 
-    getName():string {
-        return this.name;
-    }
+  getName():string {
+      return this.name;
+  }
 
-    getId():string {
-        return this.id;
-    }
-    */
+  getId():string {
+      return this.id;
+  }
+  */
 }
-//}
+// }
