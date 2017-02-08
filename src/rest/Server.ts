@@ -81,18 +81,6 @@ export default class Server {
                 that.rest.post('/api/submitClasslist', requireAdmin, requireToken, RouteHandler.updateClasslist);
                 that.rest.post('/api/updateComments', requireAdmin, requireToken, RouteHandler.updateComments);
 
-                // serve static css and js files
-                that.rest.get(/\w+\.(?:(js)|(css)|(png))/, restify.serveStatic({
-                    directory: __dirname.substring(0, __dirname.lastIndexOf("/src")) + '/frontend/public',
-                    default: 'index.html'
-                }));
-
-                // otherwise, serve index.html and let the react router decide how to render the route
-                that.rest.get(/^((?!\.).)*$/, restify.serveStatic({
-                    directory: __dirname.substring(0, __dirname.lastIndexOf("/src")) + '/frontend/public',
-                    file: 'index.html'
-                }));
-
                 that.rest.listen(that.port, function () {
                     Log.info('Server::start() - restify listening: ' + that.rest.url);
                     fulfill(true);
