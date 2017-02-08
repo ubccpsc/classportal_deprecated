@@ -4,7 +4,7 @@
 
 import Log from './Util';
 import Server from './rest/Server';
-let config = require('../config.json');
+import { config } from '../config/env';
 
 export class App {
   public initServer(port: number) {

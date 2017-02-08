@@ -4,7 +4,6 @@
 
 import Log from '../Util';
 let request = require('request');
-let config = require('../../config.json');
 let rp = require('request-promise-native');
 
 import { Helper } from '../Util';

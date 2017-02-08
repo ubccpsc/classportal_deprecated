@@ -8,7 +8,7 @@ import { Helper } from '../Util';
 import async = require('async');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
-let config = require(pathToRoot + 'config.json');
+import { config } from '../../config/env';
 
 export default class TeamController {
 
@@ -84,7 +84,7 @@ export default class TeamController {
           'appDescription': '',
           'comments': empty
         };
-        if (!!config['enable_app_store']) {
+        if (config.enable_app_store) {
           newTeam['url'] = '';
           newTeam['appName'] = appName;
           newTeam['appDescription'] = appDescription;

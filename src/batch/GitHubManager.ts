@@ -6,13 +6,12 @@
 
 import Log from '../Util';
 let request = require('request');
-let config = require('../../config.json');
 let rp = require('request-promise-native');
-
 import { Helper } from '../Util';
 import async = require('async');
 import _ = require('lodash');
 import { link } from 'fs';
+import { config } from '../../config/env';
 
 /**
  * Represents a complete team that has been formed and where all members

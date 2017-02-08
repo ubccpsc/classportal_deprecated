@@ -9,7 +9,7 @@ import Log from '../Util';
 import { Helper } from '../Util';
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
-let config = require(pathToRoot + 'config.json');
+import { config } from '../../config/env';
 
 export default class LoginController {
 
@@ -380,7 +380,7 @@ export default class LoginController {
       },
       function get_apps_and_comments(callback: any) {
         Log.trace('LoginController::loadStudentPortal| get_apps_and_comments');
-        if (!!config['enable_app_store']) {
+        if (config.enable_app_store) {
           Helper.readJSON('teams.json', function (error: any, data: any) {
             if (!error) {
               appsArray = Helper.filterApps(data, studentsFile, false);
@@ -519,7 +519,7 @@ export default class LoginController {
       },
       function get_apps_and_comments(callback: any) {
         Log.trace('LoginController::loadAdminPortal| get_apps_and_comments');
-        if (!!config['enable_app_store']) {
+        if (config.enable_app_store) {
           Helper.readJSON('teams.json', function (error: any, data: any) {
             if (!error) {
               appsArray = Helper.filterApps(data, studentsFile, true);

@@ -3,7 +3,7 @@
  */
 
 import Log from '../Util';
-let config = require('../../config.json');
+import { config } from '../../config/env';
 
 import _ = require('lodash');
 import fs = require('fs');

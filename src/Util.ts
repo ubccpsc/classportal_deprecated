@@ -7,7 +7,7 @@ import _ = require('lodash');
 import async = require('async');
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
-let config = require(pathToRoot + 'config.json');
+import { config } from '../config/env';
 
 /**
  * Grab bag of methods that probably shouldn't be in the default namespace.

@@ -5,7 +5,7 @@ import Log from '../Util';
 import { Helper } from '../Util';
 
 const pathToRoot = __dirname.substring(0, __dirname.lastIndexOf('classportal/')) + 'classportal/';
-let config = require(pathToRoot + 'config.json');
+import { config } from '../../config/env';
 
 export default class AdminController {
 
