@@ -39,7 +39,7 @@
     "request-promise-native": "^1.0.3",
     "tslint": "^4.4.2",
     "tslint-eslint-rules": "^3.3.0",
-    "typescript": "^2.2.0"
+    "typescript": "^2.1.5"
   },
   "scripts": {
     "lint": "node_modules/.bin/tslint --project .",

@@ -424,7 +424,7 @@ export class Helper {
             filteredComment['approved'] = comment['approved'];
             app['comments'].push(filteredComment);
           }
-        } else if (!!filteredComment['approved']) {
+        } else if (filteredComment['approved']) {
           app['comments'].push(filteredComment);
         }
       });

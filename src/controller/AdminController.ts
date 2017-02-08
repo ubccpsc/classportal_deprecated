@@ -156,7 +156,7 @@ export default class AdminController {
             let values = row.split(',');
 
             // sort csid, sid, lastname, firstname into arrays
-            if (!!values[0] && !!values[1] && !!values[2] && !!values[3]) {
+            if (values[0] && values[1] && values[2] && values[3]) {
               csidArray[index] = values[0];
               sidArray[index] = values[1];
               lastnameArray[index] = values[2];
