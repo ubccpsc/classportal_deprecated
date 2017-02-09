@@ -113,7 +113,7 @@ export default React.createClass({
       return undefined;
     }
     // construct a fake json for placeholders
-    return {autotest: placeholder, coverage: placeholder, retrospective: placeholder, grade: placeholder, comment: placeholder};
+    return {assnId: assnId, autotest: placeholder, coverage: placeholder, retrospective: placeholder, grade: placeholder, comment: placeholder};
   },
   renderGrades: function () {
     var rows = [];
@@ -255,6 +255,22 @@ export default React.createClass({
     }
     return true;
   },
+    isValidRetrospective: function(retro, key) {
+      if (retro && retro !== "") {
+          var retroGrade = Number(Number(retro[key]).toFixed(1));
+          // check for valid grade
+          return (
+              retroGrade === 0 ||
+              retroGrade === 0.2 ||
+              retroGrade === 0.4 ||
+              retroGrade === 0.6 ||
+              retroGrade === 0.8 ||
+              retroGrade === 1
+          );
+      } else {
+        return false;
+      }
+    },
   submitGrades: function () {
     // confirm before submitting new grade
     var resubmitMessage = "This student has already been graded for assingments...\n";
@@ -280,6 +296,10 @@ export default React.createClass({
         if (!(this.isValidGrade(newGrades[newGradeIdx], 'grade'))){
           alert("Error: [" +assnId+ "] grades must be integers between 0-100.");
           return;
+        }
+        if (!(this.isValidRetrospective(newGrades[newGradeIdx], 'retrospective'))){
+            alert("Error: [" +assnId+ "] retrospective grades must be integers between 0-1 in 0.2 increments.");
+            return;
         }
 
         data.grades.push(newGrades[newGradeIdx]);
@@ -331,10 +351,18 @@ export default React.createClass({
       }
     }
     if (index === -1){
-      newStudentGrade.grades.push({assnId: assnId});
+        let savedStudentGrades = this.returnGradesForStudent(sid, assnId, "");
+        // dereference to original object to prevent UI update prior to saving grade
+        savedStudentGrades = JSON.parse(JSON.stringify(savedStudentGrades));
+        if (savedStudentGrades !== undefined) {
+            // include previously saved grades
+            newStudentGrade.grades.push(savedStudentGrades);
+        } else {
+            newStudentGrade.grades.push({assnId: assnId});
+        }
       index = newStudentGrade.grades.length - 1;
     }
-    newStudentGrade.grades[index][key] = Number(Number(event.target.value).toFixed(1));
+    newStudentGrade.grades[index][key] = event.target.value;
     this.setState({ studentGrade: newStudentGrade });
   },
   setNewAutotest: function (sid, assnId, event) {
