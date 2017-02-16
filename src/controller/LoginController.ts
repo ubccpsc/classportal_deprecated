@@ -36,9 +36,14 @@ export default class LoginController {
 
                     request(options, function (err: any, res: any, body: any) {
                         if (!err && res.statusCode == 200) {
-                            persistGithubToken = body.access_token;
-                            Log.trace("LoginController::login| request_access_token: success");
-                            return callback(null);
+                            if (typeof body.access_token !== 'undefined') {
+                                persistGithubToken = body.access_token;
+                                Log.trace("LoginController::login| request_access_token: success");
+                                return callback(null);
+                            } else {
+                                Log.trace("LoginController::login| request_access_token: error; msg: " + body.error);
+                                return callback("error");
+                            }
                         } else {
                             Log.error("LoginController::login| request_access_token: error");
                             return callback("error");

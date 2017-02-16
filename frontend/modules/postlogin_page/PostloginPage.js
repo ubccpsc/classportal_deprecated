@@ -10,8 +10,12 @@ export default React.createClass({
     getAuthCode: function (url, callback) {
         var validAuthCode = /[?]code=([\w\/\-]+)/;
         if (validAuthCode.test(url)) {
-            var authcode = url.split("code=")[1];
-            // console.log("PostLogin.js| Obtained authcode: " + authcode)
+            // var authcode = url.split("code=")[1];
+            var authcode = url.substring(url.indexOf('code=') + 5);
+            if (authcode.indexOf('&') > 0) {
+                authcode = authcode.substring(0, ac.indexOf('&'));
+            }
+            console.log("PostLogin.js| Obtained authcode: " + authcode);
             callback(authcode);
         }
         else {
