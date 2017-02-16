@@ -13,7 +13,7 @@ export default React.createClass({
             // var authcode = url.split("code=")[1];
             var authcode = url.substring(url.indexOf('code=') + 5);
             if (authcode.indexOf('&') > 0) {
-                authcode = authcode.substring(0, ac.indexOf('&'));
+                authcode = authcode.substring(0, authcode.indexOf('&'));
             }
             console.log("PostLogin.js| Obtained authcode: " + authcode);
             callback(authcode);
