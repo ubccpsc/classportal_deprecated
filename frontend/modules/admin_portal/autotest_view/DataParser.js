@@ -153,7 +153,11 @@ module.exports = {
                 annotated.push({name: name, colour: colour, state: state});
             }
 
+            var include = true;
             if (annotated.length > 0) {
+                include = true;
+            }
+            if (include === true) {
 
                 var result = [dStr, repo, duration, finalGrade, rate, coverRate, pass, fail, skipped, annotated, row.timestamp, row.stdioUrl, row.commitUrl];
                 // dummy entry so we know what everything is
