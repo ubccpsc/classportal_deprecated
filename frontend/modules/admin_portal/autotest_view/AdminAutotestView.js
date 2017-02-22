@@ -24,10 +24,34 @@ export default React.createClass({
 
         var that = this;
 
-        client.get('/results/_design/all/_view/byDateDeliverableTeam').then(function (response) {
-            var rawRows = response.data.rows;
-            console.log('AdminAutoTestView::loadDashboardData() - received; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
+        // http://skaha.cs.ubc.ca:11312/results/_design/all/_view/byDeliverableTeamDate?group_level=2&startkey=["d2"]&endkey=["d2",{},{}]
+        // let url1 = '/results/_design/all/_view/byDateDeliverableTeam';
+        let url1 = '/results/_design/all/_view/byDeliverableTeamDate?group_level=2&startkey=["d1"]&endkey=["d1",{},{}]';
+        let url2 = '/results/_design/all/_view/byDeliverableTeamDate?group_level=2&startkey=["d2"]&endkey=["d2",{},{}]';
 
+        let allRows = [];
+        client.get(url1).then(function (response) {
+            let rawRows = response.data.rows;
+            console.log('AdminAutoTestView::loadDashboardData() - received1; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
+            allRows = allRows.concat(rawRows);
+
+            return client.get(url2);
+        }).then(function (response) {
+            let rawRows = response.data.rows;
+            console.log('AdminAutoTestView::loadDashboardData() - received2; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
+            allRows = allRows.concat(rawRows);
+
+            let keys = [];
+            for (var k of allRows) {
+                keys.push(k.value);
+            }
+            let keyStr = JSON.stringify(keys);
+            let url3 = "results/_design/all/_view/byId?keys=" + keyStr;
+
+            return client.get(url3);
+        }).then(function (response) {
+            let rawRows = response.data.rows;
+            console.log('AdminAutoTestView::loadDashboardData() - received2; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
             var rows = DataParser.process_dashboard_rows(rawRows, that.state.lastOnly, that.state.deliv, that.state.ts);
             console.log('AdminAutoTestView::loadDashboardData() - processed');
 
