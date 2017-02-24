@@ -5,9 +5,11 @@ module.exports = {
 
   output: {
     filename: 'bundle.js',
-    path: 'frontend/public',
+    path: 'frontend/public/',
     publicPath: ''
   },
+
+  watch: true,
 
   externals: {
     'config': JSON.stringify(require('./config.json'))
