@@ -247,21 +247,11 @@ export default React.createClass({
 
                     Date Cutoff:
                     <select id='optTs' name="ts" value={this.state.ts} onChange={this.tsChange}>
-                        <option value="all">N/A</option>
-                        <option value="Feb 6, 2017 @ 23:59:59">Feb 6, 2017 @ 23:59:59</option>
-                        <option value="Feb 5, 2017 @ 23:59:59">Feb 5, 2017 @ 23:59:59</option>
-                        <option value="Feb 4, 2017 @ 23:59:59">Feb 4, 2017 @ 23:59:59</option>
-                        <option value="Feb 3, 2017 @ 23:59:59">Feb 3, 2017 @ 23:59:59</option>
-                        <option value="Feb 2, 2017 @ 23:59:59">Feb 2, 2017 @ 23:59:59</option>
-                        <option value="Feb 1, 2017 @ 23:59:59">Feb 1, 2017 @ 23:59:59</option>
-                        <option value="Jan 31, 2017 @ 23:59:59">Jan 31, 2017 @ 23:59:59</option>
-                        <option value="Jan 30, 2017 @ 23:59:59">Jan 30, 2017 @ 23:59:59</option>
-                        <option value="Jan 29, 2017 @ 23:59:59">Jan 29, 2017 @ 23:59:59</option>
-                        <option value="Jan 28, 2017 @ 23:59:59">Jan 28, 2017 @ 23:59:59</option>
-                        <option value="Jan 27, 2017 @ 23:59:59">Jan 27, 2017 @ 23:59:59</option>
-                        <option value="Jan 26, 2017 @ 23:59:59">Jan 26, 2017 @ 23:59:59</option>
-                        <option value="Jan 25, 2017 @ 23:59:59">Jan 25, 2017 @ 23:59:59</option>
-                        <option value="Jan 24, 2017 @ 23:59:59">Jan 24, 2017 @ 23:59:59</option>
+                        <option value="all">Latest Execution</option>
+                        <option value="Feb 6, 2017 @ 10:00:00">D1 Deadline</option>
+                        <option value="Feb 27, 2017 @ 10:00:00">D2 Deadline</option>
+                        <option value="Mar 13, 2017 @ 10:00:00">D3 Deadline</option>
+                        <option value="Mar 27, 2017 @ 10:00:00">D4 Deadline</option>
                     </select>
                 </div>
 
