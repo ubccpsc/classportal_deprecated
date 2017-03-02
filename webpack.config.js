@@ -1,4 +1,4 @@
-var webpack = require('webpack')
+var webpack = require('webpack');
 
 module.exports = {
   entry: './frontend/index.js',
@@ -8,8 +8,6 @@ module.exports = {
     path: 'frontend/public/',
     publicPath: ''
   },
-
-  watch: true,
 
   externals: {
     'config': JSON.stringify(require('./config.json'))
