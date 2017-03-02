@@ -245,14 +245,16 @@ export default React.createClass({
                         <option value="d5">D5</option>
                     </select>
 
-                    Date Cutoff:
-                    <select id='optTs' name="ts" value={this.state.ts} onChange={this.tsChange}>
-                        <option value="all">Latest Execution</option>
-                        <option value="Feb 6, 2017 @ 10:00:00">D1 Deadline</option>
-                        <option value="Feb 27, 2017 @ 10:00:00">D2 Deadline</option>
-                        <option value="Mar 13, 2017 @ 10:00:00">D3 Deadline</option>
-                        <option value="Mar 27, 2017 @ 10:00:00">D4 Deadline</option>
-                    </select>
+                    <div style={{display: 'none'}}>
+                        Date Cutoff:
+                        <select id='optTs' name="ts" value={this.state.ts} onChange={this.tsChange}>
+                            <option value="all">Latest Execution</option>
+                            <option value="Feb 6, 2017 @ 10:00:00">D1 Deadline</option>
+                            <option value="Feb 27, 2017 @ 10:00:00">D2 Deadline</option>
+                            <option value="Mar 13, 2017 @ 10:00:00">D3 Deadline</option>
+                            <option value="Mar 27, 2017 @ 10:00:00">D4 Deadline</option>
+                        </select>
+                    </div>
                 </div>
 
                 {this.state.loaded &&
