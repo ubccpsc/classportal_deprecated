@@ -28,8 +28,10 @@ export default React.createClass({
         // let url1 = '/results/_design/all/_view/byDateDeliverableTeam';
         let url1 = '/results/_design/all/_view/byDeliverableTeamDate?group_level=2&startkey=["d1"]&endkey=["d1",{},{}]';
         let url2 = '/results/_design/all/_view/byDeliverableTeamDate?group_level=2&startkey=["d2"]&endkey=["d2",{},{}]';
+        let url3 = '/results/_design/all/_view/byDeliverableTeamDate?group_level=2&startkey=["d3"]&endkey=["d3",{},{}]';
 
         let allRows = [];
+        // NOTE: yes, this should be Promise.all
         client.get(url1).then(function (response) {
             let rawRows = response.data.rows;
             console.log('AdminAutoTestView::loadDashboardData() - received1; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
@@ -41,17 +43,24 @@ export default React.createClass({
             console.log('AdminAutoTestView::loadDashboardData() - received2; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
             allRows = allRows.concat(rawRows);
 
+            return client.get(url3);
+        }).then(function (response) {
+            let rawRows = response.data.rows;
+            console.log('AdminAutoTestView::loadDashboardData() - received3; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
+            allRows = allRows.concat(rawRows);
+
+            // this would be the body of the Promise.all:
             let keys = [];
             for (var k of allRows) {
                 keys.push(k.value);
             }
             let keyStr = JSON.stringify(keys);
-            let url3 = "results/_design/all/_view/byId?keys=" + keyStr;
+            let urlDetails = "results/_design/all/_view/byId?keys=" + keyStr;
 
-            return client.get(url3);
+            return client.get(urlDetails);
         }).then(function (response) {
             let rawRows = response.data.rows;
-            console.log('AdminAutoTestView::loadDashboardData() - received2; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
+            console.log('AdminAutoTestView::loadDashboardData() - received details; #rows: ' + rawRows.length + '; took: ' + (new Date().getTime() - start) + ' ms');
             var rows = DataParser.process_dashboard_rows(rawRows, that.state.lastOnly, that.state.deliv, that.state.ts);
             console.log('AdminAutoTestView::loadDashboardData() - processed');
 
