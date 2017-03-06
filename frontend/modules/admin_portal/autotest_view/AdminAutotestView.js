@@ -250,7 +250,6 @@ export default React.createClass({
                         <option value="d1">D1</option>
                         <option value="d2">D2</option>
                         <option value="d3">D3</option>
-                        <!--<option value="d4">D4</option>-->
                         <option value="d5">D5</option>
                     </select>
 
