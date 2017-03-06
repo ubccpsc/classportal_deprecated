@@ -87,7 +87,7 @@ export default React.createClass({
             sort: {},
             loaded: false,
             lastOnly: true,
-            deliv: "d2",
+            deliv: "d3",
             ts: 'Jan 1, 2020 @ 23:59:59'
         }
     },
