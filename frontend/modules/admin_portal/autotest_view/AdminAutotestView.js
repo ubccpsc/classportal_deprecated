@@ -87,7 +87,7 @@ export default React.createClass({
             sort: {},
             loaded: false,
             lastOnly: true,
-            deliv: "d1",
+            deliv: "d2",
             ts: 'Jan 1, 2020 @ 23:59:59'
         }
     },
@@ -250,7 +250,7 @@ export default React.createClass({
                         <option value="d1">D1</option>
                         <option value="d2">D2</option>
                         <option value="d3">D3</option>
-                        <option value="d4">D4</option>
+                        <!--<option value="d4">D4</option>-->
                         <option value="d5">D5</option>
                     </select>
 
@@ -261,7 +261,7 @@ export default React.createClass({
                             <option value="Feb 6, 2017 @ 10:00:00">D1 Deadline</option>
                             <option value="Feb 27, 2017 @ 10:00:00">D2 Deadline</option>
                             <option value="Mar 13, 2017 @ 10:00:00">D3 Deadline</option>
-                            <option value="Mar 27, 2017 @ 10:00:00">D4 Deadline</option>
+                            <option value="Mar 27, 2017 @ 10:00:00">D5 Deadline</option>
                         </select>
                     </div>
                 </div>
