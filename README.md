@@ -1,3 +1,9 @@
+# DEPRECATION WARNING
+
+This repository is deprecated; you probably want to look at:
+* [ClassPortal UI](https://github.com/ubccpsc/classportal-ui)
+* [ClassPortal Backend](https://github.com/ubccpsc/classportal-backend)
+
 # ClassPortal
 
 ClassPortal is a dynamic system for classroom management. ClassPortal helps students register for the class, associate their Github credentials, create project teams, submit documents (e.g., PDF and Zip), and view their grades. Admins can update classlists, assign grades, and initiate Github project creation code.
